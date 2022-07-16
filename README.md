@@ -1,5 +1,7 @@
 ### Huawei AppGallery Connect Publishing Plugin
 
+![Social Media Preview](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/repository.png)
+
 Legal Disclaimer: This product is **NOT** officially endorsed or certified by Huawei Technologies Co., Ltd.<br/>
 The trademarks are being referenced for identification purposes only, in terms of a nominative fair use.
 
