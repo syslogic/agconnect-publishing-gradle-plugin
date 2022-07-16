@@ -35,6 +35,6 @@ agcPublishing {
 
 ### Screenshots
 
-![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-plugin/master/screenshots/screenshot_01.png)
+![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/screenshot_01.png)
 
-[![Gradle](https://github.com/syslogic/agconnect-publishing-plugin/actions/workflows/gradle.yml/badge.svg)](https://github.com/syslogic/agconnect-publishing-plugin/actions/workflows/gradle.yml)
+[![Gradle CI](https://github.com/syslogic/agconnect-publishing-gradle-plugin/actions/workflows/gradle.yml/badge.svg)](https://github.com/syslogic/agconnect-publishing-gradle-plugin/actions/workflows/gradle.yml)

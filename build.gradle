@@ -1,6 +1,7 @@
 buildscript {
     ext {
         agp_version = '7.2.1'
+        plugin_version = '1'
         agcp_version = '1.7.0.300'
         gson_version = '2.9.0'
         junit_version = '5.8.2'
@@ -24,6 +25,12 @@ plugins {
 wrapper {
     distributionType Wrapper.DistributionType.BIN
     version '7.4.2'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
 }
 
 repositories {
@@ -62,15 +69,8 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
-}
-
 task javadocs(type: Javadoc) {
-
-    title = "AgConnectPublishingPlugin ${agp_version} API"
+    title = "Huawei AppGallery Connect Publishing Plugin ${agp_version} API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
     configurations.implementation.setCanBeResolved(true)
@@ -78,13 +78,10 @@ task javadocs(type: Javadoc) {
     classpath += configurations.implementation
     failOnError false
 
-    // options.verbose()
     options.links "https://docs.oracle.com/en/java/javase/11/docs/api/"
     options.linkSource true
     options.author true
-}
-javadoc.onlyIf {
-    new File("$buildDir/libs").exists()
+    // options.verbose()
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -103,7 +100,7 @@ artifacts {
 }
 
 group = 'io.syslogic'
-version = agp_version
+version = "${agp_version}.${plugin_version}"
 
 afterEvaluate {
     publishing {
@@ -112,7 +109,7 @@ afterEvaluate {
                 groupId = group
                 artifactId = 'agconnect-publishing-gradle-plugin'
                 from components.getByName("java")
-                version = agp_version
+                version = "${agp_version}.${plugin_version}"
                 pom {
                     name = 'AgConnect Publishing Plugin'
                     description = 'Huawei AppGallery Connect Publishing Plugin'
