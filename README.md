@@ -22,7 +22,7 @@ plugins {
 }
 ````
 
-`PublicationExtension.class` can be configured:
+`PublicationExtension` can be configured with `apiConfigFile` and `verbose`:
 
 ````
 agcPublishing {
