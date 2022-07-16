@@ -7,6 +7,7 @@ The trademarks are being referenced for identification purposes only, in terms o
 
 The official Huawei repositories can be found there: [@HMS-Core](https://github.com/orgs/HMS-Core/repositories).
 
+ ---
 
 ### Installation
 
