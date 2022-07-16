@@ -26,7 +26,7 @@ class PublishingPlugin implements Plugin<Project> {
     private @NotNull final String[] buildVariants = new String[]{"main", "debug", "release"};
     private @NotNull final String[] artifactTypes = new String[]{"apk", "aab"};
     private @NotNull final String taskGroup = "agconnect";
-    private @Nullable PublishingExtension extension = null;
+    private @Nullable PublishingExtension extension;
 
     /** It depends on :assembleRelease or :bundleRelease */
     @Override
@@ -44,7 +44,7 @@ class PublishingPlugin implements Plugin<Project> {
 
                 String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
                 String appConfigFile = basePath + "src" + File.separator + buildVariant + File.separator + "agconnect-services.json";
-                if (new File(appConfigFile).exists() && extension != null) {
+                if (extension != null && new File(appConfigFile).exists()) {
 
                     String taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                     if (buildVariant.equals("main")) {taskName = "publish" + StringUtils.capitalize(artifactType);}
@@ -54,11 +54,12 @@ class PublishingPlugin implements Plugin<Project> {
                     String apiConfigFile = project.getRootProject().getProjectDir().getAbsolutePath() +
                             File.separator + "credentials" + File.separator + "agc-apiclient.json";
 
+                    // always false ...
                     if (extension.getApiConfigFile().isPresent()) {
-                        apiConfigFile = project.getRootProject().getProjectDir().getAbsolutePath() +
-                                File.separator + extension.getApiConfigFile().get();
+                        apiConfigFile = extension.getApiConfigFile().get();
                     }
 
+                    // always false ...
                     if (extension.getVerbose().isPresent()) {
                         verbose = extension.getVerbose().get();
                     }

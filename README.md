@@ -26,8 +26,7 @@ plugins {
 
 ````
 agcPublishing {
-    apiConfigFile = "credentials${File.separator}agc-apiclient-1234567890-1234567890.json"
-    artifactType = "APK"
+    apiConfigFile.set("${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-1234567890-1234567890.json")
     verbose.set(true)
 }
 
