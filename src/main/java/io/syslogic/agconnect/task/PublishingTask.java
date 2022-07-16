@@ -55,6 +55,7 @@ abstract public class PublishingTask extends BaseTask {
 
     @Input
     abstract public Property<String> getBuildType();
+
     private String basePath       = null;
     private String uploadUrl      = null;
     private String chunkUploadUrl = null;

@@ -26,85 +26,68 @@ class PublishingPlugin implements Plugin<Project> {
     private @NotNull final String[] buildVariants = new String[]{"main", "debug", "release"};
     private @NotNull final String[] artifactTypes = new String[]{"apk", "aab"};
     private @NotNull final String taskGroup = "agconnect";
-    private @Nullable PublishingExtension extension;
+
+    private @Nullable PublishingExtension extension = null;
+    private @Nullable String apiConfigFile = null;
+    private @NotNull Boolean verbose = false;
 
     /** It depends on :assembleRelease or :bundleRelease */
     @Override
     public void apply(@NotNull Project project) {
 
-        /* Preconditions & Create Extension */
+        /* Check Preconditions */
         if (! preconditionsMet(project)) {return;}
-        else {this.createExtension(project);}
 
-        /* Register tasks, when file `agconnect-services.json` is present */
-        for (String artifactType : this.artifactTypes) {
-            for (String buildVariant : this.buildVariants) {
+        /* Create project extension `agcPublishing` */
+        this.extension = project.getExtensions().create("agcPublishing", PublishingExtensionImpl.class);
+        this.apiConfigFile = project.getRootProject().getProjectDir().getAbsolutePath() +
+                File.separator + "credentials" + File.separator + "agc-apiclient.json";
 
-                boolean verbose = true;
+        /* Project after evaluate */
+        project.afterEvaluate(it -> {
 
-                String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
-                String appConfigFile = basePath + "src" + File.separator + buildVariant + File.separator + "agconnect-services.json";
-                if (extension != null && new File(appConfigFile).exists()) {
+            /* Register tasks, when file `agconnect-services.json` is present */
+            for (String artifactType : this.artifactTypes) {
+                for (String buildVariant : this.buildVariants) {
 
-                    String taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
-                    if (buildVariant.equals("main")) {taskName = "publish" + StringUtils.capitalize(artifactType);}
-                    // System.out.println("Found " + appConfig + ", registering task :" + taskName + ".");
+                    String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
+                    String appConfigFile = basePath + "src" + File.separator + buildVariant + File.separator + "agconnect-services.json";
+                    if (new File(appConfigFile).exists()) {
 
-                    // TODO
-                    String apiConfigFile = project.getRootProject().getProjectDir().getAbsolutePath() +
-                            File.separator + "credentials" + File.separator + "agc-apiclient.json";
+                        String taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
+                        if (buildVariant.equals("main")) {taskName = "publish" + StringUtils.capitalize(artifactType);}
 
-                    // always false ...
-                    if (extension.getApiConfigFile().isPresent()) {
-                        apiConfigFile = extension.getApiConfigFile().get();
-                    }
+                        if (! extension.getApiConfigFile().isEmpty()) {apiConfigFile = extension.getApiConfigFile();}
+                        if (extension.getVerbose()) {verbose = extension.getVerbose();}
+                        // System.out.println("Found " + appConfig + ", registering task :" + taskName + ".");
 
-                    // always false ...
-                    if (extension.getVerbose().isPresent()) {
-                        verbose = extension.getVerbose().get();
-                    }
-
-                    String finalApiConfigFile = apiConfigFile;
-                    boolean finalVerbose = verbose;
-                    project.getTasks().register(taskName, PublishingTask.class, task -> {
-                        task.setGroup(this.taskGroup);
-                        task.getApiConfigFile().set(finalApiConfigFile);
-                        task.getAppConfigFile().set(appConfigFile);
-                        task.getArtifactType().set(artifactType);
-                        task.getBuildType().set(buildVariant);
-                        task.getVerbose().set(finalVerbose);
-                        task.dependsOn(getBuildTask(artifactType, buildVariant));
-                    });
-
-                    taskName = "appInfo" + StringUtils.capitalize(buildVariant);
-                    if (project.getTasks().findByName(taskName) == null) {
-                        String finalApiConfigFile1 = apiConfigFile;
-                        project.getTasks().register(taskName, AppInfoTask.class, task -> {
+                        project.getTasks().register(taskName, PublishingTask.class, task -> {
                             task.setGroup(this.taskGroup);
-                            task.getApiConfigFile().set(finalApiConfigFile1);
+                            task.getApiConfigFile().set(apiConfigFile);
                             task.getAppConfigFile().set(appConfigFile);
+                            task.getArtifactType().set(artifactType);
                             task.getBuildType().set(buildVariant);
-                            task.getVerbose().set(finalVerbose);
+                            task.getVerbose().set(verbose);
+
+                            task.dependsOn(getBuildTask(artifactType, buildVariant));
                         });
+
+                        taskName = "appInfo" + StringUtils.capitalize(buildVariant);
+                        if (project.getTasks().findByName(taskName) == null) {
+                            String finalApiConfigFile1 = apiConfigFile;
+                            project.getTasks().register(taskName, AppInfoTask.class, task -> {
+                                task.setGroup(this.taskGroup);
+                                task.getApiConfigFile().set(finalApiConfigFile1);
+                                task.getAppConfigFile().set(appConfigFile);
+                                task.getBuildType().set(buildVariant);
+                                task.getVerbose().set(verbose);
+                            });
+                        }
                     }
                 }
             }
-        }
-    }
 
-    @NotNull
-    private String getBuildTask(@NotNull String artifactType, @NotNull String buildVariant) {
-        switch (artifactType) {
-            case "aab": return "bundle" + StringUtils.capitalize(buildVariant);
-            case "apk": return "assemble" + StringUtils.capitalize(buildVariant);
-            default: return "assembleRelease";
-        }
-    }
-
-    /** Create project extension `agcPublishing` */
-    protected void createExtension(@NotNull Project project) {
-        extension = project.getExtensions().create("agcPublishing", PublishingExtension.class);
-        // extension.getVerbose().set(true);
+        });
     }
 
     /** Check if Android and AGConnect Gradle plugins were loaded. */
@@ -119,5 +102,14 @@ class PublishingPlugin implements Plugin<Project> {
             return false;
         }
         return true;
+    }
+
+    @NotNull
+    private String getBuildTask(@NotNull String artifactType, @NotNull String buildVariant) {
+        switch (artifactType) {
+            case "aab": return "bundle" + StringUtils.capitalize(buildVariant);
+            case "apk": return "assemble" + StringUtils.capitalize(buildVariant);
+            default: return "assembleRelease";
+        }
     }
 }

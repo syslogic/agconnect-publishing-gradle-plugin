@@ -26,19 +26,19 @@ plugins {
 
 ````
 agcPublishing {
-    apiConfigFile.set("${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-1234567890-1234567890.json")
-    verbose.set(true)
+    apiConfigFile = "${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
+    verbose = true
 }
-
 ````
 
 ### Screenshots
 
 ![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/screenshot_01.png)
 
+### Status
+
 [![Gradle CI](https://github.com/syslogic/agconnect-publishing-gradle-plugin/actions/workflows/gradle.yml/badge.svg)](https://github.com/syslogic/agconnect-publishing-gradle-plugin/actions/workflows/gradle.yml)
 
 [![Release](https://jitpack.io/v/syslogic/agconnect-publishing-gradle-plugin.svg)](https://jitpack.io/#io.syslogic/agconnect-publishing-gradle-plugin)
 
 [![MIT License](https://img.shields.io/github/license/syslogic/agconnect-publishing-gradle-plugin)](https://github.com/syslogic/agconnect-publishing-gradle-plugin/blob/master/LICENSE)
-
