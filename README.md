@@ -14,6 +14,8 @@ Currently the plugin can only be installed via `git clone`:
 
 ### Configuration
 
+Plugin `io.syslogic.agconnect.publishing` depends on `com.android.application` and `com.huawei.agconnect`.
+
 ````
 plugins {
     id 'com.android.application'
