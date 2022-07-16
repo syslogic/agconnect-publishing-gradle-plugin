@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.gradle.api.DefaultTask;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,10 @@ abstract public class BaseTask extends DefaultTask {
     String clientSecret = null;
     String accessToken = null;
 
+    /** It sets up HttpClient and parses config files. */
     void parseConfigFiles(String appConfig, String apiConfig, boolean verbose) {
+        this.client = HttpClientBuilder.create().setUserAgent(this.ua).build();
+
         File file = new File(appConfig);
         if (file.exists() && file.canRead()) {
             System.out.println("App Config: " + appConfig);

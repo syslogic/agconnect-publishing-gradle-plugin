@@ -9,7 +9,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
@@ -45,11 +44,10 @@ abstract public class AppInfoTask extends BaseTask {
 
     @TaskAction
     public void run() {
-        this.client = HttpClientBuilder.create().setUserAgent(this.ua).build();
         this.parseConfigFiles(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
         System.out.println("Query AppInfo for appId: " + this.appId);
-        authenticate(this.clientId, this.clientSecret, getVerbose().get());
-        getAppInfo();
+        this.authenticate(this.clientId, this.clientSecret, getVerbose().get());
+        this.getAppInfo();
     }
 
     // https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-info-query-0000001158365045

@@ -13,7 +13,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import org.gradle.api.provider.Property;
@@ -63,12 +62,11 @@ abstract public class PublishingTask extends BaseTask {
 
     @TaskAction
     public void run() {
-        this.client = HttpClientBuilder.create().setUserAgent(this.ua).build();
         this.basePath = getProject().getProjectDir().getAbsolutePath().concat("/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT));
         this.parseConfigFiles(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
-        authenticate(this.clientId, this.clientSecret, getVerbose().get());
-        getUploadUrl(getArtifactType().get(), 1);
-        uploadFile(getArtifactPath());
+        this.authenticate(this.clientId, this.clientSecret, getVerbose().get());
+        this.getUploadUrl(getArtifactType().get(), 1);
+        this.uploadFile(getArtifactPath());
     }
 
     @NotNull
