@@ -17,6 +17,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.EntityUtils;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -36,7 +37,6 @@ import io.syslogic.agconnect.model.ApiException;
 import io.syslogic.agconnect.model.Endpoint;
 import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
-import io.syslogic.agconnect.model.FileUploadInfo;
 import io.syslogic.agconnect.model.ResultCode;
 import io.syslogic.agconnect.model.UploadFileListItem;
 import io.syslogic.agconnect.model.UploadResponseWrap;
@@ -150,14 +150,15 @@ abstract public class PublishingTask extends BaseTask {
     @SuppressWarnings("SameParameterValue")
     private void uploadFile(String archivePath) {
 
+        /* Check if the file exists. */
         File file = new File(archivePath);
         if (! file.exists()) {
-            String unsigned = archivePath.replace(".apk", "-unsigned.spk");
-            if (getVerbose().get()) {
-                if (new File(unsigned).exists()) {this.stdErr("File not signed: " + unsigned);}
-                else {this.stdErr("File not found: " + archivePath);}
-            }
-            return;
+
+            /* Check if the file exists under an alternate name */
+            String message = "Not found: " + archivePath;
+            String unsigned = archivePath.replace(".apk", "-unsigned.apk");
+            if (new File(unsigned).exists()) {message = "Not signed: " + unsigned;}
+            throw new GradleException(message);
         }
 
         if (this.uploadUrl != null && this.authCode != null) {

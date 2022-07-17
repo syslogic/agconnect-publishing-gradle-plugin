@@ -57,14 +57,21 @@ class PublishingPlugin implements Plugin<Project> {
                         String taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                         if (buildVariant.equals("main")) {taskName = "publish" + StringUtils.capitalize(artifactType);}
 
-                        if (! extension.getApiConfigFile().isEmpty()) {apiConfigFile = extension.getApiConfigFile();}
+                        if (! extension.getApiConfigFile().isEmpty()) {
+                            if (! new File(extension.getApiConfigFile()).exists()) {
+                                System.err.println("Config file not found: " + extension.getApiConfigFile());
+                                System.err.println("Keeping default value: " + apiConfigFile);
+                            } else {
+                                apiConfigFile = extension.getApiConfigFile();
+                            }
+                        }
                         if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
                         // System.out.println("Found " + appConfig + ", registering task :" + taskName + ".");
 
-                        /* Publish Tasks */
+                        /* Register Tasks: Publishing */
                         project.getTasks().register(taskName, PublishingTask.class, task -> {
-                            task.setGroup(this.taskGroup);
+                            task.setGroup(taskGroup);
                             task.getApiConfigFile().set(apiConfigFile);
                             task.getAppConfigFile().set(appConfigFile);
                             task.getArtifactType().set(artifactType);
@@ -73,15 +80,16 @@ class PublishingPlugin implements Plugin<Project> {
                             task.getVerbose().set(verbose);
 
                             /* This task dependency causes it to assemble or bundle. */
-                            // task.dependsOn(getBuildTask(artifactType, buildVariant));
+                            String buildTask = getBuildTask(project, artifactType, buildVariant);
+                            task.dependsOn(buildTask);
                         });
 
-                        /* AppInfo Tasks */
+                        /* Register Tasks: AppInfo */
                         taskName = "appInfo" + StringUtils.capitalize(buildVariant);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
                             project.getTasks().register(taskName, AppInfoGetTask.class, task -> {
-                                task.setGroup(this.taskGroup);
+                                task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getBuildType().set(buildVariant);
@@ -90,12 +98,12 @@ class PublishingPlugin implements Plugin<Project> {
                             });
                         }
 
-                        /* AppId Tasks */
-                        taskName = "appId" + StringUtils.capitalize(buildVariant);
+                        /* Register Tasks: AppIdList */
+                        taskName = "appIdList" + StringUtils.capitalize(buildVariant);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
                             project.getTasks().register(taskName, AppIdListTask.class, task -> {
-                                task.setGroup(this.taskGroup);
+                                task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getBuildType().set(buildVariant);
@@ -113,10 +121,10 @@ class PublishingPlugin implements Plugin<Project> {
     public boolean preconditionsMet(@NotNull Project project) {
         if (! project.getPluginManager().hasPlugin("com.android.application") || ! project.getPluginManager().hasPlugin("com.huawei.agconnect")) {
             if (! project.getPluginManager().hasPlugin("com.android.application")) {
-                System.err.println("Plugin 'agconnect-publishing' depends on 'com.android.application'");
+                System.err.println("Plugin 'agconnect-publishing' depends on 'com.android.application'.");
             }
             if (! project.getPluginManager().hasPlugin("com.huawei.agconnect")) {
-                System.err.println("Plugin 'agconnect-publishing' depends on 'com.huawei.agconnect'");
+                System.err.println("Plugin 'agconnect-publishing' depends on 'com.huawei.agconnect'.");
             }
             return false;
         }
@@ -130,11 +138,10 @@ class PublishingPlugin implements Plugin<Project> {
     }
 
     @NotNull
-    private String getBuildTask(@NotNull String artifactType, @NotNull String buildVariant) {
-        switch (artifactType) {
-            case "aab": return "bundle" + StringUtils.capitalize(buildVariant);
-            case "apk": return "assemble" + StringUtils.capitalize(buildVariant);
-            default: return "assembleRelease";
-        }
+    private String getBuildTask(@NotNull Project project, @NotNull String artifactType, @NotNull String buildVariant) {
+        String task = "assembleRelease";
+        if (artifactType.equals("aab")) {task = "bundle" + StringUtils.capitalize(buildVariant);}
+        else if (artifactType.equals("apk")) {task = "assemble" + StringUtils.capitalize(buildVariant);}
+        return ":" + project.getName() + ":" + task;
     }
 }
