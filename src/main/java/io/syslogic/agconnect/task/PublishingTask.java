@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -19,7 +20,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -62,17 +63,18 @@ abstract public class PublishingTask extends BaseTask {
     private String uploadUrlChunked = null;
     private String authCode         = null;
 
+    /** Default {@link TaskAction} */
     @TaskAction
     public void run() {
-        String outputs = "/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT);
-        this.basePath = getProject().getProjectDir().getAbsolutePath().concat(outputs);
-        this.setup(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        String output = "/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT);
+        this.basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
+        this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
         this.authenticate();
         this.getUploadUrl(getArtifactType().get(), 1);
         this.uploadFile(getArtifactPath());
     }
 
-    @NotNull
+    @Nullable
     private String getArtifactPath() {
         String name = getProject().getName();
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
@@ -80,9 +82,12 @@ abstract public class PublishingTask extends BaseTask {
         if (new File(basePath).exists()) {
             return basePath.concat(File.separator + buildType + File.separator + name+ "-" + buildType + "." + suffix);
         }
-        return "";
+        return null;
     }
 
+    /**
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-url-0000001158365047">Obtaining the File Upload URL</a>.
+     */
     @SuppressWarnings("SameParameterValue")
     private void getUploadUrl(String archiveSuffix, int releaseType) {
         HttpGet request = new HttpGet();
@@ -107,17 +112,21 @@ abstract public class PublishingTask extends BaseTask {
                 this.authCode = result.getAuthCode();
                 this.uploadUrl = result.getUploadUrl();
                 this.uploadUrlChunked = result.getChunkUploadUrl();
-                if (getVerbose().get()) {System.out.println("  Endpoint: " + this.uploadUrl);}
+                if (getVerbose().get()) {
+                    this.stdOut("  Endpoint: " + this.uploadUrl);
+                }
             } else {
-                System.out.println("HTTP " + statusCode + " " +
+                this.stdOut("HTTP " + statusCode + " " +
                         response.getStatusLine().getReasonPhrase());
             }
         } catch (URISyntaxException | IOException e) {
-            System.out.println(e.getMessage());
+            this.stdErr(e.getMessage());
         }
     }
 
-    /** post form multi-part encoded. */
+    /**
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-file-0000001158245059">Uploading a File</a>.
+     */
     @SuppressWarnings("SameParameterValue")
     private void uploadFile(String archivePath) {
 
@@ -142,28 +151,46 @@ abstract public class PublishingTask extends BaseTask {
                 String responseString = EntityUtils.toString(httpEntity);
 
                 if (statusCode == HttpStatus.SC_OK) {
-                    UploadResponseWrap response = new Gson().fromJson(responseString, UploadResponseWrap.class);
+                    UploadResponseWrap response = new Gson()
+                            .fromJson(responseString, UploadResponseWrap.class);
                     if (response.getResult().getResultCode() == 0) {
-                        if (getVerbose().get()) {
-                            List<UploadFileListItem> items = response.getResult().getResult().getFileList();
-                            for (UploadFileListItem item : items) {
-                                // System.out.println("Purified for file: " + item.getPurifiedForFile());
-                                System.out.println("  Download: " + item.getDestinationUrl());
-                                System.out.println("Disposable: " + item.getDisposableUrl());
-                                System.out.println("      Size: " + item.getSizeFormatted());
+                        List<UploadFileListItem> items = response
+                                .getResult().getResult().getFileList();
+
+                        for (UploadFileListItem item : items) {
+                            this.updateFileInfo(item);
+                            if (getVerbose().get()) {
+                                // this.stdOut("Purified for file: " + item.getPurifiedForFile());
+                                this.stdOut("  Download: " + item.getDestinationUrl());
+                                this.stdOut("Disposable: " + item.getDisposableUrl());
+                                this.stdOut("      Size: " + item.getSizeFormatted());
                             }
-                            System.out.println("    Status: complete");
+                        }
+
+                        if (getVerbose().get()) {
+                            this.stdOut("    Status: complete");
                         }
                     } else {
                         ApiException e = response.getResult().getException();
-                        System.err.println("Upload Status: " + e.getErrorCode() + ": " + e.getErrorDesc());
+                        this.stdErr("Upload Status: " +
+                                e.getErrorCode() + ": " + e.getErrorDesc());
                     }
                 } else {
-                    System.err.println("Upload Status: HTTP " + statusCode + ": " + responseString);
+                    this.stdErr("Upload Status: HTTP " +
+                            statusCode + ": " + responseString);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                this.stdErr(e.getMessage());
             }
         }
+    }
+
+    /**
+     * TODO ...
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-file-info-0000001111685202">Updating App File Information</a>.
+     */
+    private void updateFileInfo(UploadFileListItem item) {
+        HttpPut request = new HttpPut(ENDPOINT_PUBLISH_APP_FILE_INFO);
+        request.addHeader("accept", "application/json");
     }
 }

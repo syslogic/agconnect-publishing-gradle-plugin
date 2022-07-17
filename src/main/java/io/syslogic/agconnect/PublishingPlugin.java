@@ -49,9 +49,7 @@ class PublishingPlugin implements Plugin<Project> {
             /* Register tasks, when file `agconnect-services.json` is present */
             for (String artifactType : this.artifactTypes) {
                 for (String buildVariant : this.buildVariants) {
-
-                    String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
-                    String appConfigFile = basePath + "src" + File.separator + buildVariant + File.separator + "agconnect-services.json";
+                    String appConfigFile = getAppConfigPath(project, buildVariant);
                     if (new File(appConfigFile).exists()) {
 
                         String taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
@@ -69,6 +67,7 @@ class PublishingPlugin implements Plugin<Project> {
                             task.getBuildType().set(buildVariant);
                             task.getVerbose().set(verbose);
 
+                            /* This task dependency causes it to assemble or bundle. */
                             task.dependsOn(getBuildTask(artifactType, buildVariant));
                         });
 
@@ -101,6 +100,12 @@ class PublishingPlugin implements Plugin<Project> {
             return false;
         }
         return true;
+    }
+
+    @NotNull
+    private String getAppConfigPath(Project project, String buildVariant) {
+        String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
+        return basePath + "src" + File.separator + buildVariant + File.separator + "agconnect-services.json";
     }
 
     @NotNull

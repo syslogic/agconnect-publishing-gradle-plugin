@@ -9,9 +9,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-
 import org.apache.http.impl.client.HttpClientBuilder;
+
 import org.gradle.api.DefaultTask;
+import org.gradle.api.Project;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,10 +37,8 @@ abstract public class BaseTask extends DefaultTask {
 
     static String ENDPOINT_OAUTH2_TOKEN = "https://connect-api.cloud.huawei.com/api/oauth2/v1/token";
     static String ENDPOINT_PUBLISH_UPLOAD_URL = "https://connect-api.cloud.huawei.com/api/publish/v2/upload-url";
+    static String ENDPOINT_PUBLISH_APP_FILE_INFO = "https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info";
     static String ENDPOINT_PUBLISH_APP_INFO = "https://connect-api.cloud.huawei.com/api/publish/v2/app-info";
-
-    HttpClient client;
-    String ua = "Gradle/7.2.1";
 
     Long appId = 0L;
     Long projectId = 0L;
@@ -49,45 +48,48 @@ abstract public class BaseTask extends DefaultTask {
     String clientSecret = null;
     String accessToken = null;
 
-    /** It sets up HttpClient and parses two JSON config files. */
-    void setup(String appConfig, String apiConfig, boolean verbose) {
+    HttpClient client;
 
-        this.client = HttpClientBuilder.create().setUserAgent(this.ua).build();
+    /** It sets up HttpClient and parses two JSON config files. */
+    void setup(@NotNull Project project, String appConfig, String apiConfig, boolean verbose) {
+
+        String ua = "Gradle/" + project.getGradle().getGradleVersion();
+        this.client = HttpClientBuilder.create().setUserAgent(ua).build();
 
         File file = new File(appConfig);
         if (file.exists() && file.canRead()) {
-            System.out.println("App Config: " + appConfig);
+            if (verbose) {this.stdOut("App Config: " + appConfig);}
             AppConfigFile config = new Gson().fromJson(readFile(file), AppConfigFile.class);
             this.appId = config.getClient().getAppId();
             this.packageName = config.getClient().getPackageName();
             this.projectId = config.getClient().getProjectId();
         } else {
-            System.err.println("AppId not found:");
-            System.err.println(file.getAbsoluteFile());
+            this.stdErr("AppId not found:");
+            this.stdErr(file.getAbsolutePath());
         }
 
         file = new File(apiConfig);
         if (file.exists() && file.canRead()) {
-            System.out.println("API Config: " + apiConfig);
+            if (verbose) {this.stdOut("API Config: " + apiConfig);}
             ApiConfigFile config = new Gson().fromJson(readFile(file), ApiConfigFile.class);
             if (config.getType().equals("team_client_id")) {
                 this.clientSecret = config.getClientSecret();
                 this.clientId = config.getClientId();
             } else {
-                System.out.println("API Config: credentials JSON must have role \"App administrator\"");
-                System.out.println("https://developer.huawei.com/consumer/en/service/josp/agc/index.html");
+                this.stdOut("API Config: credentials JSON must have role \"App administrator\"");
+                this.stdOut("https://developer.huawei.com/consumer/en/service/josp/agc/index.html");
             }
         } else {
-            System.err.println("API Config not found:");
-            System.err.println(file.getAbsoluteFile());
+            this.stdErr("API Config not found:");
+            this.stdErr(file.getAbsolutePath());
         }
 
         /* Log Configuration */
         if (verbose) {
-            System.out.println("     AppId: " + this.appId);
+            this.stdOut("     AppId: " + this.appId);
             if (this.clientId != null && this.clientSecret != null) {
-                System.out.println("  ClientId: " + this.clientId);
-                System.out.println("    Secret: " + this.clientSecret);
+                this.stdOut("  ClientId: " + this.clientId);
+                this.stdOut("    Secret: " + this.clientSecret);
             }
         }
     }
@@ -107,27 +109,33 @@ abstract public class BaseTask extends DefaultTask {
                 AccessTokenResponse result = new Gson().fromJson(rd.readLine(), AccessTokenResponse.class);
                 this.accessToken = result.getAccessToken();
             } else {
-                System.err.println("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
+                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            this.stdErr(e.getMessage());
         }
     }
 
     @NotNull
     private String readFile(@NotNull File file) {
-        StringBuilder data = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         String line;
         try {
             FileInputStream fis = new FileInputStream(file.getAbsolutePath());
             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
             BufferedReader reader = new BufferedReader(isr);
-            while ((line = reader.readLine()) != null) {
-                data.append(line);
-            }
+            while ((line = reader.readLine()) != null) {sb.append(line);}
         } catch (IOException e) {
-            e.printStackTrace();
+            this.stdErr(e.getMessage());
         }
-        return data.toString();
+        return sb.toString();
+    }
+
+    void stdOut(@NotNull String value) {
+        System.out.println(value);
+    }
+
+    void stdErr(@NotNull String value) {
+        System.err.println(value);
     }
 }

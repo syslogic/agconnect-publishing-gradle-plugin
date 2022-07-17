@@ -66,12 +66,12 @@ public class AppInfoResponse {
             "packageName: \"" + this.packageName + "\", " +
             "developerName: \"" + this.developerName + "\", " +
             "parentType: " + this.parentType + ", " +
-            "releaseState: " + this.releaseState + ", " +
             "deviceTypes: \"" + this.getDeviceTypesAsString() + "\", " +
+            "releaseState: " + this.releaseState + ", " +
             "certificateURLs: \"" + this.certificateURLs + "\", " +
             "defaultLang: \"" + this.defaultLang + "\", " +
             "languages: \"" + lang + "\", " +
-            "auditInfo: \"" + audit + "\", " +
+            "auditInfo: \"" + audit + "\"" +
         "}";
     }
 }

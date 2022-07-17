@@ -39,31 +39,38 @@ abstract public class AppInfoTask extends BaseTask {
     @Input
     abstract public Property<String> getBuildType();
 
-    // https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-reference-langtype-0000001158245079
-    String lang = "en-US";
+    /**
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-reference-langtype-0000001158245079">Languages</a>.
+     */
+    // String lang = "en-US";
+    String lang = null;
 
+    /** Default {@link TaskAction} */
     @TaskAction
     public void run() {
-        this.setup(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
-        System.out.println("Query AppInfo for appId " + this.appId + ".");
-        System.out.println("https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp");
+        this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        if (getVerbose().get()) {this.stdOut("Query AppInfo for appId " + this.appId + ".");}
         this.authenticate();
         this.getAppInfo();
     }
 
-    // https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-info-query-0000001158365045
+    /**
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-info-query-0000001158365045">Querying App Information</a>.
+     */
+    @SuppressWarnings("UnusedReturnValue")
     public void getAppInfo() {
         HttpGet request = new HttpGet();
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            request.setURI(new URIBuilder(ENDPOINT_PUBLISH_APP_INFO)
-                    .setParameter("appId", String.valueOf(this.appId))
-                    .setParameter("lang", this.lang)
-                    .build()
-            );
+            URIBuilder builder = new URIBuilder(ENDPOINT_PUBLISH_APP_INFO);
+            builder.setParameter("appId", String.valueOf(this.appId));
 
+            /* If this parameter is not passed, app information in all languages is queried. */
+            if (this.lang != null) {builder.setParameter("lang", this.lang);}
+
+            request.setURI(builder.build());
             HttpResponse response = this.client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
@@ -74,15 +81,19 @@ abstract public class AppInfoTask extends BaseTask {
 
                 String result = br.readLine();
                 AppInfoResponseWrap appInfo = new Gson().fromJson(result, AppInfoResponseWrap.class);
-                appInfo.getAppInfo().setPackageName(this.packageName);
-                System.out.println(appInfo.getAppInfo().toString());
+                appInfo.getAppInfo().setPackageName(this.packageName); // adding an additional field.
 
+                /* always logging the response */
+                this.stdOut(appInfo.getAppInfo().toString());
+
+                if (getVerbose().get()) {
+                    this.stdOut("https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp");
+                }
             } else {
-                System.err.println("HTTP " + statusCode + " " +
-                        response.getStatusLine().getReasonPhrase());
+                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
         } catch(Exception e) {
-            System.err.println(e.getMessage());
+            this.stdErr(e.getMessage());
         }
     }
 }
