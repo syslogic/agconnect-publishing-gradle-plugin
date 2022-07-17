@@ -22,6 +22,7 @@ Plugin `io.syslogic.agconnect.publishing` depends on `com.android.application` a
 <details>
 <summary>Plugins API</summary>
 <p>
+
 ````
 /* Still required due to AGCP plugin. */
 buildscript {
@@ -35,12 +36,15 @@ plugins {
     id 'io.syslogic.agconnect.publishing' version "7.2.1.3" apply false
 }
 ````
+
 </p>
 </details>
 
 <details>
 <summary>Buildscript</summary>
 <p>
+
+````
 buildscript {
     repositories {
         google()
@@ -55,6 +59,7 @@ buildscript {
     }
 }
 ````
+
 </p>
 </details>
 
