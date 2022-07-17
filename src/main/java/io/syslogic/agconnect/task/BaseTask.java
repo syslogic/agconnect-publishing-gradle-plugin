@@ -2,8 +2,11 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
+import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -11,6 +14,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
@@ -25,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
+import io.syslogic.agconnect.model.Endpoint;
 import io.syslogic.agconnect.model.TokenRequest;
 import io.syslogic.agconnect.model.TokenResponse;
 
@@ -35,27 +40,28 @@ import io.syslogic.agconnect.model.TokenResponse;
  */
 abstract public class BaseTask extends DefaultTask {
 
-    static String ENDPOINT_OAUTH2_TOKEN = "https://connect-api.cloud.huawei.com/api/oauth2/v1/token";
-    static String ENDPOINT_PUBLISH_UPLOAD_URL = "https://connect-api.cloud.huawei.com/api/publish/v2/upload-url";
-    static String ENDPOINT_PUBLISH_APP_ID_LIST = "https://connect-api.cloud.huawei.com/api/publish/v2/appid-list";
-    static String ENDPOINT_PUBLISH_APP_FILE_INFO = "https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info";
-    static String ENDPOINT_PUBLISH_APP_INFO = "https://connect-api.cloud.huawei.com/api/publish/v2/app-info";
-
     Long appId = 0L;
     Long projectId = 0L;
-    String packageName = null;;
+    String packageName = null;
 
     String clientId = null;
     String clientSecret = null;
     String accessToken = null;
 
     HttpClient client;
+    private PoolingHttpClientConnectionManager cm;
+    private String ua;
 
     /** It sets up HttpClient and parses two JSON config files. */
-    void setup(@NotNull Project project, String appConfig, String apiConfig, boolean verbose) {
+    void configure(@NotNull Project project, String appConfig, String apiConfig, boolean logHttp, boolean verbose) {
 
-        String ua = "Gradle/" + project.getGradle().getGradleVersion();
-        this.client = HttpClientBuilder.create().setUserAgent(ua).build();
+        /* PoolingHttpClientConnectionManager is required for subsequent requests. */
+        this.ua = "Gradle/" + project.getGradle().getGradleVersion();
+        this.cm = new PoolingHttpClientConnectionManager();
+        this.cm.setDefaultMaxPerRoute(20);
+        this.cm.setMaxTotal(100);
+
+        this.client = this.getHttpClient(logHttp);
 
         File file = new File(appConfig);
         if (file.exists() && file.canRead()) {
@@ -95,8 +101,28 @@ abstract public class BaseTask extends DefaultTask {
         }
     }
 
+    private HttpClient getHttpClient(boolean logHttp) {
+
+        HttpClientBuilder cb = HttpClientBuilder.create()
+                .setConnectionManager(this.cm)
+                .setUserAgent(this.ua);
+
+        if (logHttp) {
+            cb.addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
+                stdOut("> " + request.getRequestLine().toString());
+            })
+            .addInterceptorLast((HttpResponseInterceptor) (request, context) -> {
+                stdOut("> " + request.getStatusLine().toString());
+                for (Header header : request.getAllHeaders()) {
+                    // stdOut("> " + header.toString());
+                }
+            });
+        }
+        return cb.build();
+    }
+
     void authenticate() {
-        HttpPost request = new HttpPost(ENDPOINT_OAUTH2_TOKEN);
+        HttpPost request = new HttpPost(Endpoint.OAUTH2_TOKEN);
         String payload = new Gson().toJson(new TokenRequest(this.clientId, this.clientSecret));
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
         request.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
@@ -115,6 +141,13 @@ abstract public class BaseTask extends DefaultTask {
         } catch (IOException e) {
             this.stdErr(e.getMessage());
         }
+    }
+
+    @NotNull
+    String getFileName(@NotNull String archivePath) {
+        String regex = File.separator.equals("\\") ? "\\u005c" : File.separator;
+        String[] parts = archivePath.split(regex);
+        return parts[ parts.length-1 ];
     }
 
     @NotNull

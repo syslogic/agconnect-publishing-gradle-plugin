@@ -1,14 +1,14 @@
 buildscript {
     ext {
-        plugin_version = '2'
+        plugin_version = '3'
         agp_version = '7.2.1'
         agcp_version = '1.7.0.300'
-        gson_version = '2.9.0'
         annotations_version = '22.0.0'
-        lang3_version = '3.11' // StringUtils
         httpclient_version = '4.5.13'
         httpcore_version = '4.4.14'
         httpmime_version = '4.5.6'
+        lang3_version = '3.11'
+        gson_version = '2.9.0'
         junit_version = '5.8.2'
     }
     dependencies {
@@ -49,12 +49,12 @@ dependencies {
 
     compileOnly gradleApi()
     compileOnly "com.android.tools.build:gradle-api:$agp_version"
-    implementation "com.google.code.gson:gson:$gson_version"
-    implementation "org.apache.commons:commons-lang3:$lang3_version"
+    implementation "org.jetbrains:annotations:$annotations_version"
     implementation "org.apache.httpcomponents:httpcore:$httpcore_version"
     implementation "org.apache.httpcomponents:httpclient:$httpclient_version"
     implementation "org.apache.httpcomponents:httpmime:$httpmime_version"
-    implementation "org.jetbrains:annotations:$annotations_version"
+    implementation "org.apache.commons:commons-lang3:$lang3_version"
+    implementation "com.google.code.gson:gson:$gson_version"
 
     testImplementation gradleTestKit()
     testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
@@ -76,7 +76,7 @@ tasks.withType(Test).configureEach {
 }
 
 task javadocs(type: Javadoc) {
-    title = "Huawei AppGallery Connect Publishing Plugin ${agp_version} API"
+    title = "AppGallery Connect Publishing Plugin ${agp_version} API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
     configurations.implementation.setCanBeResolved(true)
@@ -117,7 +117,7 @@ afterEvaluate {
                 from components.getByName("java")
                 version = "${agp_version}.${plugin_version}"
                 pom {
-                    name = 'Huawei AppGallery Connect Publishing Plugin'
+                    name = 'AppGallery Connect Publishing Plugin'
                     description = 'It uploads APK & AAB to Huawei AppGallery Connect Publishing API.'
                     url = "https://github.com/syslogic/${artifactId}"
                     scm {

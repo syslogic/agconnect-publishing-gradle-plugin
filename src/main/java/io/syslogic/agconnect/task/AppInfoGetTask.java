@@ -16,6 +16,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.model.AppInfoResponse;
+import io.syslogic.agconnect.model.Endpoint;
 
 /**
  * Abstract AppInfo {@link BaseTask}
@@ -23,9 +24,6 @@ import io.syslogic.agconnect.model.AppInfoResponse;
  * @author Martin Zeitler
  */
 abstract public class AppInfoGetTask extends BaseTask {
-
-    @Input
-    public abstract Property<Boolean> getVerbose();
 
     @Input
     abstract public Property<String> getAppConfigFile();
@@ -36,6 +34,12 @@ abstract public class AppInfoGetTask extends BaseTask {
     @Input
     abstract public Property<String> getBuildType();
 
+    @Input
+    public abstract Property<Boolean> getLogHttp();
+
+    @Input
+    public abstract Property<Boolean> getVerbose();
+
     /**
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-reference-langtype-0000001158245079">Languages</a>.
      */
@@ -45,7 +49,7 @@ abstract public class AppInfoGetTask extends BaseTask {
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
         if (getVerbose().get()) {this.stdOut("Query AppInfo for appId " + this.appId + ".");}
         this.authenticate();
         this.getAppInfo();
@@ -61,7 +65,7 @@ abstract public class AppInfoGetTask extends BaseTask {
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            URIBuilder builder = new URIBuilder(ENDPOINT_PUBLISH_APP_INFO);
+            URIBuilder builder = new URIBuilder(Endpoint.PUBLISH_APP_INFO);
             builder.setParameter("appId", String.valueOf(this.appId));
 
             /* If this parameter is not passed, app information in all languages is queried. */

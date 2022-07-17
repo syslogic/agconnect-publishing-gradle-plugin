@@ -10,23 +10,23 @@ public interface PublishingExtension {
     /**
      * Define the path to the API client configuration JSON file.
      *
-     * ```groovy
-     * agcPublishing {
-     *     apiConfigFile = "..."
-     * }
-     * ```
+     * <code>agcPublishing {apiConfigFile = "agc-apiclient-*.json"}</code>
      * @return path to the JSON file.
      */
     String getApiConfigFile();
 
     /**
+     * Enable HTTP logging.
+     *
+     * <code>agcPublishing { logHttp = true }</code>
+     * @return HTTP logging on/off.
+     */
+    Boolean getLogHttp();
+
+    /**
      * Enable verbose logging.
      *
-     * ```groovy
-     * agcPublishing {
-     *     verbose = true
-     * }
-     * ```
+     * <code>agcPublishing { verbose = true }</code>
      * @return verbose logging on/off.
      */
     Boolean getVerbose();

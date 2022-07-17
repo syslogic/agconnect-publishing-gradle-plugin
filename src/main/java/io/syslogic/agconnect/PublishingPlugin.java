@@ -30,6 +30,7 @@ class PublishingPlugin implements Plugin<Project> {
 
     private @Nullable PublishingExtension extension = null;
     private @Nullable String apiConfigFile = null;
+    private @NotNull Boolean logHttp = false;
     private @NotNull Boolean verbose = false;
 
     /** It depends on :assembleRelease or :bundleRelease */
@@ -57,6 +58,7 @@ class PublishingPlugin implements Plugin<Project> {
                         if (buildVariant.equals("main")) {taskName = "publish" + StringUtils.capitalize(artifactType);}
 
                         if (! extension.getApiConfigFile().isEmpty()) {apiConfigFile = extension.getApiConfigFile();}
+                        if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
                         // System.out.println("Found " + appConfig + ", registering task :" + taskName + ".");
 
@@ -67,10 +69,11 @@ class PublishingPlugin implements Plugin<Project> {
                             task.getAppConfigFile().set(appConfigFile);
                             task.getArtifactType().set(artifactType);
                             task.getBuildType().set(buildVariant);
+                            task.getLogHttp().set(logHttp);
                             task.getVerbose().set(verbose);
 
                             /* This task dependency causes it to assemble or bundle. */
-                            task.dependsOn(getBuildTask(artifactType, buildVariant));
+                            // task.dependsOn(getBuildTask(artifactType, buildVariant));
                         });
 
                         /* AppInfo Tasks */
@@ -82,6 +85,7 @@ class PublishingPlugin implements Plugin<Project> {
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getBuildType().set(buildVariant);
+                                task.getLogHttp().set(logHttp);
                                 task.getVerbose().set(verbose);
                             });
                         }
@@ -95,6 +99,7 @@ class PublishingPlugin implements Plugin<Project> {
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getBuildType().set(buildVariant);
+                                task.getLogHttp().set(logHttp);
                                 task.getVerbose().set(verbose);
                             });
                         }
@@ -119,7 +124,7 @@ class PublishingPlugin implements Plugin<Project> {
     }
 
     @NotNull
-    private String getAppConfigPath(Project project, String buildVariant) {
+    private String getAppConfigPath(@NotNull Project project, @NotNull String buildVariant) {
         String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
         return basePath + "src" + File.separator + buildVariant + File.separator + "agconnect-services.json";
     }

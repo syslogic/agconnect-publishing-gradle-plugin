@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.EntityUtils;
@@ -32,6 +33,11 @@ import java.util.List;
 import java.util.Locale;
 
 import io.syslogic.agconnect.model.ApiException;
+import io.syslogic.agconnect.model.Endpoint;
+import io.syslogic.agconnect.model.FileInfoUpdateRequest;
+import io.syslogic.agconnect.model.FileInfoUpdateResponse;
+import io.syslogic.agconnect.model.FileUploadInfo;
+import io.syslogic.agconnect.model.ResultCode;
 import io.syslogic.agconnect.model.UploadFileListItem;
 import io.syslogic.agconnect.model.UploadResponseWrap;
 import io.syslogic.agconnect.model.UploadUrlResponse;
@@ -42,9 +48,6 @@ import io.syslogic.agconnect.model.UploadUrlResponse;
  * @author Martin Zeitler
  */
 abstract public class PublishingTask extends BaseTask {
-
-    @Input
-    public abstract Property<Boolean> getVerbose();
 
     @Input
     abstract public Property<String> getAppConfigFile();
@@ -58,21 +61,29 @@ abstract public class PublishingTask extends BaseTask {
     @Input
     abstract public Property<String> getBuildType();
 
+    @Input
+    public abstract Property<Boolean> getLogHttp();
+
+    @Input
+    public abstract Property<Boolean> getVerbose();
+
+    private int releaseType  = 1; /* 5 = phased. */
+    private String authCode  = null;
     private String uploadUrl = null;
     private String chunkUrl  = null;
-    private String authCode  = null;
 
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
         this.authenticate();
-        this.getUploadUrl(getArtifactType().get(), 1);
+        this.getUploadUrl(getArtifactType().get());
         this.uploadFile(getArtifactPath());
     }
 
     /**
-     * Obtain the build artifact path.
+     * Obtain the artifact path.
+     *
      * @return the absolute path to the artifact to upload.
      */
     @Nullable
@@ -80,29 +91,32 @@ abstract public class PublishingTask extends BaseTask {
         String name = getProject().getName();
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
         String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
-        String output = "/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT);
+        String output = File.separator + "build" + File.separator + "outputs" + File.separator +
+                getArtifactType().get().toLowerCase(Locale.ROOT);
         String basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
         if (new File(basePath).exists()) {
-            return basePath.concat(File.separator + buildType + File.separator + name+ "-" + buildType + "." + suffix);
+            return basePath.concat(File.separator + buildType + File.separator +
+                    name+ "-" + buildType + "." + suffix);
         }
         return null;
     }
 
     /**
-     * Obtaining the File Upload URL.
+     * Obtaining the upload URL.
+     *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-url-0000001158365047">Obtaining the File Upload URL</a>.
      */
     @SuppressWarnings("SameParameterValue")
-    private void getUploadUrl(String archiveSuffix, int releaseType) {
+    private void getUploadUrl(String archiveSuffix) {
         HttpGet request = new HttpGet();
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            request.setURI( new URIBuilder(ENDPOINT_PUBLISH_UPLOAD_URL)
+            request.setURI( new URIBuilder(Endpoint.PUBLISH_UPLOAD_URL)
                     .setParameter("appId", String.valueOf(this.appId))
+                    .setParameter("releaseType", String.valueOf(this.releaseType))
                     .setParameter("suffix", archiveSuffix)
-                    .setParameter("releaseType", String.valueOf(releaseType))
                     .build()
             );
 
@@ -129,18 +143,26 @@ abstract public class PublishingTask extends BaseTask {
     }
 
     /**
-     * Uploading a File.
+     * Uploading the File.
+     *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-file-0000001158245059">Uploading a File</a>.
      */
     @SuppressWarnings("SameParameterValue")
     private void uploadFile(String archivePath) {
 
         File file = new File(archivePath);
-        if (! file.exists()) {return;}
+        if (! file.exists()) {
+            String unsigned = archivePath.replace(".apk", "-unsigned.spk");
+            if (getVerbose().get()) {
+                if (new File(unsigned).exists()) {this.stdErr("File not signed: " + unsigned);}
+                else {this.stdErr("File not found: " + archivePath);}
+            }
+            return;
+        }
 
         if (this.uploadUrl != null && this.authCode != null) {
             HttpPost request = new HttpPost(this.uploadUrl);
-            request.addHeader("accept", "application/json");
+            request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
             request.setEntity(MultipartEntityBuilder.create()
                     .addPart("file", new FileBody(file))
                     .addTextBody("fileCount", "1")
@@ -155,21 +177,23 @@ abstract public class PublishingTask extends BaseTask {
                 String result = EntityUtils.toString(httpEntity);
                 if (statusCode == HttpStatus.SC_OK) {
                     UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
-                    if (wrap.getResult().getResultCode() == 0) {
+                    if (wrap.getResult().getResultCode() == ResultCode.SUCCESS) {
                         List<UploadFileListItem> items = wrap.getResult().getResult().getFileList();
                         for (UploadFileListItem item : items) {
-                            this.updateFileInfo(item);
                             if (getVerbose().get()) {
-                                // this.stdOut("Purified for file: " + item.getPurifiedForFile());
+                                // this.stdOut("Purified: " + item.getPurifiedForFile());
                                 this.stdOut("  Download: " + item.getDestinationUrl());
                                 this.stdOut("Disposable: " + item.getDisposableUrl());
                                 this.stdOut("      Size: " + item.getSizeFormatted());
                             }
-                        }
 
+                            /* update file upload info */
+                            this.updateFileInfo(getFileName(archivePath), item.getDestinationUrl());
+                        }
                         if (getVerbose().get()) {
                             this.stdOut("    Status: complete");
                         }
+
                     } else {
                         ApiException e = wrap.getResult().getException();
                         String msg = "Upload Status: " + e.getErrorCode() + ": " + e.getErrorDesc();
@@ -185,11 +209,49 @@ abstract public class PublishingTask extends BaseTask {
     }
 
     /**
-     * TODO ...
+     * Updating App File Information.
+     *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-file-info-0000001111685202">Updating App File Information</a>.
      */
-    private void updateFileInfo(UploadFileListItem item) {
-        HttpPut request = new HttpPut(ENDPOINT_PUBLISH_APP_FILE_INFO);
-        request.addHeader("accept", "application/json");
+    private void updateFileInfo(String fileName, String destFileUrl) {
+
+        HttpPut request = new HttpPut();
+        request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
+        request.setHeader("client_id", this.clientId);
+
+        try {
+            request.setURI( new URIBuilder(Endpoint.PUBLISH_APP_FILE_INFO)
+                    .setParameter("appId", String.valueOf(this.appId))
+                    .setParameter("releaseType", String.valueOf(this.releaseType))
+                    .build()
+            );
+
+            String payload = new FileInfoUpdateRequest(fileName, destFileUrl).toJson();
+            StringEntity entity = new StringEntity(payload);
+            request.setEntity(entity);
+
+            HttpResponse response = this.client.execute(request);
+            HttpEntity httpEntity = response.getEntity();
+            String result = EntityUtils.toString(httpEntity);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == HttpStatus.SC_OK) {
+                FileInfoUpdateResponse data = new Gson().fromJson(result, FileInfoUpdateResponse.class);
+                if (data.getStatus().getCode() == ResultCode.SUCCESS) {
+                    this.stdOut(data.getStatus().getMessage());
+                } else {
+                    /* upload has failed */
+                    this.stdErr("\nCode " + data.getStatus().getCode() + ": " +
+                            data.getStatus().getMessage());
+                    this.stdOut(Endpoint.PUBLISH_ERROR_CODES);
+                }
+            } else {
+                this.stdErr(response.getStatusLine().toString());
+            }
+        } catch (IOException | URISyntaxException e) {
+            this.stdErr(e.getMessage());
+        }
     }
 }

@@ -16,7 +16,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.model.AppIdListResponse;
 import io.syslogic.agconnect.model.AppInfoAppId;
-import io.syslogic.agconnect.model.UploadFileListItem;
+import io.syslogic.agconnect.model.Endpoint;
 
 /**
  * Abstract AppIdList {@link BaseTask}
@@ -24,9 +24,6 @@ import io.syslogic.agconnect.model.UploadFileListItem;
  * @author Martin Zeitler
  */
 abstract public class AppIdListTask extends BaseTask {
-
-    @Input
-    public abstract Property<Boolean> getVerbose();
 
     @Input
     abstract public Property<String> getAppConfigFile();
@@ -37,10 +34,16 @@ abstract public class AppIdListTask extends BaseTask {
     @Input
     abstract public Property<String> getBuildType();
 
+    @Input
+    public abstract Property<Boolean> getLogHttp();
+
+    @Input
+    public abstract Property<Boolean> getVerbose();
+
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
         if (getVerbose().get()) {this.stdOut("Getting ID list for package " + this.packageName + ".");}
         this.authenticate();
         this.getAppIdList();
@@ -55,7 +58,7 @@ abstract public class AppIdListTask extends BaseTask {
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            URIBuilder builder = new URIBuilder(ENDPOINT_PUBLISH_APP_ID_LIST);
+            URIBuilder builder = new URIBuilder(Endpoint.PUBLISH_APP_ID_LIST);
             builder.setParameter("packageName", String.valueOf(this.packageName));
 
             request.setURI(builder.build());

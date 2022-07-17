@@ -33,9 +33,11 @@ public class AppInfo {
     private String updateTime;
 
     @SerializedName("deviceTypes")
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private List<AppInfoDeviceType> deviceTypes;
 
     @SerializedName("languages")
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private List<AppInfoLanguage> languages;
 
     @SerializedName("auditInfo")
