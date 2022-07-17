@@ -27,11 +27,13 @@ plugins {
 }
 ````
 
-`PublicationExtension` can be configured with `apiConfigFile` and `verbose`:
+`PublicationExtension` can be configured with `apiConfigFile`, `logHttp` and `verbose`.<br/>
+The path to the API client credentials file is absolute, in order to permit external locations.
 
 ````
 agcPublishing {
     apiConfigFile = "${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
+    logHttp = true
     verbose = true
 }
 ````
