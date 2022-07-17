@@ -256,10 +256,8 @@ abstract public class PublishingTask extends BaseTask {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
                 FileInfoUpdateResponse data = new Gson().fromJson(result, FileInfoUpdateResponse.class);
-                if (data.getStatus().getCode() == ResultCode.SUCCESS) {
-                    this.stdOut(data.getStatus().getMessage());
-                } else {
-                    /* upload has failed */
+                /* If upload has failed */
+                if (data.getStatus().getCode() != ResultCode.SUCCESS) {
                     this.stdErr("\nCode " + data.getStatus().getCode() + ": " +
                             data.getStatus().getMessage());
                     this.stdOut(Endpoint.PUBLISH_ERROR_CODES);

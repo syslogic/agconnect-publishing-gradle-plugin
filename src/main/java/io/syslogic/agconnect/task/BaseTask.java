@@ -160,10 +160,10 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     void stdOut(@NotNull String value) {
-        getLogger().log(LogLevel.INFO, value);
+        System.out.println(value);
     }
 
     void stdErr(@NotNull String value) {
-        getLogger().log(LogLevel.ERROR, value);
+        System.err.println(value);
     }
 }
