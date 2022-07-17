@@ -1,5 +1,9 @@
 package io.syslogic.agconnect;
 
+import com.android.build.api.dsl.ApkSigningConfig;
+import com.android.build.api.dsl.ApplicationBuildType;
+import com.android.build.api.dsl.ApplicationExtension;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.gradle.api.Plugin;
@@ -9,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import io.syslogic.agconnect.task.AppInfoGetTask;
 import io.syslogic.agconnect.task.AppIdListTask;
@@ -23,12 +28,9 @@ import io.syslogic.agconnect.task.PublishingTask;
 @SuppressWarnings("unused")
 class PublishingPlugin implements Plugin<Project> {
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private @NotNull final String[] buildVariants = new String[]{"main", "debug", "release"};
-    private @NotNull final String[] artifactTypes = new String[]{"apk", "aab"};
     private @NotNull final String taskGroup = "agconnect";
+    private @Nullable PublishingExtension extension;
 
-    private @Nullable PublishingExtension extension = null;
     private @Nullable String apiConfigFile = null;
     private @NotNull Boolean logHttp = false;
     private @NotNull Boolean verbose = false;
@@ -37,26 +39,30 @@ class PublishingPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project project) {
 
-        /* Check Preconditions */
+        /* Check Preconditions. */
         if (! preconditionsMet(project)) {return;}
 
-        /* Create project extension `agcPublishing` */
+        /* Create project extension `agcPublishing`. */
         this.extension = project.getExtensions().create("agcPublishing", PublishingExtensionImpl.class);
+
+        /* Apply the default path for the API client configuration file. */
         this.apiConfigFile = project.getRootProject().getProjectDir().getAbsolutePath() +
                 File.separator + "credentials" + File.separator + "agc-apiclient.json";
 
-        /* Project after evaluate */
+        /* Project after evaluate. */
         project.afterEvaluate(it -> {
 
-            /* Register tasks, when file `agconnect-services.json` is present */
-            for (String artifactType : this.artifactTypes) {
-                for (String buildVariant : this.buildVariants) {
-                    String appConfigFile = getAppConfigPath(project, buildVariant);
+            /* Loop build-types which have a signing-config. */
+            for (String buildType : getBuildTypes(project)) {
+
+                /* Loop artifact-types APK & AAB. */
+                for (String artifactType : new String[]{"apk", "aab"}) { // aab or apk.
+
+                    /* When file `agconnect-services.json` is also present. */
+                    String appConfigFile = getAppConfigPath(project, buildType);
                     if (new File(appConfigFile).exists()) {
 
-                        String taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
-                        if (buildVariant.equals("main")) {taskName = "publish" + StringUtils.capitalize(artifactType);}
-
+                        /* Apply values provided by the PublishingExtension. */
                         if (! extension.getApiConfigFile().isEmpty()) {
                             if (! new File(extension.getApiConfigFile()).exists()) {
                                 System.err.println("Config file not found: " + extension.getApiConfigFile());
@@ -67,46 +73,46 @@ class PublishingPlugin implements Plugin<Project> {
                         }
                         if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
-                        // System.out.println("Found " + appConfig + ", registering task :" + taskName + ".");
 
                         /* Register Tasks: Publishing */
+                        String taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
                         project.getTasks().register(taskName, PublishingTask.class, task -> {
                             task.setGroup(taskGroup);
                             task.getApiConfigFile().set(apiConfigFile);
                             task.getAppConfigFile().set(appConfigFile);
                             task.getArtifactType().set(artifactType);
-                            task.getBuildType().set(buildVariant);
+                            task.getBuildType().set(buildType);
                             task.getLogHttp().set(logHttp);
                             task.getVerbose().set(verbose);
 
-                            /* This task dependency causes it to assemble or bundle. */
-                            String buildTask = getBuildTask(project, artifactType, buildVariant);
+                            /* This causes publish to depend on assemble or bundle. */
+                            String buildTask = getBuildTask(project, artifactType, buildType);
                             task.dependsOn(buildTask);
                         });
 
                         /* Register Tasks: AppInfo */
-                        taskName = "appInfo" + StringUtils.capitalize(buildVariant);
+                        taskName = "appInfo" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
                             project.getTasks().register(taskName, AppInfoGetTask.class, task -> {
                                 task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
-                                task.getBuildType().set(buildVariant);
+                                task.getBuildType().set(buildType);
                                 task.getLogHttp().set(logHttp);
                                 task.getVerbose().set(verbose);
                             });
                         }
 
                         /* Register Tasks: AppIdList */
-                        taskName = "appIdList" + StringUtils.capitalize(buildVariant);
+                        taskName = "appIdList" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
                             project.getTasks().register(taskName, AppIdListTask.class, task -> {
                                 task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
-                                task.getBuildType().set(buildVariant);
+                                task.getBuildType().set(buildType);
                                 task.getLogHttp().set(logHttp);
                                 task.getVerbose().set(verbose);
                             });
@@ -115,6 +121,27 @@ class PublishingPlugin implements Plugin<Project> {
                 }
             }
         });
+    }
+
+    /** Obtain Android ApplicationBuildType, which have a ApkSigningConfig. */
+    @NotNull
+    @SuppressWarnings("UnstableApiUsage")
+    private String[] getBuildTypes(@NotNull Project project) {
+        ArrayList<String> buildTypes = new ArrayList<>();
+        ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
+        for (ApplicationBuildType buildType : android.getBuildTypes()) {
+            ApkSigningConfig asc = buildType.getSigningConfig();
+            if (asc != null) {
+                // String path = "android.buildTypes." + buildType.getName() + ".signingConfig";
+                if (asc.getStoreFile()     == null || !asc.getStoreFile().exists()    ) {continue;}
+                if (asc.getStorePassword() == null || asc.getStorePassword().isEmpty()) {continue;}
+                if (asc.getKeyPassword()   == null || asc.getKeyPassword().isEmpty()  ) {continue;}
+                if (asc.getKeyAlias()      == null || asc.getKeyAlias().isEmpty()     ) {continue;}
+                buildTypes.add(buildType.getName());
+                // System.out.println(path + " OK");
+            }
+        }
+        return buildTypes.toArray(new String[0]);
     }
 
     /** Check if Android and AGConnect Gradle plugins were loaded. */

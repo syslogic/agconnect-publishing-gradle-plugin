@@ -17,7 +17,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.EntityUtils;
 
-import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -68,6 +67,7 @@ abstract public class PublishingTask extends BaseTask {
     public abstract Property<Boolean> getVerbose();
 
     private int releaseType  = 1; /* 5 = phased. */
+
     private String authCode  = null;
     private String uploadUrl = null;
     private String chunkUrl  = null;
@@ -78,7 +78,9 @@ abstract public class PublishingTask extends BaseTask {
         this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
         this.authenticate();
         this.getUploadUrl(getArtifactType().get());
-        this.uploadFile(getArtifactPath());
+        if (checkBuildOutput()) {
+            this.uploadFile(getArtifactPath());
+        }
     }
 
     /**
@@ -99,6 +101,26 @@ abstract public class PublishingTask extends BaseTask {
                     name+ "-" + buildType + "." + suffix);
         }
         return null;
+    }
+
+    /** Check build output. */
+    private boolean checkBuildOutput() {
+
+        /* Check if the file exists. */
+        String archivePath = getArtifactPath();
+        assert archivePath != null;
+
+        File file = new File(archivePath);
+        if (file.exists() && file.canRead()) {
+            return true;
+        } else {
+            /* Check if the file exists under an alternate name */
+            String message = "Not found: " + archivePath;
+            String unsigned = archivePath.replace(".apk", "-unsigned.apk");
+            if (new File(unsigned).exists()) {message = "Not signed: " + unsigned;}
+            this.stdErr(message);
+            return false;
+        }
     }
 
     /**
@@ -152,14 +174,7 @@ abstract public class PublishingTask extends BaseTask {
 
         /* Check if the file exists. */
         File file = new File(archivePath);
-        if (! file.exists()) {
-
-            /* Check if the file exists under an alternate name */
-            String message = "Not found: " + archivePath;
-            String unsigned = archivePath.replace(".apk", "-unsigned.apk");
-            if (new File(unsigned).exists()) {message = "Not signed: " + unsigned;}
-            throw new GradleException(message);
-        }
+        if (! file.exists()) {return;}
 
         if (this.uploadUrl != null && this.authCode != null) {
             HttpPost request = new HttpPost(this.uploadUrl);
@@ -180,21 +195,22 @@ abstract public class PublishingTask extends BaseTask {
                     UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
                     if (wrap.getResult().getResultCode() == ResultCode.SUCCESS) {
                         List<UploadFileListItem> items = wrap.getResult().getResult().getFileList();
+                        String sizeFormatted = "";
                         for (UploadFileListItem item : items) {
+                            sizeFormatted = item.getSizeFormatted();
                             if (getVerbose().get()) {
                                 // this.stdOut("Purified: " + item.getPurifiedForFile());
                                 this.stdOut("  Download: " + item.getDestinationUrl());
                                 this.stdOut("Disposable: " + item.getDisposableUrl());
-                                this.stdOut("      Size: " + item.getSizeFormatted());
+                                this.stdOut("      Size: " + sizeFormatted);
                             }
 
                             /* update file upload info */
                             this.updateFileInfo(getFileName(archivePath), item.getDestinationUrl());
                         }
-                        if (getVerbose().get()) {
-                            this.stdOut("    Status: complete");
+                         if (! getVerbose().get()) {
+                            this.stdOut("Uploaded " + sizeFormatted);
                         }
-
                     } else {
                         ApiException e = wrap.getResult().getException();
                         String msg = "Upload Status: " + e.getErrorCode() + ": " + e.getErrorDesc();

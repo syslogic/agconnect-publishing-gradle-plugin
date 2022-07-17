@@ -48,7 +48,7 @@ repositories {
 dependencies {
 
     compileOnly gradleApi()
-    compileOnly "com.android.tools.build:gradle-api:$agp_version"
+    implementation "com.android.tools.build:gradle-api:$agp_version"
     implementation "org.jetbrains:annotations:$annotations_version"
     implementation "org.apache.httpcomponents:httpcore:$httpcore_version"
     implementation "org.apache.httpcomponents:httpclient:$httpclient_version"

@@ -2,7 +2,6 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
@@ -18,6 +17,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
+import org.gradle.api.logging.LogLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -40,27 +40,20 @@ import io.syslogic.agconnect.model.TokenResponse;
  */
 abstract public class BaseTask extends DefaultTask {
 
-    Long appId = 0L;
-    Long projectId = 0L;
-    String packageName = null;
-
+    String ua;
+    HttpClient client;
     String clientId = null;
     String clientSecret = null;
     String accessToken = null;
-
-    HttpClient client;
-    private PoolingHttpClientConnectionManager cm;
-    private String ua;
+    String packageName = null;
+    Long projectId = 0L;
+    Long appId = 0L;
 
     /** It sets up HttpClient and parses two JSON config files. */
     void configure(@NotNull Project project, String appConfig, String apiConfig, boolean logHttp, boolean verbose) {
 
         /* PoolingHttpClientConnectionManager is required for subsequent requests. */
         this.ua = "Gradle/" + project.getGradle().getGradleVersion();
-        this.cm = new PoolingHttpClientConnectionManager();
-        this.cm.setDefaultMaxPerRoute(20);
-        this.cm.setMaxTotal(100);
-
         this.client = this.getHttpClient(logHttp);
 
         File file = new File(appConfig);
@@ -102,9 +95,12 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     private HttpClient getHttpClient(boolean logHttp) {
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setDefaultMaxPerRoute(20);
+        cm.setMaxTotal(100);
 
         HttpClientBuilder cb = HttpClientBuilder.create()
-                .setConnectionManager(this.cm)
+                .setConnectionManager(cm)
                 .setUserAgent(this.ua);
 
         if (logHttp) {
@@ -113,9 +109,7 @@ abstract public class BaseTask extends DefaultTask {
             })
             .addInterceptorLast((HttpResponseInterceptor) (request, context) -> {
                 stdOut("> " + request.getStatusLine().toString());
-                for (Header header : request.getAllHeaders()) {
-                    // stdOut("> " + header.toString());
-                }
+                // for (Header header : request.getAllHeaders()) {stdOut("> " + header.toString());}
             });
         }
         return cb.build();
@@ -166,10 +160,10 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     void stdOut(@NotNull String value) {
-        System.out.println(value);
+        getLogger().log(LogLevel.INFO, value);
     }
 
     void stdErr(@NotNull String value) {
-        System.err.println(value);
+        getLogger().log(LogLevel.ERROR, value);
     }
 }
