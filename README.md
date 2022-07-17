@@ -9,16 +9,56 @@ The official Huawei repositories can be found there: [@HMS-Core](https://github.
 
  ---
 
-### Installation
+### Development
 
-Currently the plugin can only be installed via `git clone`:
+The plugin source can be installed into any Gradle project via `git clone`:
 
     git clone https://github.com/syslogic/agconnect-publishing-gradle-plugin.git ./buildSrc
 
-### Configuration
+### Installation
 
 Plugin `io.syslogic.agconnect.publishing` depends on `com.android.application` and `com.huawei.agconnect`.
 
+<details>
+<summary>Plugins API</summary>
+<p>
+````
+/* Still required due to AGCP plugin. */
+buildscript {
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.2.1"
+    }
+}
+plugins {
+    id 'com.android.application' version "7.2.1" apply false
+    id 'com.huawei.agconnect.agcp' version "1.7.0.300" apply false
+    id 'io.syslogic.agconnect.publishing' version "7.2.1.3" apply false
+}
+````
+</p>
+</details>
+
+<details>
+<summary>Buildscript</summary>
+<p>
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://developer.huawei.com/repo/" }
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.2.1"
+        classpath "com.huawei.agconnect:agcp:1.7.0.300"
+        classpath "io.syslogic.agconnect:publishing:7.2.1.3"
+    }
+}
+````
+</p>
+</details>
+
+Module `build.gradle`:
 ````
 plugins {
     id 'com.android.application'
@@ -26,6 +66,8 @@ plugins {
     id 'io.syslogic.agconnect.publishing'
 }
 ````
+
+### Configuration
 
 `PublicationExtension` can be configured with `apiConfigFile`, `logHttp` and `verbose`.<br/>
 The path to the API client credentials file is absolute, in order to permit external locations.
