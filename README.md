@@ -55,7 +55,7 @@ The path to the API client credentials file is absolute, in order to permit exte
 ````groovy
 agcPublishing {
     apiConfigFile = "${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
-    logHttp = true
+    logHttp = false
     verbose = true
 }
 ````
