@@ -91,7 +91,7 @@ class PublishingPlugin implements Plugin<Project> {
                         });
 
                         /* Register Tasks: AppInfo */
-                        taskName = "appInfo" + StringUtils.capitalize(buildType);
+                        taskName = "getAppInfo" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
                             project.getTasks().register(taskName, AppInfoGetTask.class, task -> {
@@ -105,7 +105,7 @@ class PublishingPlugin implements Plugin<Project> {
                         }
 
                         /* Register Tasks: AppIdList */
-                        taskName = "appIdList" + StringUtils.capitalize(buildType);
+                        taskName = "getAppId" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
                             project.getTasks().register(taskName, AppIdListTask.class, task -> {
