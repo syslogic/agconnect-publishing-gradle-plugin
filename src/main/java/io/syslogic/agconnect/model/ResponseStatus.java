@@ -7,20 +7,19 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
 public class ResponseStatus {
 
     @SerializedName("code")
     private int code;
 
     @SerializedName("msg")
-    private String msg;
+    private String message;
 
     public int getCode() {
         return this.code;
     }
 
-    public String getMsg() {
-        return this.msg;
+    public String getMessage() {
+        return this.message;
     }
 }

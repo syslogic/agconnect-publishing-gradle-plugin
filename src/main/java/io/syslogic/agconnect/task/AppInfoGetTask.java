@@ -2,7 +2,7 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -10,22 +10,19 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 
+import org.apache.http.util.EntityUtils;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import io.syslogic.agconnect.model.AppInfoResponseWrap;
+import io.syslogic.agconnect.model.AppInfoResponse;
 
 /**
  * Abstract AppInfo {@link BaseTask}
  *
  * @author Martin Zeitler
  */
-abstract public class AppInfoTask extends BaseTask {
+abstract public class AppInfoGetTask extends BaseTask {
 
     @Input
     public abstract Property<Boolean> getVerbose();
@@ -45,7 +42,7 @@ abstract public class AppInfoTask extends BaseTask {
     // String lang = "en-US";
     String lang = null;
 
-    /** Default {@link TaskAction} */
+    /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
         this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
@@ -73,14 +70,12 @@ abstract public class AppInfoTask extends BaseTask {
             request.setURI(builder.build());
             HttpResponse response = this.client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity httpEntity = response.getEntity();
+            String result = EntityUtils.toString(httpEntity);
+
             if (statusCode == HttpStatus.SC_OK) {
 
-                InputStream stream = response.getEntity().getContent();
-                InputStreamReader isr = new InputStreamReader(stream, Consts.UTF_8);
-                BufferedReader br = new BufferedReader(isr);
-
-                String result = br.readLine();
-                AppInfoResponseWrap appInfo = new Gson().fromJson(result, AppInfoResponseWrap.class);
+                AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
                 appInfo.getAppInfo().setPackageName(this.packageName); // adding an additional field.
 
                 /* always logging the response */

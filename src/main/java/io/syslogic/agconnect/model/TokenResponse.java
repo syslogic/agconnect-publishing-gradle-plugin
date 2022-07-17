@@ -3,12 +3,12 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AccessTokenResponse
+ * Abstract Model: TokenResponse
  *
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
-public class AccessTokenResponse {
+public class TokenResponse {
 
     @SerializedName("access_token")
     private String accessToken;

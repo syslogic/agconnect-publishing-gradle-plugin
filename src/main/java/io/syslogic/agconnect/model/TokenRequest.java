@@ -3,12 +3,12 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AccessTokenRequest
+ * Abstract Model: TokenRequest
  *
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
-public class AccessTokenRequest {
+public class TokenRequest {
 
     @SerializedName("grant_type")
     private String grantType = "client_credentials";
@@ -17,10 +17,10 @@ public class AccessTokenRequest {
     private String clientId;
 
     @SerializedName("client_secret")
-    private String secret;
+    private String clientSecret;
 
-    public AccessTokenRequest(String clientId, String secret) {
+    public TokenRequest(String clientId, String secret) {
         this.clientId = clientId;
-        this.secret = secret;
+        this.clientSecret = secret;
     }
 }

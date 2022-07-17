@@ -10,7 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-import io.syslogic.agconnect.task.AppInfoTask;
+import io.syslogic.agconnect.task.AppInfoGetTask;
+import io.syslogic.agconnect.task.AppIdListTask;
 import io.syslogic.agconnect.task.PublishingTask;
 
 /**
@@ -59,6 +60,7 @@ class PublishingPlugin implements Plugin<Project> {
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
                         // System.out.println("Found " + appConfig + ", registering task :" + taskName + ".");
 
+                        /* Publish Tasks */
                         project.getTasks().register(taskName, PublishingTask.class, task -> {
                             task.setGroup(this.taskGroup);
                             task.getApiConfigFile().set(apiConfigFile);
@@ -71,10 +73,24 @@ class PublishingPlugin implements Plugin<Project> {
                             task.dependsOn(getBuildTask(artifactType, buildVariant));
                         });
 
+                        /* AppInfo Tasks */
                         taskName = "appInfo" + StringUtils.capitalize(buildVariant);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
-                            project.getTasks().register(taskName, AppInfoTask.class, task -> {
+                            project.getTasks().register(taskName, AppInfoGetTask.class, task -> {
+                                task.setGroup(this.taskGroup);
+                                task.getApiConfigFile().set(finalApiConfigFile1);
+                                task.getAppConfigFile().set(appConfigFile);
+                                task.getBuildType().set(buildVariant);
+                                task.getVerbose().set(verbose);
+                            });
+                        }
+
+                        /* AppId Tasks */
+                        taskName = "appId" + StringUtils.capitalize(buildVariant);
+                        if (project.getTasks().findByName(taskName) == null) {
+                            String finalApiConfigFile1 = apiConfigFile;
+                            project.getTasks().register(taskName, AppIdListTask.class, task -> {
                                 task.setGroup(this.taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);

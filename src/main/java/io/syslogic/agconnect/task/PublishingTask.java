@@ -58,27 +58,30 @@ abstract public class PublishingTask extends BaseTask {
     @Input
     abstract public Property<String> getBuildType();
 
-    private String basePath         = null;
-    private String uploadUrl        = null;
-    private String uploadUrlChunked = null;
-    private String authCode         = null;
+    private String uploadUrl = null;
+    private String chunkUrl  = null;
+    private String authCode  = null;
 
-    /** Default {@link TaskAction} */
+    /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        String output = "/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT);
-        this.basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
         this.setup(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
         this.authenticate();
         this.getUploadUrl(getArtifactType().get(), 1);
         this.uploadFile(getArtifactPath());
     }
 
+    /**
+     * Obtain the build artifact path.
+     * @return the absolute path to the artifact to upload.
+     */
     @Nullable
     private String getArtifactPath() {
         String name = getProject().getName();
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
         String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
+        String output = "/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT);
+        String basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
         if (new File(basePath).exists()) {
             return basePath.concat(File.separator + buildType + File.separator + name+ "-" + buildType + "." + suffix);
         }
@@ -86,6 +89,7 @@ abstract public class PublishingTask extends BaseTask {
     }
 
     /**
+     * Obtaining the File Upload URL.
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-url-0000001158365047">Obtaining the File Upload URL</a>.
      */
     @SuppressWarnings("SameParameterValue")
@@ -111,7 +115,7 @@ abstract public class PublishingTask extends BaseTask {
                 UploadUrlResponse result = new Gson().fromJson(rd.readLine(), UploadUrlResponse.class);
                 this.authCode = result.getAuthCode();
                 this.uploadUrl = result.getUploadUrl();
-                this.uploadUrlChunked = result.getChunkUploadUrl();
+                this.chunkUrl = result.getChunkUploadUrl();
                 if (getVerbose().get()) {
                     this.stdOut("  Endpoint: " + this.uploadUrl);
                 }
@@ -125,6 +129,7 @@ abstract public class PublishingTask extends BaseTask {
     }
 
     /**
+     * Uploading a File.
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-file-0000001158245059">Uploading a File</a>.
      */
     @SuppressWarnings("SameParameterValue")
@@ -144,19 +149,14 @@ abstract public class PublishingTask extends BaseTask {
             );
 
             try {
-                HttpResponse httpResponse = this.client.execute(request);
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-
-                HttpEntity httpEntity = httpResponse.getEntity();
-                String responseString = EntityUtils.toString(httpEntity);
-
+                HttpResponse response = this.client.execute(request);
+                int statusCode = response.getStatusLine().getStatusCode();
+                HttpEntity httpEntity = response.getEntity();
+                String result = EntityUtils.toString(httpEntity);
                 if (statusCode == HttpStatus.SC_OK) {
-                    UploadResponseWrap response = new Gson()
-                            .fromJson(responseString, UploadResponseWrap.class);
-                    if (response.getResult().getResultCode() == 0) {
-                        List<UploadFileListItem> items = response
-                                .getResult().getResult().getFileList();
-
+                    UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
+                    if (wrap.getResult().getResultCode() == 0) {
+                        List<UploadFileListItem> items = wrap.getResult().getResult().getFileList();
                         for (UploadFileListItem item : items) {
                             this.updateFileInfo(item);
                             if (getVerbose().get()) {
@@ -171,13 +171,12 @@ abstract public class PublishingTask extends BaseTask {
                             this.stdOut("    Status: complete");
                         }
                     } else {
-                        ApiException e = response.getResult().getException();
-                        this.stdErr("Upload Status: " +
-                                e.getErrorCode() + ": " + e.getErrorDesc());
+                        ApiException e = wrap.getResult().getException();
+                        String msg = "Upload Status: " + e.getErrorCode() + ": " + e.getErrorDesc();
+                        this.stdErr(msg);
                     }
                 } else {
-                    this.stdErr("Upload Status: HTTP " +
-                            statusCode + ": " + responseString);
+                    this.stdErr("Upload Status: HTTP " + statusCode + ": " + result);
                 }
             } catch (IOException e) {
                 this.stdErr(e.getMessage());

@@ -25,8 +25,8 @@ import java.nio.charset.StandardCharsets;
 
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
-import io.syslogic.agconnect.model.AccessTokenRequest;
-import io.syslogic.agconnect.model.AccessTokenResponse;
+import io.syslogic.agconnect.model.TokenRequest;
+import io.syslogic.agconnect.model.TokenResponse;
 
 /**
  * Abstract {@link BaseTask}
@@ -37,6 +37,7 @@ abstract public class BaseTask extends DefaultTask {
 
     static String ENDPOINT_OAUTH2_TOKEN = "https://connect-api.cloud.huawei.com/api/oauth2/v1/token";
     static String ENDPOINT_PUBLISH_UPLOAD_URL = "https://connect-api.cloud.huawei.com/api/publish/v2/upload-url";
+    static String ENDPOINT_PUBLISH_APP_ID_LIST = "https://connect-api.cloud.huawei.com/api/publish/v2/appid-list";
     static String ENDPOINT_PUBLISH_APP_FILE_INFO = "https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info";
     static String ENDPOINT_PUBLISH_APP_INFO = "https://connect-api.cloud.huawei.com/api/publish/v2/app-info";
 
@@ -96,7 +97,7 @@ abstract public class BaseTask extends DefaultTask {
 
     void authenticate() {
         HttpPost request = new HttpPost(ENDPOINT_OAUTH2_TOKEN);
-        String payload = new Gson().toJson(new AccessTokenRequest(this.clientId, this.clientSecret));
+        String payload = new Gson().toJson(new TokenRequest(this.clientId, this.clientSecret));
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
         request.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_JSON);
@@ -106,7 +107,7 @@ abstract public class BaseTask extends DefaultTask {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                AccessTokenResponse result = new Gson().fromJson(rd.readLine(), AccessTokenResponse.class);
+                TokenResponse result = new Gson().fromJson(rd.readLine(), TokenResponse.class);
                 this.accessToken = result.getAccessToken();
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
