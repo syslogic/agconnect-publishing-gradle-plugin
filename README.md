@@ -25,13 +25,13 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://developer.huawei.com/repo/" }
+        maven { url 'https://developer.huawei.com/repo/' }
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.2.1"
-        classpath "com.huawei.agconnect:agcp:1.7.0.300"
-        classpath "io.syslogic.agconnect:publishing:7.2.1.3"
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.huawei.agconnect:agcp:1.7.0.300'
+        classpath 'io.syslogic.agconnect:publishing:7.2.1.3'
     }
 }
 ````
