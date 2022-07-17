@@ -19,31 +19,7 @@ The plugin source can be installed into any Gradle project via `git clone`:
 
 Plugin `io.syslogic.agconnect.publishing` depends on `com.android.application` and `com.huawei.agconnect`.
 
-<details>
-<summary>Plugins API</summary>
-<p>
-
-````
-/* Still required due to AGCP plugin. */
-buildscript {
-    dependencies {
-        classpath "com.android.tools.build:gradle:7.2.1"
-    }
-}
-plugins {
-    id 'com.android.application' version "7.2.1" apply false
-    id 'com.huawei.agconnect.agcp' version "1.7.0.300" apply false
-    id 'io.syslogic.agconnect.publishing' version "7.2.1.3" apply false
-}
-````
-
-</p>
-</details>
-
-<details>
-<summary>Buildscript</summary>
-<p>
-
+Root `build.gradle`:
 ````
 buildscript {
     repositories {
@@ -59,9 +35,6 @@ buildscript {
     }
 }
 ````
-
-</p>
-</details>
 
 Module `build.gradle`:
 ````
@@ -88,6 +61,11 @@ agcPublishing {
 ### Screenshots
 
 ![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/screenshot_01.png)
+
+### Support
+- [Documentation](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-obtain_token-0000001158365043)
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/huawei-developers)
+- [Issue Tracker](https://github.com/syslogic/agconnect-publishing-gradle-plugin/issues)
 
 ### Status
 
