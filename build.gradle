@@ -87,7 +87,7 @@ task javadocs(type: Javadoc) {
     options.links "https://docs.oracle.com/en/java/javase/11/docs/api/"
     options.linkSource true
     options.author true
-    options.verbose()
+    // options.verbose()
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
