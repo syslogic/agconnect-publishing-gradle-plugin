@@ -1,9 +1,14 @@
 buildscript {
     ext {
-        agp_version = '7.2.1'
         plugin_version = '2'
+        agp_version = '7.2.1'
         agcp_version = '1.7.0.300'
         gson_version = '2.9.0'
+        annotations_version = '22.0.0'
+        lang3_version = '3.11' // StringUtils
+        httpclient_version = '4.5.13'
+        httpcore_version = '4.4.14'
+        httpmime_version = '4.5.6'
         junit_version = '5.8.2'
     }
     dependencies {
@@ -39,6 +44,22 @@ repositories {
     mavenLocal()
 }
 
+
+dependencies {
+
+    compileOnly gradleApi()
+    compileOnly "com.android.tools.build:gradle-api:$agp_version"
+    implementation "com.google.code.gson:gson:$gson_version"
+    implementation "org.apache.commons:commons-lang3:$lang3_version"
+    implementation "org.apache.httpcomponents:httpcore:$httpcore_version"
+    implementation "org.apache.httpcomponents:httpclient:$httpclient_version"
+    implementation "org.apache.httpcomponents:httpmime:$httpmime_version"
+    implementation "org.jetbrains:annotations:$annotations_version"
+
+    testImplementation gradleTestKit()
+    testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
+}
+
 gradlePlugin {
     plugins {
         PublishingPlugin {
@@ -48,21 +69,6 @@ gradlePlugin {
             implementationClass = 'io.syslogic.agconnect.PublishingPlugin'
         }
     }
-}
-
-dependencies {
-
-    compileOnly gradleApi()
-    compileOnly "com.android.tools.build:gradle-api:$agp_version"
-    implementation "com.google.code.gson:gson:$gson_version"
-    implementation "org.apache.commons:commons-lang3:3.11"
-    implementation "org.apache.httpcomponents:httpcore:4.4.14"
-    implementation "org.apache.httpcomponents:httpclient:4.5.13"
-    implementation "org.apache.httpcomponents:httpmime:4.5.6"
-    implementation "org.jetbrains:annotations:22.0.0"
-
-    testImplementation gradleTestKit()
-    testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
 }
 
 tasks.withType(Test).configureEach {
@@ -81,7 +87,7 @@ task javadocs(type: Javadoc) {
     options.links "https://docs.oracle.com/en/java/javase/11/docs/api/"
     options.linkSource true
     options.author true
-    // options.verbose()
+    options.verbose()
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -111,8 +117,8 @@ afterEvaluate {
                 from components.getByName("java")
                 version = "${agp_version}.${plugin_version}"
                 pom {
-                    name = 'AgConnect Publishing Plugin'
-                    description = 'Huawei AppGallery Connect Publishing Plugin'
+                    name = 'Huawei AppGallery Connect Publishing Plugin'
+                    description = 'It uploads APK & AAB to Huawei AppGallery Connect Publishing API.'
                     url = "https://github.com/syslogic/${artifactId}"
                     scm {
                         connection = "scm:git:git://github.com/syslogic/${artifactId}.git"

@@ -2,6 +2,8 @@ package io.syslogic.agconnect.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
@@ -39,15 +41,37 @@ public class AppInfoResponse {
     @SerializedName("auditInfo")
     private AuditInfo auditInfo;
 
+    // for easier identification.
+    private String packageName;
+    public void setPackageName(String value) {
+        this.packageName = value;
+    }
+
+    @NotNull
+    private String getDeviceTypesAsString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i < this.deviceTypes.size(); i++) {
+            sb.append(this.deviceTypes.get(i).getDeviceType());
+            if (i != this.deviceTypes.size()-1) {sb.append(",");}
+        }
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
-        return "AppInfo {"+
-            "releaseState: " + this.releaseState + ", " +
-            "defaultLang: " + this.defaultLang + ", " +
+        String lang = (this.languages == null ? "null" : String.valueOf(this.languages.size()));
+        String audit = (this.auditInfo == null ? "null" : this.auditInfo.toString());
+        return "AppInfo {" +
+            "updateTime: \"" + this.updateTime + "\", " +
+            "packageName: \"" + this.packageName + "\", " +
+            "developerName: \"" + this.developerName + "\", " +
             "parentType: " + this.parentType + ", " +
-            "developerName: " + this.developerName + ", " +
-            "certificateURLs: " + this.certificateURLs + ", " +
-            "updateTime: " + this.updateTime +
+            "releaseState: " + this.releaseState + ", " +
+            "deviceTypes: \"" + this.getDeviceTypesAsString() + "\", " +
+            "certificateURLs: \"" + this.certificateURLs + "\", " +
+            "defaultLang: \"" + this.defaultLang + "\", " +
+            "languages: \"" + lang + "\", " +
+            "auditInfo: \"" + audit + "\", " +
         "}";
     }
 }

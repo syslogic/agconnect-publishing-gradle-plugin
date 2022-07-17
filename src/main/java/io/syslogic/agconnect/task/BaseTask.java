@@ -41,14 +41,17 @@ abstract public class BaseTask extends DefaultTask {
     HttpClient client;
     String ua = "Gradle/7.2.1";
 
-    long projectId = -1L;
-    String appId = null;
+    Long appId = 0L;
+    Long projectId = 0L;
+    String packageName = null;;
+
     String clientId = null;
     String clientSecret = null;
     String accessToken = null;
 
-    /** It sets up HttpClient and parses config files. */
-    void parseConfigFiles(String appConfig, String apiConfig, boolean verbose) {
+    /** It sets up HttpClient and parses two JSON config files. */
+    void setup(String appConfig, String apiConfig, boolean verbose) {
+
         this.client = HttpClientBuilder.create().setUserAgent(this.ua).build();
 
         File file = new File(appConfig);
@@ -56,6 +59,7 @@ abstract public class BaseTask extends DefaultTask {
             System.out.println("App Config: " + appConfig);
             AppConfigFile config = new Gson().fromJson(readFile(file), AppConfigFile.class);
             this.appId = config.getClient().getAppId();
+            this.packageName = config.getClient().getPackageName();
             this.projectId = config.getClient().getProjectId();
         } else {
             System.err.println("AppId not found:");
@@ -88,9 +92,9 @@ abstract public class BaseTask extends DefaultTask {
         }
     }
 
-    void authenticate(String clientId, String clientSecret, boolean verbose) {
+    void authenticate() {
         HttpPost request = new HttpPost(ENDPOINT_OAUTH2_TOKEN);
-        String payload = new Gson().toJson(new AccessTokenRequest(clientId, clientSecret));
+        String payload = new Gson().toJson(new AccessTokenRequest(this.clientId, this.clientSecret));
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
         request.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_JSON);
@@ -102,7 +106,6 @@ abstract public class BaseTask extends DefaultTask {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                 AccessTokenResponse result = new Gson().fromJson(rd.readLine(), AccessTokenResponse.class);
                 this.accessToken = result.getAccessToken();
-                if (verbose) {System.out.println("     Token: " + this.accessToken);}
             } else {
                 System.err.println("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
@@ -112,13 +115,13 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     @NotNull
-    private String readFile(File file) {
+    private String readFile(@NotNull File file) {
         StringBuilder data = new StringBuilder();
         String line;
-        try (
-                FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                BufferedReader reader = new BufferedReader(isr)) {
+        try {
+            FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+            InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+            BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) {
                 data.append(line);
             }

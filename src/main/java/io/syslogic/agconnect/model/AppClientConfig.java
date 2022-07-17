@@ -11,6 +11,15 @@ import com.google.gson.annotations.SerializedName;
 @SuppressWarnings("unused")
 public class AppClientConfig {
 
+    @SerializedName("project_id")
+    private Long projectId;
+
+    @SerializedName("app_id")
+    private Long appId;
+
+    @SerializedName("package_name")
+    private String packageName;
+
     @SerializedName("cp_id")
     private String cpId;
 
@@ -23,20 +32,19 @@ public class AppClientConfig {
     @SerializedName("client_secret")
     private String clientSecret;
 
-    @SerializedName("project_id")
-    private long projectId;
-
-    @SerializedName("app_id")
-    private String appId;
-
     @SerializedName("api_key")
     private String apiKey;
 
-    @SerializedName("package_name")
-    private String packageName;
-
-    public String getAppId() {
+    public Long getAppId() {
         return this.appId;
+    }
+
+    public Long getProjectId() {
+        return this.projectId;
+    }
+
+    public String getPackageName() {
+        return this.packageName;
     }
 
     public String getClientId() {
@@ -49,13 +57,5 @@ public class AppClientConfig {
 
     public String getApiKey() {
         return this.apiKey;
-    }
-
-    public String getPackageName() {
-        return this.packageName;
-    }
-
-    public long getProjectId() {
-        return this.projectId;
     }
 }

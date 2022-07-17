@@ -44,9 +44,10 @@ abstract public class AppInfoTask extends BaseTask {
 
     @TaskAction
     public void run() {
-        this.parseConfigFiles(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
-        System.out.println("Query AppInfo for appId: " + this.appId);
-        this.authenticate(this.clientId, this.clientSecret, getVerbose().get());
+        this.setup(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        System.out.println("Query AppInfo for appId " + this.appId + ".");
+        System.out.println("https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp");
+        this.authenticate();
         this.getAppInfo();
     }
 
@@ -58,7 +59,7 @@ abstract public class AppInfoTask extends BaseTask {
         request.setHeader("client_id", this.clientId);
         try {
             request.setURI(new URIBuilder(ENDPOINT_PUBLISH_APP_INFO)
-                    .setParameter("appId", this.appId)
+                    .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("lang", this.lang)
                     .build()
             );
@@ -73,6 +74,7 @@ abstract public class AppInfoTask extends BaseTask {
 
                 String result = br.readLine();
                 AppInfoResponseWrap appInfo = new Gson().fromJson(result, AppInfoResponseWrap.class);
+                appInfo.getAppInfo().setPackageName(this.packageName);
                 System.out.println(appInfo.getAppInfo().toString());
 
             } else {

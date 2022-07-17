@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -56,16 +57,17 @@ abstract public class PublishingTask extends BaseTask {
     @Input
     abstract public Property<String> getBuildType();
 
-    private String basePath       = null;
-    private String uploadUrl      = null;
-    private String chunkUploadUrl = null;
-    private String authCode       = null;
+    private String basePath         = null;
+    private String uploadUrl        = null;
+    private String uploadUrlChunked = null;
+    private String authCode         = null;
 
     @TaskAction
     public void run() {
-        this.basePath = getProject().getProjectDir().getAbsolutePath().concat("/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT));
-        this.parseConfigFiles(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
-        this.authenticate(this.clientId, this.clientSecret, getVerbose().get());
+        String outputs = "/build/outputs/" + getArtifactType().get().toLowerCase(Locale.ROOT);
+        this.basePath = getProject().getProjectDir().getAbsolutePath().concat(outputs);
+        this.setup(getAppConfigFile().get(), getApiConfigFile().get(), getVerbose().get());
+        this.authenticate();
         this.getUploadUrl(getArtifactType().get(), 1);
         this.uploadFile(getArtifactPath());
     }
@@ -89,7 +91,7 @@ abstract public class PublishingTask extends BaseTask {
         request.setHeader("client_id", this.clientId);
         try {
             request.setURI( new URIBuilder(ENDPOINT_PUBLISH_UPLOAD_URL)
-                    .setParameter("appId", this.appId)
+                    .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("suffix", archiveSuffix)
                     .setParameter("releaseType", String.valueOf(releaseType))
                     .build()
@@ -98,15 +100,14 @@ abstract public class PublishingTask extends BaseTask {
             HttpResponse response = this.client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
-                InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), Consts.UTF_8);
+                InputStream stream = response.getEntity().getContent();
+                InputStreamReader isr = new InputStreamReader(stream, Consts.UTF_8);
                 BufferedReader rd = new BufferedReader(isr);
                 UploadUrlResponse result = new Gson().fromJson(rd.readLine(), UploadUrlResponse.class);
-                this.chunkUploadUrl = result.getChunkUploadUrl();
-                this.uploadUrl = result.getUploadUrl();
                 this.authCode = result.getAuthCode();
-                if (getVerbose().get()) {
-                    System.out.println("  Endpoint: " + this.uploadUrl);
-                }
+                this.uploadUrl = result.getUploadUrl();
+                this.uploadUrlChunked = result.getChunkUploadUrl();
+                if (getVerbose().get()) {System.out.println("  Endpoint: " + this.uploadUrl);}
             } else {
                 System.out.println("HTTP " + statusCode + " " +
                         response.getStatusLine().getReasonPhrase());
@@ -135,9 +136,11 @@ abstract public class PublishingTask extends BaseTask {
 
             try {
                 HttpResponse httpResponse = this.client.execute(request);
-                HttpEntity httpEntity = httpResponse.getEntity();
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
+
+                HttpEntity httpEntity = httpResponse.getEntity();
                 String responseString = EntityUtils.toString(httpEntity);
+
                 if (statusCode == HttpStatus.SC_OK) {
                     UploadResponseWrap response = new Gson().fromJson(responseString, UploadResponseWrap.class);
                     if (response.getResult().getResultCode() == 0) {

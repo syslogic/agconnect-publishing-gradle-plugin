@@ -15,6 +15,10 @@ public class AppInfoDeviceType {
     @SerializedName("deviceType")
     private int deviceType;
 
+    public int getDeviceType() {
+        return this.deviceType;
+    }
+
     @Override
     public String toString() {
         return "AppDeviceType {"+

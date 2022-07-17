@@ -8,6 +8,7 @@ package io.syslogic.agconnect;
 public class PublishingExtensionImpl implements PublishingExtension {
 
     private String apiConfigFile = null;
+
     private Boolean verbose = false;
 
     /**
@@ -15,24 +16,35 @@ public class PublishingExtensionImpl implements PublishingExtension {
      *
      * @param value the absolute path to the configuration JSON.
      */
-    @SuppressWarnings("unused")
     public void setApiConfigFile(String value) {
         this.apiConfigFile = value;
     }
+
+    /**
+     * Enable verbose logging.
+     *
+     * @param value whether true or false.
+     */
+    @SuppressWarnings("unused")
+    public void setVerbose(Boolean value) {
+        this.verbose = value;
+    }
+
+    /**
+     * Getter.
+     *
+     * @return the path to the API client configuration JSON file.
+     */
     @Override
     public String getApiConfigFile() {
         return this.apiConfigFile;
     }
 
     /**
-     * Enable verbose logging.
+     * Getter.
      *
-     * @param value wether true or false.
+     * @return verbose logging value.
      */
-    @SuppressWarnings("unused")
-    public void setVerbose(Boolean value) {
-        this.verbose = value;
-    }
     @Override
     public Boolean getVerbose() {
         return this.verbose;
