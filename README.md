@@ -17,11 +17,11 @@ The plugin source can be installed into any Gradle project via `git clone`:
 git clone https://github.com/syslogic/agconnect-publishing-gradle-plugin.git ./buildSrc
 ````
 
-### Installation
+### Package Installation
 
 Plugin `io.syslogic.agconnect.publishing` depends on `com.android.application` and `com.huawei.agconnect`.
 
-Root `build.gradle`:
+These plugins can be set up in the `buildscript` block of the root project's `build.gradle`:
 ````groovy
 buildscript {
     repositories {
@@ -38,7 +38,7 @@ buildscript {
 }
 ````
 
-Module `build.gradle`:
+Then they can be applid in the module's `build.gradle`:
 ````groovy
 plugins {
     id 'com.android.application'
