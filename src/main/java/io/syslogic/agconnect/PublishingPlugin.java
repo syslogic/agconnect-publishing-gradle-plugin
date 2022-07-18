@@ -80,7 +80,7 @@ class PublishingPlugin implements Plugin<Project> {
                         if (artifactType.equals(ArtifactType.AAB) && buildType.equals("debug")) {
                             /*
                              * The debug AAB would need to be signed with the upload key.
-                             * It is not possible to add the Android debug.keystoe either.
+                             * It is not possible to add the Android debug.keystore either.
                              */
                         } else {
                             project.getTasks().register(taskName, PublishingTask.class, task -> {
