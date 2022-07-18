@@ -98,7 +98,7 @@ The log output for task `:mobile:publishReleaseAab` explains what it does.
 > HTTP/1.1 200 OK
 
 AAB file someapp-release-1.0.0.aab has been uploaded.
-13.1 MB in 14s equals a transfer-rate of 957.0 kB/s
+13.1 MB in 14s equals a transfer-rate of 957.0 kB/s.
 ````
 
 ### Support
