@@ -6,6 +6,6 @@ package io.syslogic.agconnect.constants;
  * @author Martin Zeitler
  */
 public class ArtifactType {
-    public static String AAB = "aab";
-    public static String APK = "apk";
+    public static final String AAB = "aab";
+    public static final String APK = "apk";
 }
