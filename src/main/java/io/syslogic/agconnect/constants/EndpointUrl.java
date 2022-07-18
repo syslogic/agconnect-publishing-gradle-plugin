@@ -22,5 +22,6 @@ public class EndpointUrl {
 
     /** Console Pages */
     public static String AG_CONNECT_CERTIFICATES = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp/{appId}/9249519184596012000";
+    public static String AG_CONNECT_APP_INFO     = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp/{appId}/97458334310914199";
     public static String AG_CONNECT_API_CLIENT   = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/ups/9249519184595983326";
 }

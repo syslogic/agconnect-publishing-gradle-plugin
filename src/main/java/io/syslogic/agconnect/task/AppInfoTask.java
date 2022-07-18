@@ -84,11 +84,12 @@ abstract public class AppInfoTask extends BaseTask {
                 AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
                 appInfo.getAppInfo().setPackageName(this.packageName); // adding an additional field.
 
-                /* always logging the response */
+                /* Always logging the response. */
                 this.stdOut(appInfo.getAppInfo().toString());
 
+                /* Logging the URL to the "App information" page. */
                 if (getVerbose().get()) {
-                    this.stdOut("https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp");
+                    this.stdOut(EndpointUrl.AG_CONNECT_APP_INFO.replace("{appId}", String.valueOf(this.appId)));
                 }
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
