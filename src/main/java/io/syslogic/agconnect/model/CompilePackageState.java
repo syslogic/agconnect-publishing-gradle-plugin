@@ -4,36 +4,33 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Abstract Model: CompilePackageState
- *
+ * Note: `aabCompileStatus` and `failReason` will be deprecated.
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
 public class CompilePackageState {
 
-    @SerializedName("pkgId")
+     @SerializedName("pkgId")
     private String packageId;
-
-    @SerializedName("aabCompileStatus")
-    private int compileState;
-
-    @SerializedName("failReason")
-    private int failureReason;
 
     @SerializedName("successStatus")
     private int status;
 
+    /**
+     * App package ID.
+     * @return the ID of the app package.
+     */
     public String getPackageId() {
         return this.packageId;
     }
 
-    public int getCompileState() {
-        return this.compileState;
-    }
-
-    public int getFailureReason() {
-        return this.failureReason;
-    }
-
+    /**
+     * App package status
+     *
+     * 0: normal
+     * 1: being parsed or failed (indicating that the app package is unavailable)
+     * @return either 0 or 1.
+     */
     public int getStatus() {
         return this.status;
     }
@@ -42,8 +39,6 @@ public class CompilePackageState {
     public String toString() {
         return "CompilePackageState {"+
             "packageId: \"" + this.packageId + "\", " +
-            "compileState: \"" + this.compileState + "\", " +
-            "failureReason: \"" + this.failureReason + "\", " +
             "status: \"" + this.status + "\"" +
         "}";
     }

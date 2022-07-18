@@ -287,11 +287,7 @@ abstract public class PublishingTask extends BaseTask {
                 CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
                 for (CompilePackageState item : data.getPackageState()) {
                     /* Logging the package compilation status. */
-                    if (item.getStatus() != 0) {
-                        this.stdErr(item.toString());
-                    } else if (getVerbose().get()) {
-                        this.stdOut(item.toString());
-                    }
+                    if (getVerbose().get()) {this.stdOut(item.toString());}
                 }
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
