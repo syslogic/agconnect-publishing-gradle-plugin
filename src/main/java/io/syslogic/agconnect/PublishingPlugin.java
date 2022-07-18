@@ -74,15 +74,13 @@ class PublishingPlugin implements Plugin<Project> {
                         }
                         if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
+                        String taskName;
 
-                        /* Register Tasks: Publish. */
-                        String taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
-                        if (artifactType.equals(ArtifactType.AAB) && buildType.equals("debug")) {
-                            /*
-                             * The debug AAB would need to be signed with the upload key.
-                             * It is not possible to add the Android debug.keystore either.
-                             */
-                        } else {
+                        /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
+                        if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
+
+                            /* Register Tasks: Publish. */
+                            taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
                             project.getTasks().register(taskName, PublishingTask.class, task -> {
                                 task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(apiConfigFile);
@@ -96,6 +94,8 @@ class PublishingPlugin implements Plugin<Project> {
                                 String buildTask = getBuildTask(project, artifactType, buildType);
                                 task.dependsOn(buildTask);
                             });
+                        } else {
+                            /* The debug AAB would need to be signed with the upload key. */
                         }
 
                         /* Register Tasks: AppInfo */
