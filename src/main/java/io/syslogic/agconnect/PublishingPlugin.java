@@ -6,6 +6,7 @@ import com.android.build.api.dsl.ApplicationExtension;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -159,8 +160,9 @@ class PublishingPlugin implements Plugin<Project> {
     @SuppressWarnings("UnstableApiUsage")
     private void setDebugSigningConfig(@NotNull Project project) {
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
-        ApplicationBuildType btRelease = android.getBuildTypes().getByName("release");
-        ApplicationBuildType btDebug = android.getBuildTypes().getByName("debug");
+        NamedDomainObjectContainer<? extends ApplicationBuildType> buildTypes = android.getBuildTypes();
+        ApplicationBuildType btRelease = buildTypes.getByName("release");
+        ApplicationBuildType btDebug = buildTypes.getByName("debug");
         ApkSigningConfig apkSigningConfig = btRelease.getSigningConfig();
         btDebug.setSigningConfig(apkSigningConfig);
     }

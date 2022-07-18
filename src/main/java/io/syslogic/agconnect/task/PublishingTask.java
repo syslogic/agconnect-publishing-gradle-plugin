@@ -299,13 +299,14 @@ abstract public class PublishingTask extends BaseTask {
     }
 
     /**
-     * Obtain the artifact path.
+     * Obtain the artifact path from project property `archivesBaseName`.
+     * Project property `archivesBaseName` defaults to `project.name`.
      *
      * @return the absolute path to the artifact to upload.
      */
     @Nullable
     private String getArtifactPath() {
-        String name = getProject().getName();
+        String name = String.valueOf(getProject().getProperties().get("archivesBaseName"));
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
         String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
         String output = File.separator + "build" + File.separator + "outputs" +
