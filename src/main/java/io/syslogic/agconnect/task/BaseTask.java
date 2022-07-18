@@ -78,13 +78,13 @@ abstract public class BaseTask extends DefaultTask {
                 this.clientId = config.getClientId();
             } else {
                 this.stdErr("API client credentials must have role \"App administrator\"; provided: \"Administrator\"");
-                this.stdOut(EndpointUrl.CONNECT_API_CONSOLE);
+                this.stdOut(EndpointUrl.AG_CONNECT_API_CLIENT);
                 return false;
             }
         } else {
             this.stdErr("API client credentials not found:");
             this.stdOut(file.getAbsolutePath());
-            this.stdOut(EndpointUrl.CONNECT_API_CONSOLE);
+            this.stdOut(EndpointUrl.AG_CONNECT_API_CLIENT);
             return false;
         }
 

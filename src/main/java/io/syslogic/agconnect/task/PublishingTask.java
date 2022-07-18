@@ -4,6 +4,7 @@ import com.android.build.api.dsl.ApplicationExtension;
 import com.google.gson.Gson;
 
 import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -16,6 +17,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
 import org.gradle.api.provider.Property;
@@ -37,6 +39,8 @@ import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.constants.EndpointUrl;
+import io.syslogic.agconnect.model.CompilePackageState;
+import io.syslogic.agconnect.model.CompileStateResponse;
 import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
 import io.syslogic.agconnect.model.ResponseStatus;
@@ -108,12 +112,10 @@ abstract public class PublishingTask extends BaseTask {
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-url-0000001158365047">Obtaining the File Upload URL</a>.
      */
     private void getUploadUrl(String archiveSuffix) {
-        HttpGet request = new HttpGet();
-        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
-        request.setHeader("client_id", this.clientId);
         try {
-            request.setURI( new URIBuilder(EndpointUrl.PUBLISH_UPLOAD_URL)
+            HttpGet request = new HttpGet();
+            request.setHeaders(getDefaultHeaders());
+            request.setURI(new URIBuilder(EndpointUrl.PUBLISH_UPLOAD_URL)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
                     .setParameter("suffix", archiveSuffix)
@@ -147,7 +149,6 @@ abstract public class PublishingTask extends BaseTask {
      *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-file-0000001158245059">Uploading a File</a>.
      */
-    @SuppressWarnings("SameParameterValue")
     private void uploadFile(String archivePath) {
 
         /* Check if the file exists. */
@@ -216,15 +217,10 @@ abstract public class PublishingTask extends BaseTask {
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-file-info-0000001111685202">Updating App File Information</a>.
      */
     private void updateFileInfo(String fileName, String destFileUrl) {
-
-        HttpPut request = new HttpPut();
-        request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
-        request.setHeader("client_id", this.clientId);
-
         try {
-            request.setURI( new URIBuilder(EndpointUrl.PUBLISH_APP_FILE_INFO)
+            HttpPut request = new HttpPut();
+            request.setHeaders(getDefaultHeaders());
+            request.setURI(new URIBuilder(EndpointUrl.PUBLISH_APP_FILE_INFO)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
                     .build()
@@ -240,17 +236,26 @@ abstract public class PublishingTask extends BaseTask {
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
-
-                /* If upload has failed */
                 FileInfoUpdateResponse data = new Gson().fromJson(result, FileInfoUpdateResponse.class);
-                ResponseStatus status = data.getStatus();
+                String message = data.getStatus().getMessage();
                 String [] versions = data.getVersions();
-                if (status.getCode() != ResultCode.SUCCESS) {
-                    this.stdErr("\nCode " + status.getCode() + ": " + status.getMessage());
-                    this.stdOut(EndpointUrl.PUBLISH_ERROR_CODES);
-                } else if (versions.length > 0) { /* Query compile status by packageId. */
-                    String packageIds = String.join(",", Arrays.asList(data.getVersions()));
-                    this.getCompileStatus(packageIds);
+                int code = data.getStatus().getCode();
+
+                /* Query compile status by the returned packageId. */
+                if (code == ResultCode.SUCCESS) {
+                    if (versions.length > 0) {
+                        String packageIds = String.join(",", Arrays.asList(data.getVersions()));
+                        this.getCompileStatus(packageIds);
+                    }
+                } else if (
+                        code == ResultCode.ADD_APK_HAS_FAILED &&
+                        message.equals("[cds]add apk failed, additional msg is [app bundle must do app signature.]")
+                ) {
+                    /* Display an error message along with the URL to the relevant console page. */
+                    this.stdErr("Please enable App Signing in order to publish App Bundle format.");
+                    this.stdOut(EndpointUrl.AG_CONNECT_CERTIFICATES.replace("{appId}", String.valueOf(this.appId)));
+                } else {
+                    this.stdErr("\nCode " + code + ": " + message);
                 }
             } else {
                 this.stdErr(response.getStatusLine().toString());
@@ -260,35 +265,36 @@ abstract public class PublishingTask extends BaseTask {
         }
     }
 
-
     /**
-     * @param packageIds app package IDs, separated by commas.
+     * @param packageIds package IDs, separated by commas.
      */
-    @SuppressWarnings("UnusedReturnValue")
     public void getCompileStatus(@NotNull String packageIds) {
-
-        HttpGet request = new HttpGet();
-        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
-        request.setHeader("client_id", this.clientId);
         try {
-            URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS);
-            builder.setParameter("appId", String.valueOf(this.appId));
-            builder.setParameter("pkgIds", packageIds);
 
-            request.setURI(builder.build());
+            HttpGet request = new HttpGet();
+            request.setHeaders(getDefaultHeaders());
+            request.setURI(new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS)
+                    .setParameter("appId", String.valueOf(this.appId))
+                    .setParameter("pkgIds", packageIds)
+                    .build()
+            );
+
             HttpResponse response = this.client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
             HttpEntity httpEntity = response.getEntity();
             String result = EntityUtils.toString(httpEntity);
-            this.stdOut(result);
-
             if (statusCode == HttpStatus.SC_OK) {
 
+                /* Logging the package compilation status. */
+                if (getVerbose().get()) {
+                    CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
+                    for (CompilePackageState item : data.getPackageState()) {
+                        this.stdOut(item.toString());
+                    }
+                }
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
-
         } catch(Exception e) {
             this.stdErr(e.getMessage());
         }
@@ -328,6 +334,16 @@ abstract public class PublishingTask extends BaseTask {
             this.stdErr("Not found: " + archivePath);
             return false;
         }
+    }
+
+    @NotNull
+    private Header[] getDefaultHeaders() {
+        Header[] headers = new Header[4];
+        headers[0] = new BasicHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+        headers[1] = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        headers[2] = new BasicHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
+        headers[3] = new BasicHeader("client_id", this.clientId);
+        return headers;
     }
 
     /** Obtain version name. */

@@ -37,4 +37,14 @@ public class CompilePackageState {
     public int getStatus() {
         return this.status;
     }
+
+    @Override
+    public String toString() {
+        return "CompilePackageState {"+
+            "packageId: \"" + this.packageId + "\", " +
+            "compileState: \"" + this.compileState + "\", " +
+            "failureReason: \"" + this.failureReason + "\", " +
+            "status: \"" + this.status + "\"" +
+        "}";
+    }
 }

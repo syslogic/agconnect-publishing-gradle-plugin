@@ -13,5 +13,6 @@ public class ResultCode {
     public static int QUERY_DEV_ACCOUNT_INFO   = 204144643;
     public static int QUERY_APP_INFO           = 204144644;
     public static int OBTAIN_UPLOAD_AUTH_CODE  = 204144645;
-    public static int PACKAGE_UPLOAD_FAILED    = 204144646;
+    public static int FAILED_TO_UPLOAD_PACKAGE = 204144646;
+    public static int ADD_APK_HAS_FAILED       = 204144662;
 }
