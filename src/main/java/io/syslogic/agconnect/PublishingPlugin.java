@@ -67,7 +67,7 @@ class PublishingPlugin implements Plugin<Project> {
                         if (! extension.getApiConfigFile().isEmpty()) {
                             if (! new File(extension.getApiConfigFile()).exists()) {
                                 System.err.println("Config file not found: " + extension.getApiConfigFile());
-                                System.err.println("Keeping default value: " + apiConfigFile);
+                                System.err.println("Trying with default value: " + apiConfigFile);
                             } else {
                                 apiConfigFile = extension.getApiConfigFile();
                             }
