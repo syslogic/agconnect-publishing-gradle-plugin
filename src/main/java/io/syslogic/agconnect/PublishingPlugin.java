@@ -94,8 +94,6 @@ class PublishingPlugin implements Plugin<Project> {
                                 String buildTask = getBuildTask(project, artifactType, buildType);
                                 task.dependsOn(buildTask);
                             });
-                        } else {
-                            /* The debug AAB would need to be signed with the upload key. */
                         }
 
                         /* Register Tasks: AppInfo */
