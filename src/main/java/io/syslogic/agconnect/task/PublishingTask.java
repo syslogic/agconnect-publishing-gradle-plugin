@@ -306,15 +306,16 @@ abstract public class PublishingTask extends BaseTask {
      */
     @Nullable
     private String getArtifactPath() {
-        String name = String.valueOf(getProject().getProperties().get("archivesBaseName"));
-        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
+        String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
         String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
-        String output = File.separator + "build" + File.separator + "outputs" +
-                File.separator + (suffix.equals(ArtifactType.AAB) ? "bundle": "apk");
-        String basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
-        if (new File(basePath).exists()) {
-            return basePath.concat(File.separator + buildType + File.separator +
-                    name+ "-" + buildType + "." + suffix);
+        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
+        String fileName = (baseName + "-" + buildType + "." + suffix);
+        String output = getProject().getProjectDir().getAbsolutePath().concat(
+                File.separator + "build" + File.separator + "outputs" + File.separator +
+                (suffix.equals(ArtifactType.AAB) ? "bundle": "apk")
+        );
+        if (new File(output).exists()) {
+            return output.concat(File.separator + buildType + File.separator + fileName);
         }
         return null;
     }
