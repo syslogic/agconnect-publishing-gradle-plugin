@@ -38,6 +38,6 @@ jobs:
         id: retain-plugin-jar
         uses: actions/upload-artifact@v3
         with:
-          name: agconnect-publishing-plugin
+          name: agconnect-publishing-gradle-plugin
           path: ./build/libs/*.jar
           retention-days: 14
