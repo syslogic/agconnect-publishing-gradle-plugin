@@ -53,8 +53,11 @@ class PublishingPlugin implements Plugin<Project> {
         /* Project after evaluate. */
         project.afterEvaluate(it -> {
 
-            /* Apply buildTypes.release.signingConfig to buildTypes.debug.signingConfig. */
-            setDebugSigningConfig(project);
+            /*
+             * Apply buildTypes.release.signingConfig to buildTypes.debug.signingConfig.
+             * This may permit uploading debug AAB. TODO: this should be configurable.
+             */
+            // setDebugSigningConfig(project);
 
             /* Loop build-types which have a signing-config. */
             for (String buildType : getBuildTypes(project)) {
