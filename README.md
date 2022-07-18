@@ -64,7 +64,7 @@ agcPublishing {
 
 ![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/screenshot_01.png)
 
-### Example Log Output:
+### Example Log Output
 
 ````
 > Task :mobile:bundleRelease
