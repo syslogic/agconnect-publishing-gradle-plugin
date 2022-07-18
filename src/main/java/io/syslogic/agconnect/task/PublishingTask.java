@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
@@ -106,7 +107,6 @@ abstract public class PublishingTask extends BaseTask {
      *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-url-0000001158365047">Obtaining the File Upload URL</a>.
      */
-    @SuppressWarnings("SameParameterValue")
     private void getUploadUrl(String archiveSuffix) {
         HttpGet request = new HttpGet();
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
@@ -261,7 +261,9 @@ abstract public class PublishingTask extends BaseTask {
     }
 
 
-    /** */
+    /**
+     * @param packageIds app package IDs, separated by commas.
+     */
     @SuppressWarnings("UnusedReturnValue")
     public void getCompileStatus(@NotNull String packageIds) {
 
@@ -302,8 +304,8 @@ abstract public class PublishingTask extends BaseTask {
         String name = getProject().getName();
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
         String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
-        String output = File.separator + "build" + File.separator + "outputs" + File.separator +
-                getArtifactType().get().toLowerCase(Locale.ROOT);
+        String output = File.separator + "build" + File.separator + "outputs" +
+                File.separator + (suffix.equals(ArtifactType.AAB) ? "bundle": "apk");
         String basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
         if (new File(basePath).exists()) {
             return basePath.concat(File.separator + buildType + File.separator +
@@ -315,7 +317,7 @@ abstract public class PublishingTask extends BaseTask {
     /** Check build output. */
     private boolean checkBuildOutput() {
 
-        /* Check if the file exists. */
+        /* Check if the file exists and can be read. */
         String archivePath = getArtifactPath();
         assert archivePath != null;
 
@@ -328,7 +330,7 @@ abstract public class PublishingTask extends BaseTask {
         }
     }
 
-    /** Obtain VersionName. */
+    /** Obtain version name. */
     @NotNull
     @SuppressWarnings("UnstableApiUsage")
     private String getVersionName() {

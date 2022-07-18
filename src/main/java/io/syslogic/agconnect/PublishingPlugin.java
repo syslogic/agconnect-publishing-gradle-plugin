@@ -35,9 +35,6 @@ class PublishingPlugin implements Plugin<Project> {
 
     private @Nullable PublishingExtension extension;
     private @NotNull final String taskGroup = "agconnect";
-    private @NotNull final String[] artifactTypes = new String[] {
-            ArtifactType.APK, ArtifactType.AAB
-    };
 
     /** It depends on :assembleRelease or :bundleRelease */
     @Override
@@ -60,7 +57,7 @@ class PublishingPlugin implements Plugin<Project> {
             for (String buildType : getBuildTypes(project)) {
 
                 /* Loop artifact-types APK & AAB. */
-                for (String artifactType : artifactTypes) {
+                for (String artifactType : new String[] {ArtifactType.APK, ArtifactType.AAB}) {
 
                     /* When file `agconnect-services.json` is also present. */
                     String appConfigFile = getAppConfigPath(project, buildType);
