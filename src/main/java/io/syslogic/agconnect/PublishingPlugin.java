@@ -78,7 +78,10 @@ class PublishingPlugin implements Plugin<Project> {
                         /* Register Tasks: Publish. */
                         String taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
                         if (artifactType.equals(ArtifactType.AAB) && buildType.equals("debug")) {
-                            /* The debug AAB would need to be signed with the upload key. */
+                            /*
+                             * The debug AAB would need to be signed with the upload key.
+                             * It is not possible to add the Android debug.keystoe either.
+                             */
                         } else {
                             project.getTasks().register(taskName, PublishingTask.class, task -> {
                                 task.setGroup(taskGroup);
