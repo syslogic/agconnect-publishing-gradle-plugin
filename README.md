@@ -8,6 +8,9 @@ The trademarks are being referenced for identification purposes only, in terms o
 The official Huawei repositories can be found there: [@HMS-Core](https://github.com/orgs/HMS-Core/repositories).
 
  ---
+### Features
+
+ - It builds and uploads signed Android packages to the AppGallery Connect Publishing API.
 
 ### Development
 
@@ -49,12 +52,12 @@ plugins {
 
 ### Configuration
 
-`PublicationExtension` can be configured with:
+`PublicationExtension` can be configured with the following properties:
 
  - `configFile`: The path to the API client credentials file is absolute.
  - `assetDirectory`: Permits overriding the default asset directory name (work in progress).
- - `logHttp`: HTTP logging on/off.
  - `verbose`: Verbose logging on/off
+ - `logHttp`: HTTP logging on/off.
 
 ````groovy
 agcPublishing {
@@ -65,15 +68,24 @@ agcPublishing {
 }
 ````
 
+These properties are all optional, while:
+
+ - providing the config file at the default location: `credentials/agc-apiclient.json`.
+ - being happy with the default local assets name `agconnect`.
+ - not needing any debug console output, but only results.
+
 ### Plugin Tasks
 
 ![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/screenshot_01.png)
 
 ### Example Log Output
 
+The log output for task `:mobile:publishReleaseAab` explains what it does.
+
 ````
 > Task :mobile:bundleRelease
 > Task :mobile:publishReleaseAab
+
 > POST /api/oauth2/v1/token HTTP/1.1
 > HTTP/1.1 200 OK
 > GET /api/publish/v2/upload-url?appId=000000000&releaseType=1&suffix=aab HTTP/1.1
