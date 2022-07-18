@@ -77,9 +77,8 @@ abstract public class PublishingTask extends BaseTask {
     @NotNull
     String getUploadFileName() {
         String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
-        String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
-        return baseName + "-" + buildType + "." + suffix;
+        return baseName + "." + suffix;
     }
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
