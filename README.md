@@ -33,7 +33,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.1'
         classpath 'com.huawei.agconnect:agcp:1.7.0.300'
-        classpath 'io.syslogic.agconnect:publishing:7.2.1.4'
+        classpath 'io.syslogic.agconnect:publishing:7.2.1.5'
     }
 }
 ````
@@ -60,9 +60,29 @@ agcPublishing {
 }
 ````
 
-### Screenshots
+### Plugin Tasks
 
 ![Gradle Plugin Tasks](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/screenshot_01.png)
+
+### Example Log Output:
+
+````
+> Task :mobile:bundleRelease
+> Task :mobile:publishReleaseAab
+> POST /api/oauth2/v1/token HTTP/1.1
+> HTTP/1.1 200 OK
+> GET /api/publish/v2/upload-url?appId=000000000&releaseType=1&suffix=aab HTTP/1.1
+> HTTP/1.1 200 OK
+> POST /FileServer/uploadFile HTTP/1.1
+> HTTP/1.1 200 OK
+> PUT /api/publish/v2/app-file-info?appId=000000000&releaseType=1 HTTP/1.1
+> HTTP/1.1 200 OK
+> GET /api/publish/v2/package/compile/status?appId=000000000&pkgIds=00000000000000000 HTTP/1.1
+> HTTP/1.1 200 OK
+
+AAB someapp-release-1.0.0.aab had been uploaded.
+13.1 MB in 14s equals a transfer-rate of 957.0 kB/s
+````
 
 ### Support
 - [Documentation](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-obtain_token-0000001158365043)
