@@ -1,8 +1,10 @@
 buildscript {
     ext {
-        plugin_version = '4'
+        plugin_version = '5'
+        plugin_identifier = 'agconnect-publishing-gradle-plugin'
         agp_version = '7.2.1'
         agcp_version = '1.7.0.300'
+        publish_version = '1.0.0'
         annotations_version = '22.0.0'
         httpclient_version = '4.5.13'
         httpcore_version = '4.4.14'
@@ -14,17 +16,20 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
         classpath "com.huawei.agconnect:agcp:$agcp_version"
+        classpath "com.gradle.publish:plugin-publish-plugin:$publish_version"
     }
     repositories {
-        mavenCentral()
         google()
         maven { url 'https://developer.huawei.com/repo/' }
+        gradlePluginPortal()
+        mavenCentral()
     }
 }
 
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
 wrapper {
@@ -44,7 +49,6 @@ repositories {
     mavenLocal()
 }
 
-
 dependencies {
 
     compileOnly gradleApi()
@@ -60,12 +64,18 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
 }
 
+pluginBundle {
+    website = "https://github.com/syslogic/${plugin_identifier}"
+    vcsUrl = "https://github.com/syslogic/${plugin_identifier}.git"
+    tags = [ 'android', 'huawei', 'appgallery', 'connect', 'publish' ]
+}
+
 gradlePlugin {
     plugins {
         PublishingPlugin {
             id = 'io.syslogic.agconnect.publishing'
-            displayName = "AgConnectPublishingPlugin"
-            description = 'Huawei AppGallery Connect Publishing Plugin'
+            displayName = "AppGallery Connect Publishing Plugin"
+            description = 'It uploads to Huawei AppGallery Connect Publishing API'
             implementationClass = 'io.syslogic.agconnect.PublishingPlugin'
         }
     }
@@ -113,17 +123,17 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 groupId = group
-                artifactId = 'agconnect-publishing-gradle-plugin'
+                artifactId = "${plugin_identifier}"
                 from components.getByName("java")
                 version = "${agp_version}.${plugin_version}"
                 pom {
                     name = 'AppGallery Connect Publishing Plugin'
-                    description = 'It uploads APK & AAB to Huawei AppGallery Connect Publishing API.'
-                    url = "https://github.com/syslogic/${artifactId}"
+                    description = 'It uploads to Huawei AppGallery Connect Publishing API'
+                    url = "https://github.com/syslogic/${plugin_identifier}"
                     scm {
-                        connection = "scm:git:git://github.com/syslogic/${artifactId}.git"
-                        developerConnection = "scm:git:ssh://github.com/syslogic/${artifactId}.git"
-                        url = "https://github.com/syslogic/${artifactId}/"
+                        connection = "scm:git:git://github.com/syslogic/${plugin_identifier}.git"
+                        developerConnection = "scm:git:ssh://github.com/syslogic/${plugin_identifier}.git"
+                        url = "https://github.com/syslogic/${plugin_identifier}/"
                     }
                 }
             }
