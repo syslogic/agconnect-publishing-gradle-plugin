@@ -76,10 +76,11 @@ abstract public class PublishingTask extends BaseTask {
     @TaskAction
     public void run() {
         if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
-            this.authenticate();
-            this.getUploadUrl(getArtifactType().get());
-            if (checkBuildOutput()) {
-                this.uploadFile(getArtifactPath());
+            if (this.authenticate()) {
+                this.getUploadUrl(getArtifactType().get());
+                if (checkBuildOutput()) {
+                    this.uploadFile(getArtifactPath());
+                }
             }
         }
     }

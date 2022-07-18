@@ -99,32 +99,7 @@ abstract public class BaseTask extends DefaultTask {
         return true;
     }
 
-    /**
-     * @return an instance of {@link HttpClient}.
-     */
-    private HttpClient getHttpClient(boolean logHttp) {
-
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setDefaultMaxPerRoute(20);
-        cm.setMaxTotal(100);
-
-        HttpClientBuilder cb = HttpClientBuilder.create()
-                .setConnectionManager(cm)
-                .setUserAgent(this.ua);
-
-        if (logHttp) {
-            cb
-                .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> stdOut(
-                        "> " + request.getRequestLine().toString()
-                 ))
-                .addInterceptorLast((HttpResponseInterceptor) (request, context) -> stdOut(
-                        "> " + request.getStatusLine().toString()
-                ));
-        }
-        return cb.build();
-    }
-
-    void authenticate() {
+    boolean authenticate() {
         HttpPost request = new HttpPost(Endpoint.OAUTH2_TOKEN);
         String payload = new Gson().toJson(new TokenRequest(this.clientId, this.clientSecret));
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
@@ -138,19 +113,38 @@ abstract public class BaseTask extends DefaultTask {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                 TokenResponse result = new Gson().fromJson(rd.readLine(), TokenResponse.class);
                 this.accessToken = result.getAccessToken();
+                return true;
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
         } catch (IOException e) {
             this.stdErr(e.getMessage());
         }
+        return false;
     }
 
+    /**
+     * @return an instance of {@link HttpClient}.
+     */
     @NotNull
-    String getFileName(@NotNull String archivePath) {
-        String regex = File.separator.equals("\\") ? "\\u005c" : File.separator;
-        String[] parts = archivePath.split(regex);
-        return parts[ parts.length-1 ];
+    private HttpClient getHttpClient(boolean logHttp) {
+
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setDefaultMaxPerRoute(20);
+        cm.setMaxTotal(100);
+
+        HttpClientBuilder cb = HttpClientBuilder.create()
+                .setConnectionManager(cm)
+                .setUserAgent(this.ua);
+
+        if (logHttp) {
+            cb
+                    .addInterceptorFirst((HttpRequestInterceptor) (request, context) ->
+                            stdOut("> " + request.getRequestLine().toString()))
+                    .addInterceptorLast((HttpResponseInterceptor) (request, context) ->
+                            stdOut("> " + request.getStatusLine().toString()));
+        }
+        return cb.build();
     }
 
     @NotNull
@@ -166,6 +160,13 @@ abstract public class BaseTask extends DefaultTask {
             this.stdErr(e.getMessage());
         }
         return sb.toString();
+    }
+
+    @NotNull
+    String getFileName(@NotNull String archivePath) {
+        String regex = File.separator.equals("\\") ? "\\u005c" : File.separator;
+        String[] parts = archivePath.split(regex);
+        return parts[ parts.length-1 ];
     }
 
     void stdOut(@NotNull String value) {
