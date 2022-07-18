@@ -97,7 +97,7 @@ The log output for task `:mobile:publishReleaseAab` explains what it does.
 > GET /api/publish/v2/package/compile/status?appId=000000000&pkgIds=00000000000000000 HTTP/1.1
 > HTTP/1.1 200 OK
 
-AAB someapp-release-1.0.0.aab had been uploaded.
+AAB file someapp-release-1.0.0.aab has been uploaded.
 13.1 MB in 14s equals a transfer-rate of 957.0 kB/s
 ````
 
