@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
-import io.syslogic.agconnect.model.Endpoint;
+import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.TokenRequest;
 import io.syslogic.agconnect.model.TokenResponse;
 
@@ -78,13 +78,13 @@ abstract public class BaseTask extends DefaultTask {
                 this.clientId = config.getClientId();
             } else {
                 this.stdErr("API client credentials must have role \"App administrator\"; provided: \"Administrator\"");
-                this.stdOut(Endpoint.CONNECT_API_CONSOLE);
+                this.stdOut(EndpointUrl.CONNECT_API_CONSOLE);
                 return false;
             }
         } else {
             this.stdErr("API client credentials not found:");
             this.stdOut(file.getAbsolutePath());
-            this.stdOut(Endpoint.CONNECT_API_CONSOLE);
+            this.stdOut(EndpointUrl.CONNECT_API_CONSOLE);
             return false;
         }
 
@@ -100,7 +100,7 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     boolean authenticate() {
-        HttpPost request = new HttpPost(Endpoint.OAUTH2_TOKEN);
+        HttpPost request = new HttpPost(EndpointUrl.OAUTH2_TOKEN);
         String payload = new Gson().toJson(new TokenRequest(this.clientId, this.clientSecret));
         request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
         request.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());

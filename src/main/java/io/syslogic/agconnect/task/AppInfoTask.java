@@ -16,7 +16,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.model.AppInfoResponse;
-import io.syslogic.agconnect.model.Endpoint;
+import io.syslogic.agconnect.constants.EndpointUrl;
 
 /**
  * Abstract AppInfo {@link BaseTask}
@@ -67,7 +67,7 @@ abstract public class AppInfoTask extends BaseTask {
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            URIBuilder builder = new URIBuilder(Endpoint.PUBLISH_APP_INFO);
+            URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_INFO);
             builder.setParameter("appId", String.valueOf(this.appId));
 
             /* If this parameter is not passed, app information in all languages is queried. */

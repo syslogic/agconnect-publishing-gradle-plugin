@@ -31,14 +31,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import io.syslogic.agconnect.model.Endpoint;
+import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
 import io.syslogic.agconnect.model.ResponseStatus;
-import io.syslogic.agconnect.model.ResultCode;
+import io.syslogic.agconnect.constants.ResultCode;
 import io.syslogic.agconnect.model.UploadFileItem;
 import io.syslogic.agconnect.model.UploadResponseWrap;
 import io.syslogic.agconnect.model.UploadUrlResponse;
@@ -78,13 +79,14 @@ abstract public class PublishingTask extends BaseTask {
         return name + "-" + buildType + "-" + getVersionName() + "." + suffix;
     }
 
-    private String uploadUrl = null;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String chunkUrl  = null;
+    private String uploadUrl = null;
     private String authCode  = null;
 
-    private int releaseType  = 1; /* 5 = phased. */
-
-    private long timestamp = 0L;
+    /** Release Type: value 1=network, 5=phased. */
+    @SuppressWarnings("FieldMayBeFinal")
+    private int releaseType  = 1;
 
     /** The default {@link TaskAction}. */
     @TaskAction
@@ -111,7 +113,7 @@ abstract public class PublishingTask extends BaseTask {
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            request.setURI( new URIBuilder(Endpoint.PUBLISH_UPLOAD_URL)
+            request.setURI( new URIBuilder(EndpointUrl.PUBLISH_UPLOAD_URL)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
                     .setParameter("suffix", archiveSuffix)
@@ -163,7 +165,7 @@ abstract public class PublishingTask extends BaseTask {
             );
 
             try {
-                this.timestamp = System.currentTimeMillis();
+                long timestamp = System.currentTimeMillis();
                 HttpResponse response = this.client.execute(request);
                 int statusCode = response.getStatusLine().getStatusCode();
                 HttpEntity httpEntity = response.getEntity();
@@ -172,7 +174,7 @@ abstract public class PublishingTask extends BaseTask {
                     UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
                     if (wrap.getResult().getResultCode() == ResultCode.SUCCESS) {
                         List<UploadFileItem> items = wrap.getResult().getResult().getFileList();
-                        String sizeFormatted = "";
+                        String sizeFormatted;
                         for (UploadFileItem item : items) {
 
                             /* Verbose logging */
@@ -184,14 +186,14 @@ abstract public class PublishingTask extends BaseTask {
                                 this.stdOut("      Size: " + sizeFormatted);
                             }
 
-                            /* Update file upload info */
+                            /* Update the information for the uploaded file. */
                             String filename = getUploadFileName();
                             this.updateFileInfo(filename, item.getDestinationUrl());
 
-                            /* Log transfer stats */
-                            float duration = System.currentTimeMillis() - this.timestamp;
+                            /* Log transfer stats before the task completes. */
+                            float duration = System.currentTimeMillis() - timestamp;
                             float rate = item.getSize() / duration;
-                            this.stdOut("\n" + getArtifactType().get().toUpperCase(Locale.ROOT) + " successfully uploaded: " + getUploadFileName());
+                            this.stdOut("\n" + getArtifactType().get().toUpperCase(Locale.ROOT) + " " + getUploadFileName() + " had been uploaded.");
                             this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + rate + " MB/s");
                         }
                     } else {
@@ -222,7 +224,7 @@ abstract public class PublishingTask extends BaseTask {
         request.setHeader("client_id", this.clientId);
 
         try {
-            request.setURI( new URIBuilder(Endpoint.PUBLISH_APP_FILE_INFO)
+            request.setURI( new URIBuilder(EndpointUrl.PUBLISH_APP_FILE_INFO)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
                     .build()
@@ -238,17 +240,54 @@ abstract public class PublishingTask extends BaseTask {
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
-                FileInfoUpdateResponse data = new Gson().fromJson(result, FileInfoUpdateResponse.class);
+
                 /* If upload has failed */
-                if (data.getStatus().getCode() != ResultCode.SUCCESS) {
-                    this.stdErr("\nCode " + data.getStatus().getCode() + ": " +
-                            data.getStatus().getMessage());
-                    this.stdOut(Endpoint.PUBLISH_ERROR_CODES);
+                FileInfoUpdateResponse data = new Gson().fromJson(result, FileInfoUpdateResponse.class);
+                ResponseStatus status = data.getStatus();
+                String [] versions = data.getVersions();
+                if (status.getCode() != ResultCode.SUCCESS) {
+                    this.stdErr("\nCode " + status.getCode() + ": " + status.getMessage());
+                    this.stdOut(EndpointUrl.PUBLISH_ERROR_CODES);
+                } else if (versions.length > 0) { /* Query compile status by packageId. */
+                    String packageIds = String.join(",", Arrays.asList(data.getVersions()));
+                    this.getCompileStatus(packageIds);
                 }
             } else {
                 this.stdErr(response.getStatusLine().toString());
             }
         } catch (IOException | URISyntaxException e) {
+            this.stdErr(e.getMessage());
+        }
+    }
+
+
+    /** */
+    @SuppressWarnings("UnusedReturnValue")
+    public void getCompileStatus(@NotNull String packageIds) {
+
+        HttpGet request = new HttpGet();
+        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
+        request.setHeader("client_id", this.clientId);
+        try {
+            URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS);
+            builder.setParameter("appId", String.valueOf(this.appId));
+            builder.setParameter("pkgIds", packageIds);
+
+            request.setURI(builder.build());
+            HttpResponse response = this.client.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity httpEntity = response.getEntity();
+            String result = EntityUtils.toString(httpEntity);
+            this.stdOut(result);
+
+            if (statusCode == HttpStatus.SC_OK) {
+
+            } else {
+                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
+            }
+
+        } catch(Exception e) {
             this.stdErr(e.getMessage());
         }
     }
@@ -284,11 +323,7 @@ abstract public class PublishingTask extends BaseTask {
         if (file.exists() && file.canRead()) {
             return true;
         } else {
-            /* Check if the file exists under an alternate name */
-            String message = "Not found: " + archivePath;
-            String unsigned = archivePath.replace(".apk", "-unsigned.apk");
-            if (new File(unsigned).exists()) {message = "Not signed: " + unsigned;}
-            this.stdErr(message);
+            this.stdErr("Not found: " + archivePath);
             return false;
         }
     }

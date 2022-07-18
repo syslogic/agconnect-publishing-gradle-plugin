@@ -16,10 +16,10 @@ import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.model.AppIdListResponse;
 import io.syslogic.agconnect.model.AppInfoAppId;
-import io.syslogic.agconnect.model.Endpoint;
+import io.syslogic.agconnect.constants.EndpointUrl;
 
 /**
- * Abstract AppIdList {@link BaseTask}
+ * Abstract AppId {@link BaseTask}
  *
  * @author Martin Zeitler
  */
@@ -60,7 +60,7 @@ abstract public class AppIdTask extends BaseTask {
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
         request.setHeader("client_id", this.clientId);
         try {
-            URIBuilder builder = new URIBuilder(Endpoint.PUBLISH_APP_ID_LIST);
+            URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_ID_LIST);
             builder.setParameter("packageName", String.valueOf(this.packageName));
 
             request.setURI(builder.build());

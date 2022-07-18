@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 
+import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.AppIdTask;
 import io.syslogic.agconnect.task.PublishingTask;
@@ -28,12 +29,15 @@ import io.syslogic.agconnect.task.PublishingTask;
 @SuppressWarnings("unused")
 class PublishingPlugin implements Plugin<Project> {
 
-    private @NotNull final String taskGroup = "agconnect";
-    private @Nullable PublishingExtension extension;
-
     private @Nullable String apiConfigFile = null;
     private @NotNull Boolean logHttp = false;
     private @NotNull Boolean verbose = false;
+
+    private @Nullable PublishingExtension extension;
+    private @NotNull final String taskGroup = "agconnect";
+    private @NotNull final String[] artifactTypes = new String[] {
+            ArtifactType.APK, ArtifactType.AAB
+    };
 
     /** It depends on :assembleRelease or :bundleRelease */
     @Override
@@ -56,7 +60,7 @@ class PublishingPlugin implements Plugin<Project> {
             for (String buildType : getBuildTypes(project)) {
 
                 /* Loop artifact-types APK & AAB. */
-                for (String artifactType : new String[]{"apk", "aab"}) { // aab or apk.
+                for (String artifactType : artifactTypes) {
 
                     /* When file `agconnect-services.json` is also present. */
                     String appConfigFile = getAppConfigPath(project, buildType);
@@ -74,7 +78,7 @@ class PublishingPlugin implements Plugin<Project> {
                         if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
-                        /* Register Tasks: Publishing */
+                        /* Register Tasks: Publish */
                         String taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
                         project.getTasks().register(taskName, PublishingTask.class, task -> {
                             task.setGroup(taskGroup);
@@ -104,7 +108,7 @@ class PublishingPlugin implements Plugin<Project> {
                             });
                         }
 
-                        /* Register Tasks: AppIdList */
+                        /* Register Tasks: AppId */
                         taskName = "getAppId" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
@@ -167,8 +171,8 @@ class PublishingPlugin implements Plugin<Project> {
     @NotNull
     private String getBuildTask(@NotNull Project project, @NotNull String artifactType, @NotNull String buildVariant) {
         String task = "assembleRelease";
-        if (artifactType.equals("aab")) {task = "bundle" + StringUtils.capitalize(buildVariant);}
-        else if (artifactType.equals("apk")) {task = "assemble" + StringUtils.capitalize(buildVariant);}
+        if (artifactType.equals(ArtifactType.AAB)) {task = "bundle" + StringUtils.capitalize(buildVariant);}
+        else if (artifactType.equals(ArtifactType.APK)) {task = "assemble" + StringUtils.capitalize(buildVariant);}
         return ":" + project.getName() + ":" + task;
     }
 }

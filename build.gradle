@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        plugin_version = '3'
+        plugin_version = '4'
         agp_version = '7.2.1'
         agcp_version = '1.7.0.300'
         annotations_version = '22.0.0'
