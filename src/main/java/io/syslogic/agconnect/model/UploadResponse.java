@@ -14,14 +14,14 @@ public class UploadResponse {
     private int resultCode;
 
     @SerializedName("CException")
-    private ApiException exception;
+    private ResponseStatus status;
 
     @SerializedName("UploadFileRsp")
     private UploadFileResponse result;
 
     public int getResultCode() {return this.resultCode;}
 
-    public ApiException getException() {return this.exception;}
+    public ResponseStatus getStatus() {return this.status;}
 
     public UploadFileResponse getResult() {
         return this.result;

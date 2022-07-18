@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Abstract Model: AppConfig
- * This is the app config file.
+ *
+ * This is file agconnect-services.json, where only appId is of interest.
  *
  * @author Martin Zeitler
  */
@@ -12,9 +13,9 @@ import com.google.gson.annotations.SerializedName;
 public class AppConfigFile {
 
     @SerializedName("client")
-    private AppClientConfig client;
+    private AppConfigClient client;
 
-    public AppClientConfig getClient() {
+    public AppConfigClient getClient() {
         return this.client;
     }
 }

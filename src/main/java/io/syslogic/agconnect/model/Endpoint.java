@@ -17,6 +17,9 @@ public class Endpoint {
     public static String PUBLISH_PHASED_RELEASE = "https://connect-api.cloud.huawei.com/api/publish/v2/phased-release";
     public static String PUBLISH_ON_SHELF_TIME  = "https://connect-api.cloud.huawei.com/api/publish/v2/on-shelf-time";
 
+    /** AppGallery Connect API */
+    public static String CONNECT_API_CONSOLE    = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/ups/9249519184595983326";
+
     /** Status Codes */
     public static String PUBLISH_ERROR_CODES    = "https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-publishingapi-errorcode-0000001163523297";
 }

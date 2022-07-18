@@ -32,10 +32,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
-import io.syslogic.agconnect.model.ApiException;
 import io.syslogic.agconnect.model.Endpoint;
 import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
+import io.syslogic.agconnect.model.ResponseStatus;
 import io.syslogic.agconnect.model.ResultCode;
 import io.syslogic.agconnect.model.UploadFileListItem;
 import io.syslogic.agconnect.model.UploadResponseWrap;
@@ -75,11 +75,12 @@ abstract public class PublishingTask extends BaseTask {
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
-        this.authenticate();
-        this.getUploadUrl(getArtifactType().get());
-        if (checkBuildOutput()) {
-            this.uploadFile(getArtifactPath());
+        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
+            this.authenticate();
+            this.getUploadUrl(getArtifactType().get());
+            if (checkBuildOutput()) {
+                this.uploadFile(getArtifactPath());
+            }
         }
     }
 
@@ -212,8 +213,8 @@ abstract public class PublishingTask extends BaseTask {
                             this.stdOut("Uploaded " + sizeFormatted);
                         }
                     } else {
-                        ApiException e = wrap.getResult().getException();
-                        String msg = "Upload Status: " + e.getErrorCode() + ": " + e.getErrorDesc();
+                        ResponseStatus e = wrap.getResult().getStatus();
+                        String msg = "Upload Status: " + e.getCode() + ": " + e.getMessage();
                         this.stdErr(msg);
                     }
                 } else {

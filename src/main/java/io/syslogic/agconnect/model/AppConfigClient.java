@@ -3,13 +3,14 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AppClientConfig
- * This is the app config file; only appId is of interest.
+ * Abstract Model: AppConfigClient
+ *
+ * This is file agconnect-services.json, where only appId is of interest.
  *
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
-public class AppClientConfig {
+public class AppConfigClient {
 
     @SerializedName("project_id")
     private Long projectId;

@@ -49,10 +49,11 @@ abstract public class AppInfoGetTask extends BaseTask {
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
-        if (getVerbose().get()) {this.stdOut("Query AppInfo for appId " + this.appId + ".");}
-        this.authenticate();
-        this.getAppInfo();
+        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
+            if (getVerbose().get()) {this.stdOut("Query AppInfo for appId " + this.appId + ".");}
+            this.authenticate();
+            this.getAppInfo();
+        }
     }
 
     /**

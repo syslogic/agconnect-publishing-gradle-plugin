@@ -9,10 +9,10 @@ import com.google.gson.annotations.SerializedName;
  */
 public class ResponseStatus {
 
-    @SerializedName("code")
+    @SerializedName(value="errorCode", alternate={"code"})
     private int code;
 
-    @SerializedName("msg")
+    @SerializedName(value="errorDesc", alternate={"msg"})
     private String message;
 
     public int getCode() {

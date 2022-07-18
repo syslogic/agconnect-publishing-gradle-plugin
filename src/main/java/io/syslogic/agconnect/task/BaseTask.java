@@ -17,7 +17,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
-import org.gradle.api.logging.LogLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -50,7 +49,7 @@ abstract public class BaseTask extends DefaultTask {
     Long appId = 0L;
 
     /** It sets up HttpClient and parses two JSON config files. */
-    void configure(@NotNull Project project, String appConfig, String apiConfig, boolean logHttp, boolean verbose) {
+    boolean configure(@NotNull Project project, String appConfig, String apiConfig, boolean logHttp, boolean verbose) {
 
         /* PoolingHttpClientConnectionManager is required for subsequent requests. */
         this.ua = "Gradle/" + project.getGradle().getGradleVersion();
@@ -66,22 +65,27 @@ abstract public class BaseTask extends DefaultTask {
         } else {
             this.stdErr("AppId not found:");
             this.stdErr(file.getAbsolutePath());
+            return false;
         }
 
         file = new File(apiConfig);
         if (file.exists() && file.canRead()) {
             if (verbose) {this.stdOut("API Config: " + apiConfig);}
             ApiConfigFile config = new Gson().fromJson(readFile(file), ApiConfigFile.class);
-            if (config.getType().equals("team_client_id")) {
+            String role = config.getRole();
+            if (role.equals("team_client_id")) {
                 this.clientSecret = config.getClientSecret();
                 this.clientId = config.getClientId();
             } else {
-                this.stdOut("API Config: credentials JSON must have role \"App administrator\"");
-                this.stdOut("https://developer.huawei.com/consumer/en/service/josp/agc/index.html");
+                this.stdErr("API client credentials must have role \"App administrator\"; provided: \"Administrator\"");
+                this.stdOut(Endpoint.CONNECT_API_CONSOLE);
+                return false;
             }
         } else {
-            this.stdErr("API Config not found:");
-            this.stdErr(file.getAbsolutePath());
+            this.stdErr("API client credentials not found:");
+            this.stdOut(file.getAbsolutePath());
+            this.stdOut(Endpoint.CONNECT_API_CONSOLE);
+            return false;
         }
 
         /* Log Configuration */
@@ -92,9 +96,14 @@ abstract public class BaseTask extends DefaultTask {
                 this.stdOut("    Secret: " + this.clientSecret);
             }
         }
+        return true;
     }
 
+    /**
+     * @return an instance of {@link HttpClient}.
+     */
     private HttpClient getHttpClient(boolean logHttp) {
+
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setDefaultMaxPerRoute(20);
         cm.setMaxTotal(100);
@@ -104,13 +113,13 @@ abstract public class BaseTask extends DefaultTask {
                 .setUserAgent(this.ua);
 
         if (logHttp) {
-            cb.addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
-                stdOut("> " + request.getRequestLine().toString());
-            })
-            .addInterceptorLast((HttpResponseInterceptor) (request, context) -> {
-                stdOut("> " + request.getStatusLine().toString());
-                // for (Header header : request.getAllHeaders()) {stdOut("> " + header.toString());}
-            });
+            cb
+                .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> stdOut(
+                        "> " + request.getRequestLine().toString()
+                 ))
+                .addInterceptorLast((HttpResponseInterceptor) (request, context) -> stdOut(
+                        "> " + request.getStatusLine().toString()
+                ));
         }
         return cb.build();
     }

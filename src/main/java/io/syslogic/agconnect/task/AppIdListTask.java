@@ -43,10 +43,11 @@ abstract public class AppIdListTask extends BaseTask {
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get());
-        if (getVerbose().get()) {this.stdOut("Getting ID list for package " + this.packageName + ".");}
-        this.authenticate();
-        this.getAppIdList();
+        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
+            if (getVerbose().get()) {this.stdOut("Getting ID list for package " + this.packageName + ".");}
+            this.authenticate();
+            this.getAppIdList();
+        }
     }
 
     /** */

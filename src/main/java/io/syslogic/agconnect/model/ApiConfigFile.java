@@ -4,18 +4,23 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Abstract Model: ApiConfig
- * This is the API client config file.
+ *
+ * This is file credentials/agc-apiclient.json.
  *
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
 public class ApiConfigFile {
 
-    @SerializedName("type")
-    private String type; // must be `team_client_id`.
-
     @SerializedName("configuration_version")
     private String configVersion;
+
+    /**
+     * This value must be `team_client_id` and not `project_client_id`,
+     * else the result is: HTTP/1.1 403 client token authorization fail.
+     */
+    @SerializedName("type")
+    private String role;
 
     @SerializedName("developer_id")
     private String developerId;
@@ -32,8 +37,11 @@ public class ApiConfigFile {
     @SerializedName("region")
     private String region;
 
-    public Object getType() {
-        return this.type;
+    public String getConfigVersion() {
+        return this.configVersion;
+    }
+    public String getRole() {
+        return this.role;
     }
     public String getDeveloperId() {
         return this.developerId;
