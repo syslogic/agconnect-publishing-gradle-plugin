@@ -192,7 +192,7 @@ abstract public class PublishingTask extends BaseTask {
                             /* Log transfer stats before the task completes. */
                             long duration = System.currentTimeMillis() - timestamp;
                             this.stdOut("\n" + getArtifactType().get().toUpperCase(Locale.ROOT) + " file " + getUploadFileName() + " has been uploaded.");
-                            this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration));
+                            this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration) + ".");
                         }
                     } else {
                         ResponseStatus e = wrap.getResult().getStatus();
