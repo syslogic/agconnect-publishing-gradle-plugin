@@ -1,5 +1,6 @@
 package io.syslogic.agconnect.task;
 
+import com.android.build.api.dsl.ApplicationExtension;
 import com.google.gson.Gson;
 
 import org.apache.http.Consts;
@@ -21,6 +22,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -49,10 +51,10 @@ import io.syslogic.agconnect.model.UploadUrlResponse;
 abstract public class PublishingTask extends BaseTask {
 
     @Input
-    abstract public Property<String> getAppConfigFile();
+    abstract public Property<String> getApiConfigFile();
 
     @Input
-    abstract public Property<String> getApiConfigFile();
+    abstract public Property<String> getAppConfigFile();
 
     @Input
     abstract public Property<String> getArtifactType();
@@ -66,11 +68,23 @@ abstract public class PublishingTask extends BaseTask {
     @Input
     public abstract Property<Boolean> getVerbose();
 
-    private int releaseType  = 1; /* 5 = phased. */
+    /** Property `rootProject.name` can be defined in `settings.gradle`. */
+    @Input
+    @NotNull
+    String getUploadFileName() {
+        String name = getProject().getRootProject().getName();
+        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
+        String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
+        return name + "-" + buildType + "-" + getVersionName() + "." + suffix;
+    }
 
-    private String authCode  = null;
     private String uploadUrl = null;
     private String chunkUrl  = null;
+    private String authCode  = null;
+
+    private int releaseType  = 1; /* 5 = phased. */
+
+    private long timestamp = 0L;
 
     /** The default {@link TaskAction}. */
     @TaskAction
@@ -82,46 +96,6 @@ abstract public class PublishingTask extends BaseTask {
                     this.uploadFile(getArtifactPath());
                 }
             }
-        }
-    }
-
-    /**
-     * Obtain the artifact path.
-     *
-     * @return the absolute path to the artifact to upload.
-     */
-    @Nullable
-    private String getArtifactPath() {
-        String name = getProject().getName();
-        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
-        String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
-        String output = File.separator + "build" + File.separator + "outputs" + File.separator +
-                getArtifactType().get().toLowerCase(Locale.ROOT);
-        String basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
-        if (new File(basePath).exists()) {
-            return basePath.concat(File.separator + buildType + File.separator +
-                    name+ "-" + buildType + "." + suffix);
-        }
-        return null;
-    }
-
-    /** Check build output. */
-    private boolean checkBuildOutput() {
-
-        /* Check if the file exists. */
-        String archivePath = getArtifactPath();
-        assert archivePath != null;
-
-        File file = new File(archivePath);
-        if (file.exists() && file.canRead()) {
-            return true;
-        } else {
-            /* Check if the file exists under an alternate name */
-            String message = "Not found: " + archivePath;
-            String unsigned = archivePath.replace(".apk", "-unsigned.apk");
-            if (new File(unsigned).exists()) {message = "Not signed: " + unsigned;}
-            this.stdErr(message);
-            return false;
         }
     }
 
@@ -189,6 +163,7 @@ abstract public class PublishingTask extends BaseTask {
             );
 
             try {
+                this.timestamp = System.currentTimeMillis();
                 HttpResponse response = this.client.execute(request);
                 int statusCode = response.getStatusLine().getStatusCode();
                 HttpEntity httpEntity = response.getEntity();
@@ -199,27 +174,33 @@ abstract public class PublishingTask extends BaseTask {
                         List<UploadFileItem> items = wrap.getResult().getResult().getFileList();
                         String sizeFormatted = "";
                         for (UploadFileItem item : items) {
+
+                            /* Verbose logging */
                             sizeFormatted = item.getSizeFormatted();
                             if (getVerbose().get()) {
-                                // this.stdOut("Purified: " + item.getPurifiedForFile());
+                                // this.stdOut("Purified: " + item.getPurifiedForFile()); ?
                                 this.stdOut("  Download: " + item.getDestinationUrl());
                                 this.stdOut("Disposable: " + item.getDisposableUrl());
                                 this.stdOut("      Size: " + sizeFormatted);
                             }
 
-                            /* update file upload info */
-                            this.updateFileInfo(getFileName(archivePath), item.getDestinationUrl());
-                        }
-                         if (! getVerbose().get()) {
-                            this.stdOut("Uploaded " + sizeFormatted);
+                            /* Update file upload info */
+                            String filename = getUploadFileName();
+                            this.updateFileInfo(filename, item.getDestinationUrl());
+
+                            /* Log transfer stats */
+                            float duration = System.currentTimeMillis() - this.timestamp;
+                            float rate = item.getSize() / duration;
+                            this.stdOut("\n" + getArtifactType().get().toUpperCase(Locale.ROOT) + " successfully uploaded: " + getUploadFileName());
+                            this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + rate + " MB/s");
                         }
                     } else {
                         ResponseStatus e = wrap.getResult().getStatus();
-                        String msg = "Upload Status: " + e.getCode() + ": " + e.getMessage();
+                        String msg = "Upload Error: " + e.getCode() + ": " + e.getMessage();
                         this.stdErr(msg);
                     }
                 } else {
-                    this.stdErr("Upload Status: HTTP " + statusCode + ": " + result);
+                    this.stdErr("Upload HTTP Error: " + statusCode + ": " + result);
                 }
             } catch (IOException e) {
                 this.stdErr(e.getMessage());
@@ -270,5 +251,57 @@ abstract public class PublishingTask extends BaseTask {
         } catch (IOException | URISyntaxException e) {
             this.stdErr(e.getMessage());
         }
+    }
+
+    /**
+     * Obtain the artifact path.
+     *
+     * @return the absolute path to the artifact to upload.
+     */
+    @Nullable
+    private String getArtifactPath() {
+        String name = getProject().getName();
+        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
+        String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
+        String output = File.separator + "build" + File.separator + "outputs" + File.separator +
+                getArtifactType().get().toLowerCase(Locale.ROOT);
+        String basePath = getProject().getProjectDir().getAbsolutePath().concat(output);
+        if (new File(basePath).exists()) {
+            return basePath.concat(File.separator + buildType + File.separator +
+                    name+ "-" + buildType + "." + suffix);
+        }
+        return null;
+    }
+
+    /** Check build output. */
+    private boolean checkBuildOutput() {
+
+        /* Check if the file exists. */
+        String archivePath = getArtifactPath();
+        assert archivePath != null;
+
+        File file = new File(archivePath);
+        if (file.exists() && file.canRead()) {
+            return true;
+        } else {
+            /* Check if the file exists under an alternate name */
+            String message = "Not found: " + archivePath;
+            String unsigned = archivePath.replace(".apk", "-unsigned.apk");
+            if (new File(unsigned).exists()) {message = "Not signed: " + unsigned;}
+            this.stdErr(message);
+            return false;
+        }
+    }
+
+    /** Obtain VersionName. */
+    @NotNull
+    @SuppressWarnings("UnstableApiUsage")
+    private String getVersionName() {
+        String versionName = "0.0.0";
+        ApplicationExtension android = (ApplicationExtension) getProject().getExtensions().getByName("android");
+        if (android.getDefaultConfig().getVersionName() != null) {
+            versionName = android.getDefaultConfig().getVersionName();
+        }
+        return versionName;
     }
 }

@@ -23,13 +23,13 @@ import io.syslogic.agconnect.model.Endpoint;
  *
  * @author Martin Zeitler
  */
-abstract public class AppIdListTask extends BaseTask {
-
-    @Input
-    abstract public Property<String> getAppConfigFile();
+abstract public class AppIdTask extends BaseTask {
 
     @Input
     abstract public Property<String> getApiConfigFile();
+
+    @Input
+    abstract public Property<String> getAppConfigFile();
 
     @Input
     abstract public Property<String> getBuildType();

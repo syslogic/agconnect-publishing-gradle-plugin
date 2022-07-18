@@ -162,13 +162,6 @@ abstract public class BaseTask extends DefaultTask {
         return sb.toString();
     }
 
-    @NotNull
-    String getFileName(@NotNull String archivePath) {
-        String regex = File.separator.equals("\\") ? "\\u005c" : File.separator;
-        String[] parts = archivePath.split(regex);
-        return parts[ parts.length-1 ];
-    }
-
     void stdOut(@NotNull String value) {
         System.out.println(value);
     }

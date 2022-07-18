@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.syslogic.agconnect.task.AppInfoGetTask;
-import io.syslogic.agconnect.task.AppIdListTask;
+import io.syslogic.agconnect.task.AppInfoTask;
+import io.syslogic.agconnect.task.AppIdTask;
 import io.syslogic.agconnect.task.PublishingTask;
 
 /**
@@ -94,7 +94,7 @@ class PublishingPlugin implements Plugin<Project> {
                         taskName = "getAppInfo" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
-                            project.getTasks().register(taskName, AppInfoGetTask.class, task -> {
+                            project.getTasks().register(taskName, AppInfoTask.class, task -> {
                                 task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
@@ -108,7 +108,7 @@ class PublishingPlugin implements Plugin<Project> {
                         taskName = "getAppId" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
                             String finalApiConfigFile1 = apiConfigFile;
-                            project.getTasks().register(taskName, AppIdListTask.class, task -> {
+                            project.getTasks().register(taskName, AppIdTask.class, task -> {
                                 task.setGroup(taskGroup);
                                 task.getApiConfigFile().set(finalApiConfigFile1);
                                 task.getAppConfigFile().set(appConfigFile);
