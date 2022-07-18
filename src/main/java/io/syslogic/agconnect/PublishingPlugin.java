@@ -75,21 +75,25 @@ class PublishingPlugin implements Plugin<Project> {
                         if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                         if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
-                        /* Register Tasks: Publish */
+                        /* Register Tasks: Publish. */
                         String taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
-                        project.getTasks().register(taskName, PublishingTask.class, task -> {
-                            task.setGroup(taskGroup);
-                            task.getApiConfigFile().set(apiConfigFile);
-                            task.getAppConfigFile().set(appConfigFile);
-                            task.getArtifactType().set(artifactType);
-                            task.getBuildType().set(buildType);
-                            task.getLogHttp().set(logHttp);
-                            task.getVerbose().set(verbose);
+                        if (artifactType.equals(ArtifactType.AAB) && buildType.equals("debug")) {
+                            /* The debug AAB would need to be signed with the upload key. */
+                        } else {
+                            project.getTasks().register(taskName, PublishingTask.class, task -> {
+                                task.setGroup(taskGroup);
+                                task.getApiConfigFile().set(apiConfigFile);
+                                task.getAppConfigFile().set(appConfigFile);
+                                task.getArtifactType().set(artifactType);
+                                task.getBuildType().set(buildType);
+                                task.getLogHttp().set(logHttp);
+                                task.getVerbose().set(verbose);
 
-                            /* This causes publish to depend on assemble or bundle. */
-                            String buildTask = getBuildTask(project, artifactType, buildType);
-                            task.dependsOn(buildTask);
-                        });
+                                /* This causes publish to depend on assemble or bundle. */
+                                String buildTask = getBuildTask(project, artifactType, buildType);
+                                task.dependsOn(buildTask);
+                            });
+                        }
 
                         /* Register Tasks: AppInfo */
                         taskName = "getAppInfo" + StringUtils.capitalize(buildType);

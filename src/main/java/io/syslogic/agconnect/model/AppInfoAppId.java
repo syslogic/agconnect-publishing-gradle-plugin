@@ -14,7 +14,7 @@ public class AppInfoAppId {
     private String key;
 
     @SerializedName("value")
-    private String value;
+    private int value;
 
     @Override
     public String toString() {
