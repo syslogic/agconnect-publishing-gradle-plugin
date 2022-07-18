@@ -29,7 +29,7 @@ import io.syslogic.agconnect.task.PublishingTask;
 @SuppressWarnings("unused")
 class PublishingPlugin implements Plugin<Project> {
 
-    private @Nullable String apiConfigFile = null;
+    private @Nullable String configFile = null;
     private @NotNull Boolean logHttp = false;
     private @NotNull Boolean verbose = false;
 
@@ -47,11 +47,14 @@ class PublishingPlugin implements Plugin<Project> {
         this.extension = project.getExtensions().create("agcPublishing", PublishingExtensionImpl.class);
 
         /* Apply the default path for the API client configuration file. */
-        this.apiConfigFile = project.getRootProject().getProjectDir().getAbsolutePath() +
+        this.configFile = project.getRootProject().getProjectDir().getAbsolutePath() +
                 File.separator + "credentials" + File.separator + "agc-apiclient.json";
 
         /* Project after evaluate. */
         project.afterEvaluate(it -> {
+
+            /* Apply buildTypes.release.signingConfig to buildTypes.debug.signingConfig. */
+            setDebugSigningConfig(project);
 
             /* Loop build-types which have a signing-config. */
             for (String buildType : getBuildTypes(project)) {
@@ -64,12 +67,12 @@ class PublishingPlugin implements Plugin<Project> {
                     if (new File(appConfigFile).exists()) {
 
                         /* Apply values provided by the PublishingExtension. */
-                        if (! extension.getApiConfigFile().isEmpty()) {
-                            if (! new File(extension.getApiConfigFile()).exists()) {
-                                System.err.println("Config file not found: " + extension.getApiConfigFile());
-                                System.err.println("Trying with default value: " + apiConfigFile);
+                        if (! extension.getConfigFile().isEmpty()) {
+                            if (! new File(extension.getConfigFile()).exists()) {
+                                System.err.println("Config file not found: " + extension.getConfigFile());
+                                System.err.println("Trying with default value: " + configFile);
                             } else {
-                                apiConfigFile = extension.getApiConfigFile();
+                                configFile = extension.getConfigFile();
                             }
                         }
                         if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
@@ -83,7 +86,7 @@ class PublishingPlugin implements Plugin<Project> {
                             taskName = "publish" + StringUtils.capitalize(buildType) + StringUtils.capitalize(artifactType);
                             project.getTasks().register(taskName, PublishingTask.class, task -> {
                                 task.setGroup(taskGroup);
-                                task.getApiConfigFile().set(apiConfigFile);
+                                task.getApiConfigFile().set(configFile);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getArtifactType().set(artifactType);
                                 task.getBuildType().set(buildType);
@@ -99,10 +102,10 @@ class PublishingPlugin implements Plugin<Project> {
                         /* Register Tasks: AppInfo */
                         taskName = "getAppInfo" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
-                            String finalApiConfigFile1 = apiConfigFile;
+                            String apiConfigFile = configFile;
                             project.getTasks().register(taskName, AppInfoTask.class, task -> {
                                 task.setGroup(taskGroup);
-                                task.getApiConfigFile().set(finalApiConfigFile1);
+                                task.getApiConfigFile().set(apiConfigFile);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getBuildType().set(buildType);
                                 task.getLogHttp().set(logHttp);
@@ -113,10 +116,10 @@ class PublishingPlugin implements Plugin<Project> {
                         /* Register Tasks: AppId */
                         taskName = "getAppId" + StringUtils.capitalize(buildType);
                         if (project.getTasks().findByName(taskName) == null) {
-                            String finalApiConfigFile1 = apiConfigFile;
+                            String apiConfigFile = configFile;
                             project.getTasks().register(taskName, AppIdTask.class, task -> {
                                 task.setGroup(taskGroup);
-                                task.getApiConfigFile().set(finalApiConfigFile1);
+                                task.getApiConfigFile().set(apiConfigFile);
                                 task.getAppConfigFile().set(appConfigFile);
                                 task.getBuildType().set(buildType);
                                 task.getLogHttp().set(logHttp);
@@ -132,7 +135,7 @@ class PublishingPlugin implements Plugin<Project> {
     /** Obtain Android ApplicationBuildType, which have a ApkSigningConfig. */
     @NotNull
     @SuppressWarnings("UnstableApiUsage")
-    private String[] getBuildTypes(@NotNull Project project) {
+    String[] getBuildTypes(@NotNull Project project) {
         ArrayList<String> buildTypes = new ArrayList<>();
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
         for (ApplicationBuildType buildType : android.getBuildTypes()) {
@@ -148,6 +151,15 @@ class PublishingPlugin implements Plugin<Project> {
             }
         }
         return buildTypes.toArray(new String[0]);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void setDebugSigningConfig(@NotNull Project project) {
+        ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
+        ApplicationBuildType btRelease = android.getBuildTypes().getByName("release");
+        ApplicationBuildType btDebug = android.getBuildTypes().getByName("debug");
+        ApkSigningConfig apkSigningConfig = btRelease.getSigningConfig();
+        btDebug.setSigningConfig(apkSigningConfig);
     }
 
     /** Check if Android and AGConnect Gradle plugins were loaded. */

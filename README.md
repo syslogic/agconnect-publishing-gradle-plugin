@@ -11,7 +11,7 @@ The official Huawei repositories can be found there: [@HMS-Core](https://github.
 
 ### Development
 
-The plugin source can be installed into any Gradle project via `git clone`:
+The plugin source can be installed into any Android Gradle project with `git clone`:
 
 ````bash
 git clone https://github.com/syslogic/agconnect-publishing-gradle-plugin.git ./buildSrc
@@ -49,12 +49,17 @@ plugins {
 
 ### Configuration
 
-`PublicationExtension` can be configured with `apiConfigFile`, `logHttp` and `verbose`.<br/>
-The path to the API client credentials file is absolute, in order to permit external locations.
+`PublicationExtension` can be configured with:
+
+ - `configFile`: The path to the API client credentials file is absolute.
+ - `assetDirectory`: Permits overriding the default asset directory name (work in progress).
+ - `logHttp`: HTTP logging on/off.
+ - `verbose`: Verbose logging on/off
 
 ````groovy
 agcPublishing {
-    apiConfigFile = "${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
+    configFile = "${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
+    assetDirectory = 'play'
     logHttp = false
     verbose = true
 }

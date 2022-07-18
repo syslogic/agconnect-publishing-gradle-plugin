@@ -13,7 +13,16 @@ public interface PublishingExtension {
      * <code>agcPublishing {apiConfigFile = "agc-apiclient-*.json"}</code>
      * @return path to the JSON file.
      */
-    String getApiConfigFile();
+    String getConfigFile();
+
+    /**
+     * Define the dirname for the directory into which to download the assets.
+     * Note: It is intended to provide compatibility to to Play Store publisher.
+     *
+     * <code>agcPublishing {assetDirName = "play"}</code>
+     * @return the name of the asset directory.
+     */
+    String getAssetDirectory();
 
     /**
      * Enable HTTP logging.

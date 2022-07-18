@@ -7,7 +7,8 @@ package io.syslogic.agconnect;
  */
 public class PublishingExtensionImpl implements PublishingExtension {
 
-    private String apiConfigFile = null;
+    private String configFile = null;
+    private String assetDirectory = null;
     private Boolean verbose = false;
     private Boolean logHttp = false;
 
@@ -17,8 +18,20 @@ public class PublishingExtensionImpl implements PublishingExtension {
      * @param value the absolute path to the configuration JSON.
      */
     @SuppressWarnings("unused")
-    public void setApiConfigFile(String value) {
-        this.apiConfigFile = value;
+    public void setConfigFile(String value) {
+        this.configFile = value;
+    }
+
+    /**
+     * Define the dirname for the directory into which to download the assets.
+     * Note: It is intended to provide compatibility to to Play Store publisher.
+     *
+     * <code>agcPublishing {assetDirName = "play"}</code>
+     * @param value the directory name to use instead of `agconnect`.
+     */
+    @SuppressWarnings("unused")
+    public void setAssetDirectory(String value) {
+        this.assetDirectory = value;
     }
 
     /**
@@ -43,8 +56,14 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     /** @return the path to the API client configuration JSON file. */
     @Override
-    public String getApiConfigFile() {
-        return this.apiConfigFile;
+    public String getConfigFile() {
+        return this.configFile;
+    }
+
+    /** @return the name of the asset directory. */
+    @Override
+    public String getAssetDirectory() {
+        return this.assetDirectory;
     }
 
     /** @return verbose logging value. */
