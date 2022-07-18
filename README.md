@@ -38,7 +38,7 @@ buildscript {
 }
 ````
 
-Then they can be applid in the module's `build.gradle`:
+Then they can be applied in the module's `build.gradle`:
 ````groovy
 plugins {
     id 'com.android.application'
