@@ -19,13 +19,13 @@ public class UploadFileResponse {
     private int resultCode;
 
     @SerializedName("fileInfoList")
-    private List<UploadFileListItem> fileList;
+    private List<UploadFileItem> fileList;
 
     public int getResultCode() {
         return this.resultCode;
     }
 
-    public List<UploadFileListItem> getFileList() {
+    public List<UploadFileItem> getFileList() {
         return this.fileList;
     }
 }

@@ -41,12 +41,13 @@ abstract public class BaseTask extends DefaultTask {
 
     String ua;
     HttpClient client;
+
+    Long appId = 0L;
+    String packageName = null;
+
     String clientId = null;
     String clientSecret = null;
     String accessToken = null;
-    String packageName = null;
-    Long projectId = 0L;
-    Long appId = 0L;
 
     /** It sets up HttpClient and parses two JSON config files. */
     boolean configure(@NotNull Project project, String appConfig, String apiConfig, boolean logHttp, boolean verbose) {
@@ -59,9 +60,8 @@ abstract public class BaseTask extends DefaultTask {
         if (file.exists() && file.canRead()) {
             if (verbose) {this.stdOut("App Config: " + appConfig);}
             AppConfigFile config = new Gson().fromJson(readFile(file), AppConfigFile.class);
-            this.appId = config.getClient().getAppId();
-            this.packageName = config.getClient().getPackageName();
-            this.projectId = config.getClient().getProjectId();
+            this.appId = config.getAppInfo().getAppId();
+            this.packageName = config.getAppInfo().getPackageName();
         } else {
             this.stdErr("AppId not found:");
             this.stdErr(file.getAbsolutePath());

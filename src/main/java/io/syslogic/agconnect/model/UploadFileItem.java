@@ -5,12 +5,12 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Locale;
 
 /**
- * Abstract Model: UploadFileListItem
+ * Abstract Model: UploadFileItem
  *
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
-public class UploadFileListItem {
+public class UploadFileItem {
 
     @SerializedName("fileDestUlr")
     private String destinationUrl;

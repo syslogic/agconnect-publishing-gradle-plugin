@@ -5,17 +5,23 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Abstract Model: AppConfig
  *
- * This is file agconnect-services.json, where only appId is of interest.
+ * This is file agconnect-services.json, where only appInfo.appId is of interest.
  *
  * @author Martin Zeitler
  */
 @SuppressWarnings("unused")
 public class AppConfigFile {
 
-    @SerializedName("client")
-    private AppConfigClient client;
+    @SerializedName("configuration_version")
+    private String configVersion;
 
-    public AppConfigClient getClient() {
-        return this.client;
+    @SerializedName("app_info")
+    private AppConfigInfo appInfo;
+
+    public String getConfigVersion() {
+        return this.configVersion;
+    }
+    public AppConfigInfo getAppInfo() {
+        return this.appInfo;
     }
 }

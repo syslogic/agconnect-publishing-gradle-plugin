@@ -37,7 +37,7 @@ import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
 import io.syslogic.agconnect.model.ResponseStatus;
 import io.syslogic.agconnect.model.ResultCode;
-import io.syslogic.agconnect.model.UploadFileListItem;
+import io.syslogic.agconnect.model.UploadFileItem;
 import io.syslogic.agconnect.model.UploadResponseWrap;
 import io.syslogic.agconnect.model.UploadUrlResponse;
 
@@ -196,9 +196,9 @@ abstract public class PublishingTask extends BaseTask {
                 if (statusCode == HttpStatus.SC_OK) {
                     UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
                     if (wrap.getResult().getResultCode() == ResultCode.SUCCESS) {
-                        List<UploadFileListItem> items = wrap.getResult().getResult().getFileList();
+                        List<UploadFileItem> items = wrap.getResult().getResult().getFileList();
                         String sizeFormatted = "";
-                        for (UploadFileListItem item : items) {
+                        for (UploadFileItem item : items) {
                             sizeFormatted = item.getSizeFormatted();
                             if (getVerbose().get()) {
                                 // this.stdOut("Purified: " + item.getPurifiedForFile());
