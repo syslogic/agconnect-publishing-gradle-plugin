@@ -79,7 +79,7 @@ abstract public class PublishingTask extends BaseTask {
         String name = getProject().getRootProject().getName();
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
         String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
-        return name + "-" + buildType + "-" + getVersionName() + "." + suffix;
+        return name + "_" + getVersionName() + "+" + buildType + "." + suffix;
     }
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})

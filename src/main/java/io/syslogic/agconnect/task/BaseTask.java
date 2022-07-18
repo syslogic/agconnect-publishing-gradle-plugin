@@ -153,6 +153,7 @@ abstract public class BaseTask extends DefaultTask {
         return cb.build();
     }
 
+    @NotNull
     String getTransferRate(long kilobytes, long ms) {
         long rate = kilobytes / (ms / 1000) * 1024; // bytes per second
         int u = 0;
