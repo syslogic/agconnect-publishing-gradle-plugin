@@ -2,6 +2,7 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
+import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
@@ -14,9 +15,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
+import org.gradle.api.tasks.Input;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -25,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
@@ -100,13 +104,15 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     boolean authenticate() {
+
         HttpPost request = new HttpPost(EndpointUrl.OAUTH2_TOKEN);
+        request.setHeaders(getDefaultHeaders());
+
         String payload = new Gson().toJson(new TokenRequest(this.clientId, this.clientSecret));
-        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        request.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_JSON);
-        request.setEntity(entity);
+
         try {
+            request.setEntity(entity);
             HttpResponse response = client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
@@ -147,6 +153,40 @@ abstract public class BaseTask extends DefaultTask {
         return cb.build();
     }
 
+    String getTransferRate(long kilobytes, long ms) {
+        long rate = kilobytes / (ms / 1000) * 1024; // bytes per second
+        int u = 0;
+        for (; rate > 1024*1024; rate >>= 10) {u++;}
+        if (rate > 1024) {u++;}
+        return String.format(Locale.ROOT, "%.1f %cB", rate/1024f, " kMGTPE".charAt(u))+ "/s";
+    }
+
+    @Input
+    @NotNull
+    Header[] getDefaultHeaders() {
+        Header[] headers;
+        if (this.accessToken == null) {
+            headers = new Header[2];
+            headers[0] = new BasicHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+            headers[1] = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        } else {
+            headers = new Header[4];
+            headers[0] = new BasicHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+            headers[1] = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+            headers[2] = new BasicHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
+            headers[3] = new BasicHeader("client_id", this.clientId);
+        }
+        return headers;
+    }
+
+    void stdOut(@NotNull String value) {
+        System.out.println(value);
+    }
+
+    void stdErr(@NotNull String value) {
+        System.err.println(value);
+    }
+
     @NotNull
     private String readFile(@NotNull File file) {
         StringBuilder sb = new StringBuilder();
@@ -160,13 +200,5 @@ abstract public class BaseTask extends DefaultTask {
             this.stdErr(e.getMessage());
         }
         return sb.toString();
-    }
-
-    void stdOut(@NotNull String value) {
-        System.out.println(value);
-    }
-
-    void stdErr(@NotNull String value) {
-        System.err.println(value);
     }
 }

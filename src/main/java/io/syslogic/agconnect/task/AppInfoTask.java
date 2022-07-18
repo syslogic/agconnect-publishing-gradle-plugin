@@ -3,12 +3,10 @@ package io.syslogic.agconnect.task;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
 
 import org.apache.http.util.EntityUtils;
 import org.gradle.api.provider.Property;
@@ -62,10 +60,10 @@ abstract public class AppInfoTask extends BaseTask {
      */
     @SuppressWarnings("UnusedReturnValue")
     public void getAppInfo() {
+
         HttpGet request = new HttpGet();
-        request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
-        request.setHeader("client_id", this.clientId);
+        request.setHeaders(getDefaultHeaders());
+
         try {
             URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_INFO);
             builder.setParameter("appId", String.valueOf(this.appId));

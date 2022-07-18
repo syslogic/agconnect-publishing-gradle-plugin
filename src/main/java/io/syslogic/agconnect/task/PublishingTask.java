@@ -4,7 +4,6 @@ import com.android.build.api.dsl.ApplicationExtension;
 import com.google.gson.Gson;
 
 import org.apache.http.Consts;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -17,7 +16,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
 import org.gradle.api.provider.Property;
@@ -156,6 +154,7 @@ abstract public class PublishingTask extends BaseTask {
         if (! file.exists()) {return;}
 
         if (this.uploadUrl != null && this.authCode != null) {
+
             HttpPost request = new HttpPost(this.uploadUrl);
             request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
             request.setEntity(MultipartEntityBuilder.create()
@@ -192,10 +191,9 @@ abstract public class PublishingTask extends BaseTask {
                             this.updateFileInfo(filename, item.getDestinationUrl());
 
                             /* Log transfer stats before the task completes. */
-                            float duration = System.currentTimeMillis() - timestamp;
-                            float rate = item.getSize() / duration;
+                            long duration = System.currentTimeMillis() - timestamp;
                             this.stdOut("\n" + getArtifactType().get().toUpperCase(Locale.ROOT) + " " + getUploadFileName() + " had been uploaded.");
-                            this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + rate + " MB/s");
+                            this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration));
                         }
                     } else {
                         ResponseStatus e = wrap.getResult().getStatus();
@@ -217,9 +215,11 @@ abstract public class PublishingTask extends BaseTask {
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-file-info-0000001111685202">Updating App File Information</a>.
      */
     private void updateFileInfo(String fileName, String destFileUrl) {
+
+        HttpPut request = new HttpPut();
+        request.setHeaders(getDefaultHeaders());
+
         try {
-            HttpPut request = new HttpPut();
-            request.setHeaders(getDefaultHeaders());
             request.setURI(new URIBuilder(EndpointUrl.PUBLISH_APP_FILE_INFO)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
@@ -269,10 +269,11 @@ abstract public class PublishingTask extends BaseTask {
      * @param packageIds package IDs, separated by commas.
      */
     public void getCompileStatus(@NotNull String packageIds) {
-        try {
 
-            HttpGet request = new HttpGet();
-            request.setHeaders(getDefaultHeaders());
+        HttpGet request = new HttpGet();
+        request.setHeaders(getDefaultHeaders());
+
+        try {
             request.setURI(new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("pkgIds", packageIds)
@@ -331,16 +332,6 @@ abstract public class PublishingTask extends BaseTask {
             this.stdErr("Not found: " + archivePath);
             return false;
         }
-    }
-
-    @NotNull
-    private Header[] getDefaultHeaders() {
-        Header[] headers = new Header[4];
-        headers[0] = new BasicHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        headers[1] = new BasicHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-        headers[2] = new BasicHeader(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken);
-        headers[3] = new BasicHeader("client_id", this.clientId);
-        return headers;
     }
 
     /** Obtain version name. */
