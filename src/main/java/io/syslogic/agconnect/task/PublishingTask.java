@@ -284,11 +284,12 @@ abstract public class PublishingTask extends BaseTask {
             HttpEntity httpEntity = response.getEntity();
             String result = EntityUtils.toString(httpEntity);
             if (statusCode == HttpStatus.SC_OK) {
-
-                /* Logging the package compilation status. */
-                if (getVerbose().get()) {
-                    CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
-                    for (CompilePackageState item : data.getPackageState()) {
+                CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
+                for (CompilePackageState item : data.getPackageState()) {
+                    /* Logging the package compilation status. */
+                    if (item.getStatus() != 0) {
+                        this.stdErr(item.toString());
+                    } else if (getVerbose().get()) {
                         this.stdOut(item.toString());
                     }
                 }
