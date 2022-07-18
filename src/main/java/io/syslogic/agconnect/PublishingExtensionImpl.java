@@ -14,7 +14,8 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     /**
      * Define the path to the API client configuration file.
-     *
+     * <br><br>
+     * <code>agcPublishing {configFile = ""}</code>
      * @param value the absolute path to the configuration JSON.
      */
     @SuppressWarnings("unused")
@@ -25,8 +26,8 @@ public class PublishingExtensionImpl implements PublishingExtension {
     /**
      * Define the dirname for the directory into which to download the assets.
      * Note: It is intended to provide compatibility to to Play Store publisher.
-     *
-     * <code>agcPublishing {assetDirName = "play"}</code>
+     * <br><br>
+     * <code>agcPublishing {assetDirectory = "play"}</code>
      * @param value the directory name to use instead of `agconnect`.
      */
     @SuppressWarnings("unused")
@@ -36,7 +37,8 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     /**
      * Verbose logging.
-     *
+     * <br><br>
+     * <code>agcPublishing {verbose = true}</code>
      * @param value whether true or false.
      */
     @SuppressWarnings("unused")
@@ -46,7 +48,8 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     /**
      * HTTP logging.
-     *
+     * <br><br>
+     * <code>agcPublishing {logHttp = true}</code>
      * @param value whether true or false.
      */
     @SuppressWarnings("unused")
@@ -66,13 +69,13 @@ public class PublishingExtensionImpl implements PublishingExtension {
         return this.assetDirectory;
     }
 
-    /** @return verbose logging value. */
+    /** @return the current value for verbose logging. */
     @Override
     public Boolean getVerbose() {
         return this.verbose;
     }
 
-    /** @return HTTP logging value. */
+    /** @return the current value for HTTP logging. */
     @Override
     public Boolean getLogHttp() {
         return this.logHttp;
