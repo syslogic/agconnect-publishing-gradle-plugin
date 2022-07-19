@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        plugin_version = '5'
+        plugin_version = '6'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         agp_version = '7.2.1'
         agcp_version = '1.7.0.300'
@@ -92,12 +92,10 @@ task javadocs(type: Javadoc) {
     configurations.implementation.setCanBeResolved(true)
     classpath = files(new File(System.getProperty('java.home') + File.separator + 'lib' + File.separator + 'rt.jar'))
     classpath += configurations.implementation
-    failOnError false
-
     options.links "https://docs.oracle.com/en/java/javase/11/docs/api/"
     options.linkSource true
     options.author true
-    // options.verbose()
+    failOnError false
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
