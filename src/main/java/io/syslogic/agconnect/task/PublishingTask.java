@@ -77,15 +77,6 @@ abstract public class PublishingTask extends BaseTask {
     @Input
     public abstract Property<Boolean> getVerbose();
 
-    /** Property `rootProject.name` can be defined in `settings.gradle`. */
-    @Input
-    @NotNull
-    String getUploadFileName() {
-        String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
-        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
-        return baseName + "." + suffix;
-    }
-
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String chunkUrl  = null;
     private String uploadUrl = null;
@@ -300,6 +291,15 @@ abstract public class PublishingTask extends BaseTask {
         } catch(Exception e) {
             this.stdErr(e.getMessage());
         }
+    }
+
+    /** Property `archivesBaseName` appears most reliable. */
+    @Input
+    @NotNull
+    String getUploadFileName() {
+        String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
+        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
+        return baseName + "." + suffix;
     }
 
     /**
