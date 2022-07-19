@@ -1,6 +1,5 @@
 package io.syslogic.agconnect.task;
 
-import com.android.build.api.dsl.ApplicationExtension;
 import com.google.gson.Gson;
 
 import org.apache.http.Consts;
@@ -64,7 +63,13 @@ abstract public class PublishingTask extends BaseTask {
     abstract public Property<String> getArtifactType();
 
     @Input
+    abstract public Property<String> getProductFlavor();
+
+    @Input
     abstract public Property<String> getBuildType();
+
+    @Input
+    abstract public Property<String> getBuildVariant();
 
     @Input
     public abstract Property<Boolean> getLogHttp();
@@ -306,15 +311,26 @@ abstract public class PublishingTask extends BaseTask {
     @Nullable
     private String getArtifactPath() {
         String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
-        String buildType = getBuildType().get().toLowerCase(Locale.ROOT);
-        String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
-        String fileName = (baseName + "-" + buildType + "." + suffix);
+        String buildType = getBuildType().get();
+        String flavor = getProductFlavor().get();
+        String suffix = getArtifactType().get();
+        String variant = getBuildVariant().get();
+
         String output = getProject().getProjectDir().getAbsolutePath().concat(
                 File.separator + "build" + File.separator + "outputs" + File.separator +
-                (suffix.equals(ArtifactType.AAB) ? "bundle": "apk")
+                (suffix.equals(ArtifactType.AAB) ? "bundle": "apk") + File.separator +
+                variant + File.separator
         );
         if (new File(output).exists()) {
-            return output.concat(File.separator + buildType + File.separator + fileName);
+            String fileName = output.concat(baseName + "-" + buildType + "." + suffix);
+            if (new File(fileName).exists()) {
+                return fileName;
+            } else {
+                fileName = output.concat(baseName + "-" + flavor + "-" + buildType + "." + suffix);
+                if (new File(fileName).exists()) {
+                    return fileName;
+                }
+            }
         }
         return null;
     }
@@ -324,7 +340,7 @@ abstract public class PublishingTask extends BaseTask {
 
         /* Check if the file exists and can be read. */
         String archivePath = getArtifactPath();
-        assert archivePath != null;
+        if (archivePath == null) {return false;}
 
         File file = new File(archivePath);
         if (file.exists() && file.canRead()) {
@@ -333,17 +349,5 @@ abstract public class PublishingTask extends BaseTask {
             this.stdErr("Not found: " + archivePath);
             return false;
         }
-    }
-
-    /** Obtain version name. */
-    @NotNull
-    @SuppressWarnings("UnstableApiUsage")
-    private String getVersionName() {
-        String versionName = "0.0.0";
-        ApplicationExtension android = (ApplicationExtension) getProject().getExtensions().getByName("android");
-        if (android.getDefaultConfig().getVersionName() != null) {
-            versionName = android.getDefaultConfig().getVersionName();
-        }
-        return versionName;
     }
 }
