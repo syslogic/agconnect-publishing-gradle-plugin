@@ -39,7 +39,7 @@ abstract class BaseTestCase extends TestCase {
 
     File appConfigRelease;
     String appConfigReleaseData;
-    
+
     /**
      * Generate buildscript & plugins block.
      *
@@ -158,6 +158,8 @@ abstract class BaseTestCase extends TestCase {
     private String getRootProjectPath() {
         return new File("C:\\Home\\Applications\\androidx-audiolibrary\\buildSrc").getAbsolutePath();
     }
+
+    /* TODO: AndroidManifest.xml */
 
     BuildResult getBuildResult(@SuppressWarnings("SameParameterValue") String arguments) {
         return GradleRunner.create()
