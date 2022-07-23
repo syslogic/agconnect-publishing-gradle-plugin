@@ -24,8 +24,9 @@ abstract class BaseTestCase extends TestCase {
 
     String identifier = "io.syslogic.agconnect.publishing";
     @TempDir File testProjectDir;
-    File settingsFile;
     File buildFile;
+    File srcDebug;
+    File srcRelease;
 
     Project project;
     String clientId;
@@ -38,29 +39,39 @@ abstract class BaseTestCase extends TestCase {
     @BeforeEach
     @SuppressWarnings("deprecation")
     public void setup() {
-        this.settingsFile = new File(testProjectDir, "settings.gradle");
+
+        this.srcDebug = new File(testProjectDir, "src" + File.separator + "java" + File.separator + "debug");
+        this.srcDebug.mkdir();
+
+        this.srcRelease = new File(testProjectDir, "src" + File.separator + "java" + File.separator + "debug");
+        this.srcRelease.mkdir();
+
         this.buildFile = new File(testProjectDir, "build.gradle");
         try {
             FileUtils.writeStringToFile(this.buildFile, "buildscript {\n" +
                 "repositories {\n" +
                     "google()\n" +
                     "mavenCentral()\n" +
-                    "gradlePluginPortal()\n" +
                     "maven { url 'https://developer.huawei.com/repo/' }\n" +
+                    "maven { url 'https://jitpack.io' }\n" +
+                    "mavenLocal()\n" +
                 "}\n" +
                 "dependencies {\n" +
                     "classpath 'com.android.tools.build:gradle:7.2.1'\n" +
                     "classpath 'com.huawei.agconnect:agcp:1.7.0.300'\n" +
+                    "classpath 'io.syslogic.agconnect:publishing:7.2.1.6'\n" +
                "}\n" +
             "}\n\n"+
+
             "apply plugin: 'com.android.application'\n" +
             "apply plugin: 'com.huawei.agconnect'\n" +
+            "apply plugin: '" + identifier + "'\n\n" +
 
             "android {\n" +
                 "compileSdk 32\n" +
             "}");
-
             logFileContents(this.buildFile.getAbsolutePath());
+
         } catch (IOException ignore) {}
     }
 
