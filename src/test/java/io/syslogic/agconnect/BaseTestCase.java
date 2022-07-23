@@ -4,6 +4,7 @@ import org.gradle.internal.impldep.junit.framework.TestCase;
 import org.gradle.internal.impldep.org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -28,11 +29,17 @@ abstract class BaseTestCase extends TestCase {
 
     File credentials;
     File apiConfig;
+    String apiAccountConfigData;
+
     File srcDebug;
     File srcRelease;
-    File appConfigDebug;
-    File appConfigRelease;
 
+    File appConfigDebug;
+    String appConfigDebugData;
+
+    File appConfigRelease;
+    String appConfigReleaseData;
+    
     /**
      * Generate buildscript & plugins block.
      *
@@ -41,25 +48,32 @@ abstract class BaseTestCase extends TestCase {
     @BeforeEach
     public void setup() {
 
+        /* in order to support both environments */
+        if (System.getenv().containsKey("CI")) {
+            initByGitHubEnv();
+        } else {
+            initByParentProject();
+        }
+
         /* credentials/agc-apiclient.json */
         this.credentials = new File(testProject, "credentials");
         if (this.credentials.mkdir()) {
             this.apiConfig = new File(credentials, "agc-apiclient.json");
-            this.writeFile(this.apiConfig, "{}");
+            this.writeFile(this.apiConfig, this.apiAccountConfigData);
         }
 
         /* src/java/debug/agconnect-services.json */
         this.srcDebug = new File(testProject, "src" + File.separator + "java" + File.separator + "debug");
         if (this.srcDebug.mkdir()) {
             this.appConfigDebug = new File(srcDebug, "agconnect-services.json");
-            this.writeFile(this.appConfigDebug, "{}");
+            this.writeFile(this.appConfigDebug, this.appConfigDebugData);
         }
 
         /* src/java/release/agconnect-services.json */
         this.srcRelease = new File(testProject, "src" + File.separator + "java" + File.separator + "release");
         if (this.srcRelease.mkdir()) {
             this.appConfigRelease = new File(srcRelease, "agconnect-services.json");
-            this.writeFile(this.appConfigRelease, "{}");
+            this.writeFile(this.appConfigRelease, this.appConfigReleaseData);
         }
 
         /* build.gradle */
@@ -124,6 +138,25 @@ abstract class BaseTestCase extends TestCase {
         "agcPublishing {\n" +
 
         "}\n");
+    }
+
+    /** Local Environment */
+    private void initByParentProject() {
+        this.apiAccountConfigData = readFile(getRootProjectPath() + File.separator + "credentials" +  File.separator + "agc-apiclient.json");
+        this.appConfigReleaseData = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "java" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        this.appConfigDebugData = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "java" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
+    }
+
+    /** TODO: GitHub Environment */
+    private void initByGitHubEnv() {
+        this.apiAccountConfigData = System.getenv("AGC_API_CONFIG");
+        this.appConfigReleaseData = System.getenv("AGC_APP_RELEASE_CONFIG");
+        this.appConfigDebugData = System.getenv("AGC_APP_DEBUG_CONFIG");
+    }
+
+    @NotNull
+    private String getRootProjectPath() {
+        return new File("C:\\Home\\Applications\\androidx-audiolibrary\\buildSrc").getAbsolutePath();
     }
 
     BuildResult getBuildResult(@SuppressWarnings("SameParameterValue") String arguments) {
