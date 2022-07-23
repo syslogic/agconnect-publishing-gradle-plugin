@@ -1,5 +1,6 @@
 package io.syslogic.agconnect;
 
+import org.gradle.api.tasks.InputFile;
 import org.gradle.internal.impldep.junit.framework.TestCase;
 import org.gradle.internal.impldep.org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.BuildResult;
@@ -25,20 +26,21 @@ abstract class BaseTestCase extends TestCase {
     String identifier = "io.syslogic.agconnect.publishing";
 
     @TempDir File testProject;
+    File settingsFile;
     File buildFile;
 
     File credentials;
-    File apiConfig;
-    String apiAccountConfigData;
+    String apiConfig;
 
+    File src;
+    File srcMain;
     File srcDebug;
     File srcRelease;
 
-    File appConfigDebug;
-    String appConfigDebugData;
+    File manifest;
 
-    File appConfigRelease;
-    String appConfigReleaseData;
+    String appConfigDebug;
+    String appConfigRelease;
 
     /**
      * Generate buildscript & plugins block.
@@ -49,36 +51,54 @@ abstract class BaseTestCase extends TestCase {
     public void setup() {
 
         /* in order to support both environments */
-        if (System.getenv().containsKey("CI")) {
-            initByGitHubEnv();
+        if (! System.getenv().containsKey("CI")) {
+            initLocal();
         } else {
-            initByParentProject();
+            initCi();
+        }
+
+        /* src */
+        this.src = new File(testProject, "src");
+        if (src.exists() || src.mkdir()) {
+
+            /* src/main/AndroidManifest.xml */
+            this.srcMain = new File(testProject, "src" + File.separator + "main");
+            if (srcMain.exists() || srcMain.mkdir()) {
+                this.manifest = new File(testProject, "src" + File.separator + "main" +  File.separator + "AndroidManifest.xml");
+                this.writeFile(manifest,"<?xml version='1.0' encoding='utf-8'?>\n<manifest package='io.syslogic.audio'/>");
+            }
+
+            /* src/debug/agconnect-services.json */
+            this.srcDebug = new File(testProject, "src" + File.separator + "debug");
+            if (srcDebug.exists() || srcDebug.mkdir()) {
+                writeFile(new File(srcDebug, "agconnect-services.json"), appConfigDebug);
+            } else {
+                error("missing: " + srcDebug.getAbsolutePath());
+            }
+
+            /* src/release/agconnect-services.json */
+            this.srcRelease = new File(testProject, "src" + File.separator + "release");
+            if (srcRelease.exists() || srcRelease.mkdir()) {
+                writeFile( new File(srcRelease, "agconnect-services.json"), appConfigRelease);
+            } else {
+                error("missing: " + srcRelease.getAbsolutePath());
+            }
         }
 
         /* credentials/agc-apiclient.json */
         this.credentials = new File(testProject, "credentials");
-        if (this.credentials.mkdir()) {
-            this.apiConfig = new File(credentials, "agc-apiclient.json");
-            this.writeFile(this.apiConfig, this.apiAccountConfigData);
+        if (credentials.exists() || credentials.mkdir()) {
+            writeFile(new File(credentials, "agc-apiclient.json"), apiConfig);
+        } else {
+            error("missing: " + credentials.getAbsolutePath());
         }
 
-        /* src/java/debug/agconnect-services.json */
-        this.srcDebug = new File(testProject, "src" + File.separator + "java" + File.separator + "debug");
-        if (this.srcDebug.mkdir()) {
-            this.appConfigDebug = new File(srcDebug, "agconnect-services.json");
-            this.writeFile(this.appConfigDebug, this.appConfigDebugData);
-        }
-
-        /* src/java/release/agconnect-services.json */
-        this.srcRelease = new File(testProject, "src" + File.separator + "java" + File.separator + "release");
-        if (this.srcRelease.mkdir()) {
-            this.appConfigRelease = new File(srcRelease, "agconnect-services.json");
-            this.writeFile(this.appConfigRelease, this.appConfigReleaseData);
-        }
+        /* settings.gradle */
+        this.settingsFile = new File(testProject, "settings.gradle");
 
         /* build.gradle */
         this.buildFile = new File(testProject, "build.gradle");
-        this.writeFile(this.buildFile, "buildscript {\n" +
+        writeFile(buildFile, "buildscript {\n" +
             "repositories {\n" +
                 "google()\n" +
                 "mavenCentral()\n" +
@@ -102,6 +122,9 @@ abstract class BaseTestCase extends TestCase {
             "defaultConfig {\n" +
                 "minSdk 23\n" +
                 "targetSdk 32\n" +
+                "applicationId 'io.syslogic.audio'\n" +
+                "versionName '0.0.1'\n" +
+                "versionCode 1\n" +
             "}\n" +
             "signingConfigs {\n" +
                 "debug {\n" +
@@ -135,38 +158,45 @@ abstract class BaseTestCase extends TestCase {
             "}\n"+
         "}\n\n" +
 
+        "dependencies {\n" +
+        "}\n\n" +
+
         "agcPublishing {\n" +
 
         "}\n");
     }
 
     /** Local Environment */
-    private void initByParentProject() {
-        this.apiAccountConfigData = readFile(getRootProjectPath() + File.separator + "credentials" +  File.separator + "agc-apiclient.json");
-        this.appConfigReleaseData = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "java" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        this.appConfigDebugData = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "java" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
+    private void initLocal() {
+        this.apiConfig = readFile(getRootProjectPath() + File.separator + "credentials" +  File.separator + "agc-apiclient.json");
+        this.appConfigRelease = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        this.appConfigDebug = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
     }
 
     /** TODO: GitHub Environment */
-    private void initByGitHubEnv() {
-        this.apiAccountConfigData = System.getenv("AGC_API_CONFIG");
-        this.appConfigReleaseData = System.getenv("AGC_APP_RELEASE_CONFIG");
-        this.appConfigDebugData = System.getenv("AGC_APP_DEBUG_CONFIG");
+    private void initCi() {
+        this.apiConfig = System.getenv("AGC_API_CONFIG");
+        this.appConfigRelease = System.getenv("AGC_APP_RELEASE_CONFIG");
+        this.appConfigDebug = System.getenv("AGC_APP_DEBUG_CONFIG");
     }
 
     @NotNull
     private String getRootProjectPath() {
-        return new File("C:\\Home\\Applications\\androidx-audiolibrary\\buildSrc").getAbsolutePath();
+        return new File("C:\\Home\\Applications\\androidx-audiolibrary").getAbsolutePath();
     }
 
-    /* TODO: AndroidManifest.xml */
+    BuildResult getBuildResult(String arguments) {
 
-    BuildResult getBuildResult(@SuppressWarnings("SameParameterValue") String arguments) {
-        return GradleRunner.create()
+        GradleRunner runner = GradleRunner
+                .create()
                 .withProjectDir(this.testProject)
                 .withArguments(arguments)
-                .withPluginClasspath()
-                .build();
+                .withPluginClasspath();
+
+        if (! System.getenv().containsKey("CI")) {
+            runner.withDebug(true).forwardOutput();
+        }
+        return runner.build();
     }
 
     String readFile(String path) {
@@ -183,6 +213,16 @@ abstract class BaseTestCase extends TestCase {
     void writeFile(File file, String data) {
         try {
             FileUtils.writeStringToFile(file, data);
-        } catch (IOException ignore) {}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void error(String data) {
+        System.err.println(data);
+    }
+
+    void log(String data) {
+        System.out.println(data);
     }
 }
