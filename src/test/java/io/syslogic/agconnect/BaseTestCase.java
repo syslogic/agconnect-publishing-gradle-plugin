@@ -227,10 +227,10 @@ abstract class BaseTestCase extends TestCase {
     }
 
     String getRootProjectPath() {
-        if (! System.getenv().containsKey("CI")) {
-            return new File(this.sourceDirectory).getAbsolutePath() + File.separator;
-        } else {
+        if (System.getenv().containsKey("CI")) {
             return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath() + File.separator;
+        } else {
+            return new File(this.sourceDirectory).getAbsolutePath() + File.separator;
         }
     }
 
