@@ -21,6 +21,15 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
 
+      - name: 🔢 Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: 🔢 Set up variables
+        shell: bash
+        env:
+          AGC_PACKAGE_ID:  ${{ secrets.AGC_PACKAGE_ID }}
+        run: echo $AGC_PACKAGE_ID
+
       - name: ☕ Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -28,10 +37,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: 🔢 Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Build with Gradle
+        env:
+          AGC_PACKAGE_ID:  ${{ secrets.AGC_PACKAGE_ID }}
         run: ./gradlew :build
 
       - name: 📦 Retain Artifact (JAR)
