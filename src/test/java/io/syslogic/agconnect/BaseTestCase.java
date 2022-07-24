@@ -169,9 +169,24 @@ abstract class BaseTestCase extends TestCase {
             "}\n" +
             "signingConfigs {\n" +
                 "debug {\n" +
+
                 "}\n" +
                 "release {\n" +
+
                 "}\n"+
+            "}\n" +
+            "flavorDimensions 'vendor'\n" +
+            "productFlavors {\n" +
+                "google {\n" +
+                    "dimension 'vendor'\n" +
+                    "versionNameSuffix '-google'\n" +
+                    "versionCode android.defaultConfig.versionCode + 25000\n" +
+                "}\n" +
+                "huawei {\n" +
+                    "dimension 'vendor'\n" +
+                    "versionNameSuffix '-huawei'\n" +
+                    "versionCode android.defaultConfig.versionCode + 50000\n" +
+                "}\n" +
             "}\n" +
             "buildTypes {\n" +
                 "debug {\n" +
