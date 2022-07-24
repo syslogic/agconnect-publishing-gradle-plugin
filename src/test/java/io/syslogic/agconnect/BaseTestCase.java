@@ -180,6 +180,14 @@ abstract class BaseTestCase extends TestCase {
 
                 "}\n"+
             "}\n" +
+            "sourceSets {\n" +
+                "main {\n" +
+                    "java.srcDir 'src/main/java'\n" +
+                "}\n" +
+                "huawei {\n" +
+                    "java.srcDir 'src/huawei/java'\n" +
+                "}\n" +
+            "}\n" +
             "flavorDimensions 'vendor'\n" +
             "productFlavors {\n" +
                 "huawei {\n" +
@@ -227,16 +235,13 @@ abstract class BaseTestCase extends TestCase {
     }
 
     BuildResult getBuildResult(String arguments) {
-        GradleRunner runner = GradleRunner
-                .create()
+        GradleRunner runner = GradleRunner.create()
                 .withProjectDir(this.testProject)
                 .withArguments(arguments)
                 .withPluginClasspath();
 
         if (! System.getenv().containsKey("CI")) {
-            runner
-                    .withDebug(true)
-                    .forwardOutput();
+            runner.withDebug(true).forwardOutput();
         }
         return runner.build();
     }
