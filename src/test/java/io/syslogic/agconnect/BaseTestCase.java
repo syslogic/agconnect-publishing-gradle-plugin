@@ -223,13 +223,8 @@ abstract class BaseTestCase extends TestCase {
     private void initDefault() {
         String rootDirectory = getRootProjectPath();
         this.apiConfig = readFile(rootDirectory + "credentials" +  File.separator + "agc-apiclient.json");
-        if (! System.getenv().containsKey("CI")) {
-            this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-            this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
-        } else {
-            this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "release" + File.separator + "agconnect-services.json");
-            this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "debug" + File.separator + "agconnect-services.json");
-        }
+        this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
