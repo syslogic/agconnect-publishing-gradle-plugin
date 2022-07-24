@@ -218,7 +218,7 @@ abstract class BaseTestCase extends TestCase {
         this.appConfigDebug = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
     }
 
-    /** TODO: GitHub Environment */
+    /** GitHub Environment */
     private void initCi() {
         this.packageId = System.getenv("AGC_PACKAGE_ID");
         this.apiConfig = System.getenv("AGC_API_CONFIG");
@@ -230,7 +230,9 @@ abstract class BaseTestCase extends TestCase {
         if (! System.getenv().containsKey("CI")) {
             return new File(sourceDirectory).getAbsolutePath();
         } else {
-            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath();
+            String dirname = new File(System.getenv().get("GITHUB_WORKSPACE")).getParentFile().getAbsolutePath() + File.separator + "mobile";
+            if (! new File(dirname).exists()) {new File(dirname).mkdir();}
+            return dirname;
         }
     }
 
