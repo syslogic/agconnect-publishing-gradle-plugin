@@ -5,11 +5,13 @@ on:
     branches: [ master ]
     paths-ignore:
       - '**/README.md'
+      - '**/.gitignore'
       - '.run/**'
   pull_request:
     branches: [ master ]
     paths-ignore:
       - '**/README.md'
+      - '**/.gitignore'
       - '.run/**'
 
 jobs:
@@ -34,15 +36,20 @@ jobs:
       - name: 🔢 Set up config files
         shell: bash
         env:
-          AGC_PACKAGE_ID:  ${{ secrets.AGC_PACKAGE_ID }}
           AGC_API_CONFIG: ${{ secrets.AGC_API_CONFIG }}
           AGC_APP_RELEASE_CONFIG: ${{ secrets.AGC_APP_RELEASE_CONFIG }}
-          AGC_APP_DEBUG_CONFIG:  ${{ secrets.AGC_APP_DEBUG_CONFIG }}
-        run: echo $AGC_PACKAGE_ID
+          AGC_APP_DEBUG_CONFIG: ${{ secrets.AGC_APP_DEBUG_CONFIG }}
+        run: |
+          mkdir $GITHUB_WORKSPACE/credentials && \
+          mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug && \
+          mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease && \
+          echo "$AGC_API_CONFIG" > $GITHUB_WORKSPACE/credentials/agc-apiclient.json && \
+          echo "$AGC_APP_DEBUG_CONFIG" > $GITHUB_WORKSPACE/mobile/src/huaweiDebug/agconnect-services.json && \
+          echo "$AGC_APP_RELEASE_CONFIG" > $GITHUB_WORKSPACE/mobile/src/huaweiRelease/agconnect-services.json
 
       - name: Build with Gradle
         env:
-          AGC_PACKAGE_ID:  ${{ secrets.AGC_PACKAGE_ID }}
+          AGC_PACKAGE_ID: ${{ secrets.AGC_PACKAGE_ID }}
         run: ./gradlew :build
 
       - name: 📦 Retain Artifact (JAR)

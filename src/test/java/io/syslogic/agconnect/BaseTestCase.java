@@ -106,7 +106,7 @@ abstract class BaseTestCase extends TestCase {
             /* src/release/agconnect-services.json */
             this.srcRelease = new File(testProject, "src" + File.separator + "release");
             if (srcRelease.exists() || srcRelease.mkdir()) {
-                writeFile( new File(srcRelease, "agconnect-services.json"), appConfigRelease);
+                writeFile(new File(srcRelease, "agconnect-services.json"), appConfigRelease);
             }
         }
 
@@ -224,7 +224,7 @@ abstract class BaseTestCase extends TestCase {
         if (! System.getenv().containsKey("CI")) {
             return new File(sourceDirectory).getAbsolutePath();
         } else {
-            String dirname = new File(System.getenv().get("GITHUB_WORKSPACE")).getParentFile().getAbsolutePath() + File.separator + "mobile";
+            String dirname = new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath();
             if (! new File(dirname).exists()) {new File(dirname).mkdir();}
             return dirname;
         }
