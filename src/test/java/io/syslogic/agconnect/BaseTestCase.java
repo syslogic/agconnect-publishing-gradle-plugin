@@ -81,11 +81,10 @@ abstract class BaseTestCase extends TestCase {
     public void setup() {
 
         /* in order to support both environments */
-        if (! System.getenv().containsKey("CI")) {
-            initLocal();
-        } else {
-            initCi();
-        }
+        if (System.getenv().containsKey("CI")) {initCi();}
+
+        /* always set up the strings */
+        initDefault();
 
         /* src */
         this.src = new File(testProject, "src");
@@ -211,19 +210,19 @@ abstract class BaseTestCase extends TestCase {
         "}\n");
     }
 
-    /** Local Environment */
-    private void initLocal() {
-        this.apiConfig = readFile(getRootProjectPath() + File.separator + "credentials" +  File.separator + "agc-apiclient.json");
-        this.appConfigRelease = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        this.appConfigDebug = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
-    }
-
     /** GitHub Environment */
     private void initCi() {
         this.packageId = System.getenv("AGC_PACKAGE_ID");
         this.apiConfig = System.getenv("AGC_API_CONFIG");
         this.appConfigRelease = System.getenv("AGC_APP_RELEASE_CONFIG");
         this.appConfigDebug = System.getenv("AGC_APP_DEBUG_CONFIG");
+    }
+
+    /** Local Environment */
+    private void initDefault() {
+        this.apiConfig = readFile(getRootProjectPath() + File.separator + "credentials" +  File.separator + "agc-apiclient.json");
+        this.appConfigRelease = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        this.appConfigDebug = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
     }
 
     private String getRootProjectPath() {
