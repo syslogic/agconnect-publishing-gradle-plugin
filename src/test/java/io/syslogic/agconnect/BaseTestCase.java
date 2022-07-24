@@ -150,7 +150,7 @@ abstract class BaseTestCase extends TestCase {
             "dependencies {\n" +
                 "classpath 'com.android.tools.build:gradle:7.2.1'\n" +
                 "classpath 'com.huawei.agconnect:agcp:1.7.0.300'\n" +
-                "classpath 'io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.6'\n" +
+                "classpath 'io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.7'\n" +
            "}\n" +
         "}\n"+
 
