@@ -214,17 +214,23 @@ abstract class BaseTestCase extends TestCase {
 
     /** Local Environment */
     private void initDefault() {
-        this.apiConfig = readFile(getRootProjectPath() + File.separator + "credentials" +  File.separator + "agc-apiclient.json");
-        this.appConfigRelease = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        this.appConfigDebug = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
+        String rootDirectory = getRootProjectPath();
+        this.apiConfig = readFile(rootDirectory + "credentials" +  File.separator + "agc-apiclient.json");
+        if (! System.getenv().containsKey("CI")) {
+            this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+            this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
+        } else {
+            this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "release" + File.separator + "agconnect-services.json");
+            this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "debug" + File.separator + "agconnect-services.json");
+        }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private String getRootProjectPath() {
         if (! System.getenv().containsKey("CI")) {
-            return new File(this.sourceDirectory).getAbsolutePath();
+            return new File(this.sourceDirectory).getAbsolutePath() + File.separator;
         } else {
-            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath();
+            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath() + File.separator;
         }
     }
 
