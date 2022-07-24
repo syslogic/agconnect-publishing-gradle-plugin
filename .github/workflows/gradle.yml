@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: 🔢 Set up config files
+      - name: 🔢 Configure
         shell: bash
         env:
           AGC_API_CONFIG: ${{ secrets.AGC_API_CONFIG }}
@@ -43,10 +43,9 @@ jobs:
           mkdir $GITHUB_WORKSPACE/credentials && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/debug && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/release && \
-          echo "$AGC_API_CONFIG" > $GITHUB_WORKSPACE/credentials/agc-apiclient.json && \
-          echo "$AGC_APP_DEBUG_CONFIG" > $GITHUB_WORKSPACE/mobile/src/debug/agconnect-services.json && \
-          echo "$AGC_APP_RELEASE_CONFIG" > $GITHUB_WORKSPACE/mobile/src/release/agconnect-services.json
-
+          echo $AGC_API_CONFIG > $GITHUB_WORKSPACE/credentials/agc-apiclient.json && \
+          echo $AGC_APP_DEBUG_CONFIG > $GITHUB_WORKSPACE/mobile/src/debug/agconnect-services.json && \
+          echo $AGC_APP_RELEASE_CONFIG > $GITHUB_WORKSPACE/mobile/src/release/agconnect-services.json
       - name: Build with Gradle
         env:
           AGC_PACKAGE_ID: ${{ secrets.AGC_PACKAGE_ID }}
@@ -66,5 +65,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: agconnect-publishing-gradle-plugin-test
-          path: ./build/reports/tests/test/index.html
+          path: ./build/reports/tests/test
           retention-days: 1
