@@ -1,11 +1,9 @@
 package io.syslogic.agconnect;
 
-import org.gradle.api.tasks.InputFile;
 import org.gradle.internal.impldep.junit.framework.TestCase;
 import org.gradle.internal.impldep.org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -23,27 +21,59 @@ import java.util.stream.Stream;
  */
 abstract class BaseTestCase extends TestCase {
 
+    /** Plugin package identifier */
     String identifier = "io.syslogic.agconnect.publishing";
 
+    /** Local environment, not to be used by CI */
+    String sourceDirectory = "C:\\Home\\Applications\\androidx-audiolibrary";
+
+    /** Local environment, not to be used by CI */
+    String packageId = "io.syslogic.audio";
+
+    /** Temporary directory, where to run the generated project */
     @TempDir File testProject;
+
+    /** File `settings.gradle` is required to look up `aapt2` */
     File settingsFile;
+
+    /** File `build.gradle` */
     File buildFile;
 
+    /** Directory `credentials` */
     File credentials;
     String apiConfig;
 
+    /** Directory `src` */
     File src;
+
+    /** Directory `src/main/java` */
     File srcMain;
+
+    /** Directory `src/debug/java` */
     File srcDebug;
+
+    /** Directory `src/release/java` */
     File srcRelease;
 
+    /** File `src/main/AndroidManifest.xml` */
     File manifest;
 
+    /**
+     * The configuration JSON string for debug builds;
+     * either locally copied or inserted as GitHub secret.
+     */
     String appConfigDebug;
+
+    /**
+     * The configuration JSON string for release builds;
+     * either locally copied or inserted as GitHub secret.
+     */
     String appConfigRelease;
 
     /**
-     * Generate buildscript & plugins block.
+     * Generate the configuration files required in order to test the plugin, which are:
+     * `build.gradle`, `settings.gradle`, `agconnect-services.json`, `agc-apiclient.json`
+     * and `AndroidManifest.xml`.
      *
      * @see <a href="https://github.com/gradle/gradle/blob/master/subprojects/core/src/main/java/org/gradle/api/internal/initialization/DefaultScriptHandler.java">DefaultScriptHandler.java</a>
      */
@@ -65,7 +95,7 @@ abstract class BaseTestCase extends TestCase {
             this.srcMain = new File(testProject, "src" + File.separator + "main");
             if (srcMain.exists() || srcMain.mkdir()) {
                 this.manifest = new File(testProject, "src" + File.separator + "main" +  File.separator + "AndroidManifest.xml");
-                this.writeFile(manifest,"<?xml version='1.0' encoding='utf-8'?>\n<manifest package='io.syslogic.audio'/>");
+                this.writeFile(manifest,"<?xml version='1.0' encoding='utf-8'?>\n<manifest package='" + this.packageId + "'/>");
             }
 
             /* src/debug/agconnect-services.json */
@@ -95,6 +125,24 @@ abstract class BaseTestCase extends TestCase {
 
         /* settings.gradle */
         this.settingsFile = new File(testProject, "settings.gradle");
+        writeFile(settingsFile, "import org.gradle.api.initialization.resolve.RepositoriesMode\n" +
+                "pluginManagement {\n" +
+                "    repositories {\n" +
+                "        gradlePluginPortal()\n" +
+                "        google()\n" +
+                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
+                "        maven { url 'https://jitpack.io' }\n" +
+                "        mavenCentral()\n" +
+                "    }\n" +
+                "}\n" +
+                "dependencyResolutionManagement {\n" +
+                "    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)\n" +
+                "    repositories {\n" +
+                "        google()\n" +
+                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
+                "        mavenCentral()\n" +
+                "    }\n" +
+                "}\n");
 
         /* build.gradle */
         this.buildFile = new File(testProject, "build.gradle");
@@ -122,8 +170,8 @@ abstract class BaseTestCase extends TestCase {
             "defaultConfig {\n" +
                 "minSdk 23\n" +
                 "targetSdk 32\n" +
-                "applicationId 'io.syslogic.audio'\n" +
-                "versionName '0.0.1'\n" +
+                "applicationId '" + this.packageId + "'\n" +
+                "versionName '1.0.0'\n" +
                 "versionCode 1\n" +
             "}\n" +
             "signingConfigs {\n" +
@@ -157,12 +205,9 @@ abstract class BaseTestCase extends TestCase {
                 "}\n"+
             "}\n"+
         "}\n\n" +
-
         "dependencies {\n" +
         "}\n\n" +
-
         "agcPublishing {\n" +
-
         "}\n");
     }
 
@@ -175,18 +220,22 @@ abstract class BaseTestCase extends TestCase {
 
     /** TODO: GitHub Environment */
     private void initCi() {
+        this.packageId = System.getenv("AGC_APP_PACKAGE_ID");
         this.apiConfig = System.getenv("AGC_API_CONFIG");
         this.appConfigRelease = System.getenv("AGC_APP_RELEASE_CONFIG");
         this.appConfigDebug = System.getenv("AGC_APP_DEBUG_CONFIG");
     }
 
-    @NotNull
     private String getRootProjectPath() {
-        return new File("C:\\Home\\Applications\\androidx-audiolibrary").getAbsolutePath();
+        if (! System.getenv().containsKey("CI")) {
+            return new File(sourceDirectory).getAbsolutePath();
+        } else {
+            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath();
+        }
     }
 
+    @SuppressWarnings("SameParameterValue")
     BuildResult getBuildResult(String arguments) {
-
         GradleRunner runner = GradleRunner
                 .create()
                 .withProjectDir(this.testProject)
@@ -194,7 +243,9 @@ abstract class BaseTestCase extends TestCase {
                 .withPluginClasspath();
 
         if (! System.getenv().containsKey("CI")) {
-            runner.withDebug(true).forwardOutput();
+            runner
+                    .withDebug(true)
+                    .forwardOutput();
         }
         return runner.build();
     }
@@ -218,11 +269,6 @@ abstract class BaseTestCase extends TestCase {
         }
     }
 
-    void error(String data) {
-        System.err.println(data);
-    }
-
-    void log(String data) {
-        System.out.println(data);
-    }
+    void error(String data) {System.err.println(data);}
+    void log(String data) {System.out.println(data);}
 }
