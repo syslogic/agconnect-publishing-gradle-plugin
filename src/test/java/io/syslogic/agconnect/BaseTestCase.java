@@ -177,11 +177,6 @@ abstract class BaseTestCase extends TestCase {
             "}\n" +
             "flavorDimensions 'vendor'\n" +
             "productFlavors {\n" +
-                "google {\n" +
-                    "dimension 'vendor'\n" +
-                    "versionNameSuffix '-google'\n" +
-                    "versionCode android.defaultConfig.versionCode + 25000\n" +
-                "}\n" +
                 "huawei {\n" +
                     "dimension 'vendor'\n" +
                     "versionNameSuffix '-huawei'\n" +
