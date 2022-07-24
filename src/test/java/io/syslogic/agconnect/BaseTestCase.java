@@ -80,11 +80,16 @@ abstract class BaseTestCase extends TestCase {
     @BeforeEach
     public void setup() {
 
-        /* in order to support both environments */
-        if (System.getenv().containsKey("CI")) {initCi();}
+        /* GitHub Environment */
+        if (System.getenv().containsKey("CI")) {
+            this.packageId = System.getenv("AGC_PACKAGE_ID");
+        }
 
         /* always set up the strings */
-        initDefault();
+        String rootDirectory = getRootProjectPath();
+        this.apiConfig = readFile(rootDirectory + "credentials" +  File.separator + "agc-apiclient.json");
+        this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
 
         /* src */
         this.src = new File(testProject, "src");
@@ -180,7 +185,6 @@ abstract class BaseTestCase extends TestCase {
                 "huawei {\n" +
                     "dimension 'vendor'\n" +
                     "versionNameSuffix '-huawei'\n" +
-                    "versionCode android.defaultConfig.versionCode + 50000\n" +
                 "}\n" +
             "}\n" +
             "buildTypes {\n" +
@@ -214,21 +218,7 @@ abstract class BaseTestCase extends TestCase {
         "}\n");
     }
 
-    /** GitHub Environment */
-    private void initCi() {
-        this.packageId = System.getenv("AGC_PACKAGE_ID");
-    }
-
-    /** Local Environment */
-    private void initDefault() {
-        String rootDirectory = getRootProjectPath();
-        this.apiConfig = readFile(rootDirectory + "credentials" +  File.separator + "agc-apiclient.json");
-        this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private String getRootProjectPath() {
+    String getRootProjectPath() {
         if (! System.getenv().containsKey("CI")) {
             return new File(this.sourceDirectory).getAbsolutePath() + File.separator;
         } else {
@@ -236,7 +226,6 @@ abstract class BaseTestCase extends TestCase {
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
     BuildResult getBuildResult(String arguments) {
         GradleRunner runner = GradleRunner
                 .create()
