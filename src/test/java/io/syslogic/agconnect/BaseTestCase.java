@@ -222,11 +222,9 @@ abstract class BaseTestCase extends TestCase {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private String getRootProjectPath() {
         if (! System.getenv().containsKey("CI")) {
-            return new File(sourceDirectory).getAbsolutePath();
+            return new File(this.sourceDirectory).getAbsolutePath();
         } else {
-            String dirname = new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath();
-            if (! new File(dirname).exists()) {new File(dirname).mkdir();}
-            return dirname;
+            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath();
         }
     }
 
