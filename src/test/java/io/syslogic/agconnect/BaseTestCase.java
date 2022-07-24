@@ -207,9 +207,6 @@ abstract class BaseTestCase extends TestCase {
     /** GitHub Environment */
     private void initCi() {
         this.packageId = System.getenv("AGC_PACKAGE_ID");
-        this.apiConfig = System.getenv("AGC_API_CONFIG");
-        this.appConfigRelease = System.getenv("AGC_APP_RELEASE_CONFIG");
-        this.appConfigDebug = System.getenv("AGC_APP_DEBUG_CONFIG");
     }
 
     /** Local Environment */
