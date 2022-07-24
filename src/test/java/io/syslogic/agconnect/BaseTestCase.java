@@ -101,16 +101,12 @@ abstract class BaseTestCase extends TestCase {
             this.srcDebug = new File(testProject, "src" + File.separator + "debug");
             if (srcDebug.exists() || srcDebug.mkdir()) {
                 writeFile(new File(srcDebug, "agconnect-services.json"), appConfigDebug);
-            } else {
-                error("missing: " + srcDebug.getAbsolutePath());
             }
 
             /* src/release/agconnect-services.json */
             this.srcRelease = new File(testProject, "src" + File.separator + "release");
             if (srcRelease.exists() || srcRelease.mkdir()) {
                 writeFile( new File(srcRelease, "agconnect-services.json"), appConfigRelease);
-            } else {
-                error("missing: " + srcRelease.getAbsolutePath());
             }
         }
 
@@ -118,8 +114,6 @@ abstract class BaseTestCase extends TestCase {
         this.credentials = new File(testProject, "credentials");
         if (credentials.exists() || credentials.mkdir()) {
             writeFile(new File(credentials, "agc-apiclient.json"), apiConfig);
-        } else {
-            error("missing: " + credentials.getAbsolutePath());
         }
 
         /* settings.gradle */
@@ -225,6 +219,7 @@ abstract class BaseTestCase extends TestCase {
         this.appConfigDebug = readFile(getRootProjectPath() + File.separator + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private String getRootProjectPath() {
         if (! System.getenv().containsKey("CI")) {
             return new File(sourceDirectory).getAbsolutePath();
@@ -269,7 +264,4 @@ abstract class BaseTestCase extends TestCase {
             e.printStackTrace();
         }
     }
-
-    void error(String data) {System.err.println(data);}
-    void log(String data) {System.out.println(data);}
 }
