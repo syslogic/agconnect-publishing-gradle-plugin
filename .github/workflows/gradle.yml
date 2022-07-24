@@ -59,3 +59,12 @@ jobs:
           name: agconnect-publishing-gradle-plugin
           path: ./build/libs/*.jar
           retention-days: 14
+
+      - name: 📦 Retain Test
+        if: always()
+        id: retain-plugin-test
+        uses: actions/upload-artifact@v3
+        with:
+          name: agconnect-publishing-gradle-plugin-test
+          path: ./build/reports/tests/test/index.html
+          retention-days: 1
