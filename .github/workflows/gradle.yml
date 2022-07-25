@@ -61,14 +61,16 @@ jobs:
       - name: Build with Gradle
         env:
           AGC_PACKAGE_ID: ${{ secrets.AGC_PACKAGE_ID }}
-        run: ./gradlew :build
+        run: |
+          cd buildSrc
+          ./gradlew :build
 
       - name: 📦 Retain Artifact (JAR)
         id: retain-plugin-jar
         uses: actions/upload-artifact@v3
         with:
           name: agconnect-publishing-gradle-plugin
-          path: ./build/libs/*.jar
+          path: ./buildSrc/build/libs/*.jar
           retention-days: 14
 
       - name: 📦 Retain Test
@@ -77,5 +79,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: agconnect-publishing-gradle-plugin-test
-          path: ./build/reports/tests/test
+          path: ./buildSrc/build/reports/tests/test
           retention-days: 1
