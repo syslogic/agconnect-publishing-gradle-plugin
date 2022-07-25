@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 class PublishingTest extends BaseTestCase {
 
     @Test
-    public void helpTest() {
-        BuildResult result = runTask(":tasks");
-        // assertNotNull(result);
-        assertTrue(true);
+    public void buildEnvironmentTest() {
+        BuildResult result = runTask(":mobile:buildEnvironment");
+        // assertTrue(true);
+        assertNotNull(result);
     }
 }

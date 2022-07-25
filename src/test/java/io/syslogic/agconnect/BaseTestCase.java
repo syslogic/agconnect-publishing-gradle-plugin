@@ -10,14 +10,20 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
@@ -119,6 +125,15 @@ abstract class BaseTestCase extends TestCase {
      */
     static void generateProject(@NotNull File projectDir) {
 
+        /* Locally: Copy `buildSrc/build/libs` to temporary project `libs` directory */
+        if (! System.getenv().containsKey("CI")) {
+            File libsDir = new File(projectDir, "libs");
+            if (libsDir.exists() || libsDir.mkdir()) {
+                File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + "libs" + File.separator + "agconnect-publishing-gradle-plugin-7.2.1.8.jar");
+                copyDirectory(libs, new File(projectDir, "libs" + File.separator + "agconnect-publishing-gradle-plugin-7.2.1.8.jar"));
+            }
+        }
+
         /* File `keystore.properties` */
         propertiesFile = new File(projectDir, "keystore.properties");
         writeFile(propertiesFile, readFile(getProjectRootPath() + File.separator + "keystore.properties"), false);
@@ -136,17 +151,6 @@ abstract class BaseTestCase extends TestCase {
         /* Generic: settings.gradle */
         settingsFile = new File(projectDir, "settings.gradle");
         writeFile(settingsFile, getSettingsString(), false);
-
-        /* Locally: Copy `buildSrc` to temporary project directory */
-        if (! System.getenv().containsKey("CI")) {
-            File buildSrc = new File(projectDir, "buildSrc");
-            if (buildSrc.exists() || buildSrc.mkdir()) {
-                buildSrc = new File(projectDir, "buildSrc/src"); // reassignment
-                if (buildSrc.exists() || buildSrc.mkdir()) {
-                    copyDirectory(new File(getProjectRootPath() + "buildSrc/src"), buildSrc);
-                }
-            }
-        }
 
         /* Generic: `mobile/src` */
         File mobile = new File(projectDir, "mobile");
@@ -180,6 +184,7 @@ abstract class BaseTestCase extends TestCase {
                 writeFile(projectBuildFile,
                    "apply plugin: \"com.android.application\"\n" +
                         "apply plugin: \"com.huawei.agconnect\"\n" +
+                        "apply plugin: \"io.syslogic.agconnect.publishing\"\n" +
                         "android {\n" +
                         "    compileSdk 32\n" +
                         "    defaultConfig {\n" +
@@ -252,23 +257,25 @@ abstract class BaseTestCase extends TestCase {
     @NotNull
     static String getSettingsString() {
         return
-                "import org.gradle.api.initialization.resolve.RepositoriesMode\n\n" +
+                "\nimport org.gradle.api.initialization.resolve.RepositoriesMode\n\n" +
                 "pluginManagement {\n" +
                 "    repositories {\n" +
                 "        gradlePluginPortal()\n" +
-                "        google()\n" +
-                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
+                "        google()\n"  +
                 "        mavenCentral()\n" +
+                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
+                "        flatDir { dirs \"libs\" }\n" +
                 "    }\n" +
                 "}\n" +
                 "dependencyResolutionManagement {\n" +
                 "    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)\n" +
                 "    repositories {\n" +
                 "        google()\n" +
-                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
                 "        mavenCentral()\n" +
+                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
                 "    }\n" +
                 "}\n" +
+                "rootProject.name = \"PublishingPlugin\"\n" +
                 "include \":mobile\"\n";
     }
 
@@ -281,10 +288,12 @@ abstract class BaseTestCase extends TestCase {
                 "        mavenCentral()\n" +
                 "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
                 "        mavenLocal()\n" +
+                "        flatDir { dirs \"libs\" }\n" +
                 "    }\n" +
                 "    dependencies {\n" +
                 "        classpath \"com.android.tools.build:gradle:7.2.1\"\n" +
                 "        classpath \"com.huawei.agconnect:agcp:1.7.0.300\"\n" +
+                "        classpath \"io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.8\"\n" +
                 "    }\n" +
                 "}\n\n";
     }
@@ -293,8 +302,8 @@ abstract class BaseTestCase extends TestCase {
     static String getKeystorePropertiesString() {
         return
             "if (rootProject.file('keystore.properties').exists()) {\n" +
-            "    def keystore = new Properties()\n" +
             "    def is = new FileInputStream(rootProject.file('keystore.properties'))\n" +
+            "    def keystore = new Properties()\n" +
             "    keystore.load(is)\n" +
             "    project.ext.set('debugKeystorePass',   keystore['debugKeystorePass'])\n" +
             "    project.ext.set('debugKeyAlias',       keystore['debugKeyAlias'])\n" +
@@ -359,17 +368,17 @@ abstract class BaseTestCase extends TestCase {
     }
 
     static void copyDirectory(@NotNull File source, @NotNull File destination) {
-        try {
-            Files.walk(source.toPath()).forEachOrdered(sourcePath -> {
-                log(sourcePath.getFileName().toString());
-                try {
-                    Files.copy(sourcePath, source.toPath().resolve(
-                            destination.toPath().relativize(sourcePath)
-                    ));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+
+        try (
+                InputStream in = new BufferedInputStream(new FileInputStream(source));
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(destination))
+        ) {
+            byte[] buffer = new byte[1024];
+            int lengthRead;
+            while ((lengthRead = in.read(buffer)) > 0) {
+                out.write(buffer, 0, lengthRead);
+                out.flush();
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

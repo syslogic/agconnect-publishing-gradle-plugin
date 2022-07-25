@@ -83,6 +83,11 @@ gradlePlugin {
     }
 }
 
+tasks.withType(Jar).configureEach {
+    archiveBaseName.set("agconnect-publishing-gradle-plugin")
+    archiveVersion.set("${agp_version}.${plugin_version}")
+}
+
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
