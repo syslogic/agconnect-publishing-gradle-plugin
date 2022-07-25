@@ -17,6 +17,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.EntityUtils;
 
+import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -317,7 +318,7 @@ abstract public class PublishingTask extends BaseTask {
         String variant = getBuildVariant().get();
 
         String output = getProject().getProjectDir().getAbsolutePath().concat(
-                File.separator + "build" + File.separator + "outputs" + File.separator +
+                File.separator + Project.DEFAULT_BUILD_DIR_NAME + File.separator + "outputs" + File.separator +
                 (suffix.equals(ArtifactType.AAB) ? "bundle": "apk") + File.separator +
                 variant + File.separator
         );

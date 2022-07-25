@@ -9,7 +9,7 @@ buildscript {
         httpclient_version = '4.5.13'
         httpcore_version = '4.4.14'
         httpmime_version = '4.5.6'
-        lang3_version = '3.11'
+        lang3_version = '3.12.0'
         gson_version = '2.9.0'
         junit_version = '5.8.2'
     }
@@ -61,6 +61,7 @@ dependencies {
     implementation "com.google.code.gson:gson:$gson_version"
 
     testImplementation gradleTestKit()
+    testImplementation "org.jetbrains:annotations:$annotations_version"
     testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
     testImplementation(project)
 }

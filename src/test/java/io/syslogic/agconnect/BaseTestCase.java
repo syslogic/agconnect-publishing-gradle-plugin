@@ -1,14 +1,20 @@
 package io.syslogic.agconnect;
 
+import org.gradle.api.Project;
 import org.gradle.internal.impldep.junit.framework.TestCase;
-import org.gradle.internal.impldep.org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
-import org.junit.jupiter.api.BeforeEach;
+import org.gradle.testkit.runner.UnexpectedBuildResultException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,115 +27,206 @@ import java.util.stream.Stream;
  */
 abstract class BaseTestCase extends TestCase {
 
+    /** Temporary directory for the generated project */
+    static @TempDir File testProject;
+
     /** Plugin package identifier */
-    String identifier = "io.syslogic.agconnect.publishing";
+    static String identifier = "io.syslogic.agconnect.publishing";
 
     /** Local environment, not to be used by CI */
-    String sourceDirectory = "C:\\Home\\Applications\\androidx-audiolibrary";
+    static String packageId = "io.syslogic.audio";
 
-    /** Local environment, not to be used by CI */
-    String packageId = "io.syslogic.audio";
-
-    /** Temporary directory, where to run the generated project */
-    @TempDir File testProject;
+    /** File `keystore.properties` */
+    static File propertiesFile;
 
     /** File `settings.gradle` is required to look up `aapt2` */
-    File settingsFile;
+    static File settingsFile;
 
     /** File `build.gradle` */
-    File buildFile;
+    static File buildFile;
 
     /** Directory `credentials` */
-    File credentials;
-    String apiConfig;
+    static File credentials;
+
+    static String apiConfig;
 
     /** Directory `src` */
-    File src;
+    static File src;
 
     /** Directory `src/main/java` */
-    File srcMain;
-
-    /** Directory `src/debug/java` */
-    File srcDebug;
-
-    /** Directory `src/release/java` */
-    File srcRelease;
+    static File srcMain;
 
     /** File `src/main/AndroidManifest.xml` */
-    File manifest;
+    static File manifestMain;
+
+    /** Directory `src/huaweiDebug/java` */
+    static File srcDebug;
+
+    /** Directory `src/huaweiRelease/java` */
+    static File srcRelease;
 
     /**
      * The configuration JSON string for debug builds;
-     * either locally copied or inserted as GitHub secret.
+     * copied from local file (inserted from GitHub secrets).
      */
-    String appConfigDebug;
+    static String appConfigDebug;
 
     /**
      * The configuration JSON string for release builds;
-     * either locally copied or inserted as GitHub secret.
+     * copied from local file (inserted from GitHub secrets).
      */
-    String appConfigRelease;
+    static String appConfigRelease;
 
     /**
-     * Generate the configuration files required in order to test the plugin, which are:
-     * `build.gradle`, `settings.gradle`, `agconnect-services.json`, `agc-apiclient.json`
-     * and `AndroidManifest.xml`.
+     * Generate the configuration files required to test the plugin, which are: `build.gradle`,
+     * `settings.gradle`, `agconnect-services.json`, `agc-apiclient.json` and `AndroidManifest.xml`.
      *
      * @see <a href="https://github.com/gradle/gradle/blob/master/subprojects/core/src/main/java/org/gradle/api/internal/initialization/DefaultScriptHandler.java">DefaultScriptHandler.java</a>
      */
-    @BeforeEach
-    public void setup() {
+    @BeforeAll
+    static void setup() {
 
-        /* GitHub Environment */
+        /* GitHub Test Project `applicationId` */
         if (System.getenv().containsKey("CI")) {
-            this.packageId = System.getenv("AGC_PACKAGE_ID");
+            if (System.getenv().containsKey("AGC_PACKAGE_ID")) {
+                packageId = System.getenv("AGC_PACKAGE_ID");
+            }
         }
 
-        /* always set up the strings */
-        String rootDirectory = getRootProjectPath();
-        this.apiConfig = readFile(rootDirectory + "credentials" +  File.separator + "agc-apiclient.json");
-        this.appConfigRelease = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        this.appConfigDebug = readFile(rootDirectory + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
+        /* These config strings are being copied from the reference project */
+        apiConfig = readFile(getProjectRootPath() + "credentials" +  File.separator + "agc-apiclient.json");
+        appConfigRelease = readFile(getProjectRootPath() + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        appConfigDebug = readFile(getProjectRootPath() + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
 
-        /* src */
-        this.src = new File(testProject, "src");
+        /* File `keystore.properties` */
+        propertiesFile = new File(testProject, "keystore.properties");
+        writeFile(propertiesFile, readFile(getProjectRootPath() + File.separator + "keystore.properties"), false);
+
+        /* File `credentials/agc-apiclient.json` */
+        credentials = new File(testProject, "credentials");
+        if (credentials.exists() || credentials.mkdir()) {
+            writeFile(new File(credentials, "agc-apiclient.json"), apiConfig, false);
+        }
+
+        /* Generic: src */
+        src = new File(testProject, "src");
         if (src.exists() || src.mkdir()) {
 
-            /* src/main/AndroidManifest.xml */
-            this.srcMain = new File(testProject, "src" + File.separator + "main");
+            /* Generic: `src/main/AndroidManifest.xml` */
+            srcMain = new File(testProject, "src" + File.separator + "main");
             if (srcMain.exists() || srcMain.mkdir()) {
-                this.manifest = new File(testProject, "src" + File.separator + "main" +  File.separator + "AndroidManifest.xml");
-                this.writeFile(manifest,"<?xml version='1.0' encoding='utf-8'?>\n<manifest package='" + this.packageId + "'/>");
+                manifestMain = new File(testProject, "src" + File.separator + "main" +  File.separator + "AndroidManifest.xml");
+                writeFile(manifestMain, getManifestString("main"), false);
             }
 
-            /* src/debug/agconnect-services.json */
-            this.srcDebug = new File(testProject, "src" + File.separator + "debug");
+            /* Vendor: `src/huaweiDebug/agconnect-services.json` */
+            srcDebug = new File(testProject, "src" + File.separator + "huaweiDebug");
             if (srcDebug.exists() || srcDebug.mkdir()) {
-                writeFile(new File(srcDebug, "agconnect-services.json"), appConfigDebug);
+                File configDebug = new File(srcDebug, "agconnect-services.json");
+                writeFile(configDebug, appConfigDebug, false);
             }
 
-            /* src/release/agconnect-services.json */
-            this.srcRelease = new File(testProject, "src" + File.separator + "release");
+            /* Vendor: `src/huaweiRelease/agconnect-services.json` */
+            srcRelease = new File(testProject, "src" + File.separator + "huaweiRelease");
             if (srcRelease.exists() || srcRelease.mkdir()) {
-                writeFile(new File(srcRelease, "agconnect-services.json"), appConfigRelease);
+                File configRelease = new File(srcRelease, "agconnect-services.json");
+                writeFile(configRelease, appConfigRelease, false);
             }
         }
 
-        /* credentials/agc-apiclient.json */
-        this.credentials = new File(testProject, "credentials");
-        if (credentials.exists() || credentials.mkdir()) {
-            writeFile(new File(credentials, "agc-apiclient.json"), apiConfig);
-        }
+        /* Generic: settings.gradle */
+        settingsFile = new File(testProject, "settings.gradle");
+        writeFile(settingsFile, getSettingsString(), false);
 
-        /* settings.gradle */
-        this.settingsFile = new File(testProject, "settings.gradle");
-        writeFile(settingsFile, "import org.gradle.api.initialization.resolve.RepositoriesMode\n" +
+        /* Generic: build.gradle */
+        buildFile = new File(testProject, Project.DEFAULT_BUILD_FILE);
+        writeFile(buildFile, getBuildScriptString() +
+            getKeystorePropertiesString() +
+            "apply plugin: \"com.android.application\"\n" +
+            "apply plugin: \"com.huawei.agconnect\"\n" +
+            "apply plugin: \"" + identifier + "\"\n\n" +
+
+            "android {\n" +
+            "    compileSdk 32\n" +
+            "    defaultConfig {\n" +
+            "        minSdk 23\n" +
+            "        targetSdk 32\n" +
+            "        applicationId \"" + packageId + "\"\n" +
+            "        versionName \"1.0.0\"\n" +
+            "        versionCode 1\n" +
+            "    }\n" +
+            "    signingConfigs {\n" +
+            "        debug {\n" +
+            "            storeFile file(\"" + getDebugKeystorePath() + "\")\n" +
+            "            storePassword rootProject.ext.get(\"debugKeystorePass\")\n" +
+            "            keyAlias rootProject.ext.get(\"debugKeyAlias\")\n" +
+            "            keyPassword rootProject.ext.get(\"debugKeyPass\")\n" +
+            "        }\n" +
+            "        release {\n" +
+            "            storeFile file(\"" + getUploadKeystorePath() + "\")\n" +
+            "            storePassword rootProject.ext.get(\"releaseKeystorePass\")\n" +
+            "            keyAlias rootProject.ext.get(\"releaseKeyAlias\")\n" +
+            "            keyPassword rootProject.ext.get(\"releaseKeyPass\")\n" +
+            "        }\n"+
+            "    }\n" +
+            "    sourceSets {\n" +
+            "        main {}\n" +
+            "        huawei {\n" +
+            "            java.srcDir \"src/huawei/java\"\n" +
+            "        }\n" +
+            "    }\n" +
+            "    flavorDimensions \"vendor\"\n" +
+            "    productFlavors {\n" +
+            "        huawei {\n" +
+            "            dimension \"vendor\"\n" +
+            "            versionNameSuffix \"-huawei\"\n" +
+            "        }\n" +
+            "    }\n" +
+            "    buildTypes {\n" +
+            "        debug {\n" +
+            "            signingConfig signingConfigs.debug\n" +
+            "            applicationIdSuffix \".debug\"\n" +
+            "            debuggable true\n" +
+            "            jniDebuggable true\n" +
+            "            zipAlignEnabled true\n" +
+            "            renderscriptDebuggable true\n" +
+            "            pseudoLocalesEnabled false\n" +
+            "            shrinkResources false\n" +
+            "            minifyEnabled false\n" +
+            "        }\n" +
+            "        release {\n" +
+            "            signingConfig signingConfigs.release\n" +
+            "            shrinkResources true\n" +
+            "            testCoverageEnabled false\n" +
+            "            zipAlignEnabled true\n" +
+            "            pseudoLocalesEnabled false\n" +
+            "            renderscriptDebuggable false\n" +
+            "            minifyEnabled true\n" +
+            "            jniDebuggable false\n" +
+            "            debuggable false\n" +
+            "        }\n"+
+            "    }\n"+
+            "}\n\n" + // `android`
+            "dependencies {\n" +
+            "}\n\n" +
+            "agcPublishing {\n" +
+            "}\n",false);
+
+        log(readFile(settingsFile.getAbsolutePath()));
+        log(readFile(buildFile.getAbsolutePath()));
+    }
+
+    @NotNull
+    static String getSettingsString() {
+        return
+                "import org.gradle.api.initialization.resolve.RepositoriesMode\n\n" +
                 "pluginManagement {\n" +
                 "    repositories {\n" +
                 "        gradlePluginPortal()\n" +
                 "        google()\n" +
                 "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
-                "        maven { url 'https://jitpack.io' }\n" +
+                //"        flatDir { dirs \"" + getOutputDirectoryPath() + "\" }\n" +
+                "        maven { url \"https://jitpack.io\" }\n" +
                 "        mavenCentral()\n" +
                 "    }\n" +
                 "}\n" +
@@ -140,115 +237,84 @@ abstract class BaseTestCase extends TestCase {
                 "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
                 "        mavenCentral()\n" +
                 "    }\n" +
-                "}\n");
-
-        /* build.gradle */
-        this.buildFile = new File(testProject, "build.gradle");
-        writeFile(buildFile, "buildscript {\n" +
-            "repositories {\n" +
-                "google()\n" +
-                "mavenCentral()\n" +
-                "maven { url 'https://developer.huawei.com/repo/' }\n" +
-                "maven { url 'https://jitpack.io' }\n" +
-                "mavenLocal()\n" +
-            "}\n" +
-            "dependencies {\n" +
-                "classpath 'com.android.tools.build:gradle:7.2.1'\n" +
-                "classpath 'com.huawei.agconnect:agcp:1.7.0.300'\n" +
-                "classpath 'io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.7'\n" +
-           "}\n" +
-        "}\n"+
-
-        "apply plugin: 'com.android.application'\n" +
-        "apply plugin: 'com.huawei.agconnect'\n" +
-        "apply plugin: '" + this.identifier + "'\n" +
-
-        "android {\n" +
-            "compileSdk 32\n" +
-            "defaultConfig {\n" +
-                "minSdk 23\n" +
-                "targetSdk 32\n" +
-                "applicationId '" + this.packageId + "'\n" +
-                "versionName '1.0.0'\n" +
-                "versionCode 1\n" +
-            "}\n" +
-            "signingConfigs {\n" +
-                "debug {\n" +
-
                 "}\n" +
-                "release {\n" +
-
-                "}\n"+
-            "}\n" +
-            "sourceSets {\n" +
-                "main {\n" +
-                    "java.srcDir 'src/main/java'\n" +
-                "}\n" +
-                "huawei {\n" +
-                    "java.srcDir 'src/huawei/java'\n" +
-                "}\n" +
-            "}\n" +
-            "flavorDimensions 'vendor'\n" +
-            "productFlavors {\n" +
-                "huawei {\n" +
-                    "dimension 'vendor'\n" +
-                    "versionNameSuffix '-huawei'\n" +
-                "}\n" +
-            "}\n" +
-            "buildTypes {\n" +
-                "debug {\n" +
-                    "signingConfig signingConfigs.debug\n" +
-                    "applicationIdSuffix '.debug'\n" +
-                    "debuggable true\n" +
-                    "jniDebuggable true\n" +
-                    "zipAlignEnabled true\n" +
-                    "renderscriptDebuggable true\n" +
-                    "pseudoLocalesEnabled false\n" +
-                    "shrinkResources false\n" +
-                    "minifyEnabled false\n" +
-                "}\n" +
-                "release {\n" +
-                    "signingConfig signingConfigs.release\n" +
-                    "shrinkResources true\n" +
-                    "testCoverageEnabled false\n" +
-                    "zipAlignEnabled true\n" +
-                    "pseudoLocalesEnabled false\n" +
-                    "renderscriptDebuggable false\n" +
-                    "minifyEnabled true\n" +
-                    "jniDebuggable false\n" +
-                    "debuggable false\n" +
-                "}\n"+
-            "}\n"+
-        "}\n\n" +
-        "dependencies {\n" +
-        "}\n\n" +
-        "agcPublishing {\n" +
-        "}\n");
+                "include \":mobile\"\n";
     }
 
-    String getRootProjectPath() {
-        if (System.getenv().containsKey("CI")) {
-            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath() + File.separator;
-        } else {
-            return new File(this.sourceDirectory).getAbsolutePath() + File.separator;
+    @NotNull
+    static String getBuildScriptString() {
+        return
+                "buildscript {\n" +
+                "    repositories {\n" +
+                "        google()\n" +
+                "        mavenCentral()\n" +
+                "        maven { url \"https://developer.huawei.com/repo/\" }\n" +
+                // "        flatDir { dirs \"" + getOutputDirectoryPath() + "\" }\n" +
+                "        maven { url \"https://jitpack.io\" }\n" +
+                "        mavenLocal()\n" +
+                "    }\n" +
+                "    dependencies {\n" +
+                "        classpath \"com.android.tools.build:gradle:7.2.1\"\n" +
+                "        classpath \"com.huawei.agconnect:agcp:1.7.0.300\"\n" +
+                // "        classpath \"" + identifier + ":buildSrc:7.2.1.8@jar\"\n" +
+                "        classpath \"io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.8\"\n" +
+                "    }\n" +
+                "}\n\n";
+    }
+
+    @NotNull
+    static String getKeystorePropertiesString() {
+        return
+            "if (rootProject.file('keystore.properties').exists()) {\n" +
+            "    def keystore = new Properties()\n" +
+            "    keystore.load(new FileInputStream(rootProject.file('keystore.properties')))\n" +
+            "    project.ext.set('debugKeystorePass',   keystore['debugKeystorePass'])\n" +
+            "    project.ext.set('debugKeyAlias',       keystore['debugKeyAlias'])\n" +
+            "    project.ext.set('debugKeyPass',        keystore['debugKeyPass'])\n" +
+            "    project.ext.set('releaseKeystorePass', keystore['releaseKeystorePass'])\n" +
+            "    project.ext.set('releaseKeyAlias',     keystore['releaseKeyAlias'])\n" +
+            "    project.ext.set('releaseKeyPass',      keystore['releaseKeyPass'])\n" +
+            "}\n\n";
+    }
+
+    @NotNull
+    static String getManifestString(@SuppressWarnings("SameParameterValue") String sourceSet) {
+        return
+            "<?xml version='1.0' encoding='utf-8'?>\n"  +
+            "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+            "    package='" + packageId + "'>\n" +
+            "    <application android:hasCode=\"false\"/>" +
+            "</manifest>";
+    }
+
+    @Nullable
+    @SuppressWarnings("SameParameterValue")
+    BuildResult runTask(String arguments) {
+        BuildResult result = null;
+        try {
+            GradleRunner runner =
+                    GradleRunner.create()
+                            .withProjectDir(testProject)
+                            .withGradleVersion("7.4.2")
+                            .withArguments(arguments)
+                            .withPluginClasspath();
+
+            if (!System.getenv().containsKey("CI")) {
+                runner.withDebug(true).forwardOutput();
+            }
+            result = runner.build();
+        } catch (UnexpectedBuildResultException e) {
+            System.err.println(">> " + e.getBuildResult().getOutput());
+            System.err.println(e.getMessage());
         }
+        return result;
     }
 
-    BuildResult getBuildResult(String arguments) {
-        GradleRunner runner = GradleRunner.create()
-                .withProjectDir(this.testProject)
-                .withArguments(arguments)
-                .withPluginClasspath();
-
-        if (! System.getenv().containsKey("CI")) {
-            runner.withDebug(true).forwardOutput();
-        }
-        return runner.build();
-    }
-
-    String readFile(String path) {
+    @NotNull
+    static String readFile(String path) {
         StringBuilder sb = new StringBuilder();
-        try (Stream<String> stream = Files.lines(Paths.get(path), StandardCharsets.UTF_8)) {
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path), StandardCharsets.UTF_8);
             stream.forEach(s -> sb.append(s).append("\n"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -256,12 +322,44 @@ abstract class BaseTestCase extends TestCase {
         return sb.toString();
     }
 
-    @SuppressWarnings("deprecation")
-    void writeFile(File file, String data) {
-        try {
-            FileUtils.writeStringToFile(file, data);
-        } catch (IOException e) {
-            e.printStackTrace();
+    static void writeFile(@NotNull File file, @NotNull String data, @SuppressWarnings("SameParameterValue") boolean append) {
+        try (PrintWriter p = new PrintWriter(new FileOutputStream(file.getAbsolutePath(), append))) {
+            p.println(data);
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    @NotNull
+    static String getProjectRootPath() {
+        if (System.getenv().containsKey("CI")) {
+            return new File(System.getenv().get("GITHUB_WORKSPACE")).getAbsolutePath() + File.separator;
+        } else {
+            return System.getProperty("user.dir").replace("buildSrc", "");
+        }
+    }
+
+    @NotNull
+    static String getOutputDirectoryPath() {
+        String value = System.getProperty("user.dir") + File.separator + "build" + File.separator + "libs";
+        return value.replace("\\", "\\\\");
+    }
+
+    @NotNull
+    static String getDebugKeystorePath() {
+        String value = System.getProperty("user.home") + File.separator + ".android" + File.separator + "debug.keystore";
+        return value.replace("\\", "\\\\");
+    }
+
+    @NotNull
+    static String getUploadKeystorePath() {
+        String value = System.getProperty("user.home") + File.separator + ".android" + File.separator + "upload.keystore";
+        return value.replace("\\", "\\\\");
+    }
+
+    static void log(@NotNull String data) {
+        if (! System.getenv().containsKey("CI")) {
+            System.out.println(data);
         }
     }
 }

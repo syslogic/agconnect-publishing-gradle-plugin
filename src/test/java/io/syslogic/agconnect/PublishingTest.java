@@ -1,6 +1,7 @@
 package io.syslogic.agconnect;
 
 import org.gradle.testkit.runner.BuildResult;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -11,8 +12,22 @@ import org.junit.jupiter.api.Test;
 class PublishingTest extends BaseTestCase {
 
     @Test
-    public void getAppIdTest() {
-        BuildResult result = getBuildResult("assembleDebug");
-        assertNotNull(result.getOutput());
+    public void helpTest() {
+        BuildResult result = runTask(":welp");
+        assertNull(result);
     }
+
+/*
+    @Test
+    public void bundleDebugTest() {
+        BuildResult result = runTask(":bundleDebug");
+        assertNotNull(result);
+    }
+
+    @Test
+    public void bundleReleaseTest() {
+        BuildResult result = runTask(":bundleRelease");
+        assertNotNull(result);
+    }
+*/
 }

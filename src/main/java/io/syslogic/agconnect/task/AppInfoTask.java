@@ -56,7 +56,7 @@ abstract public class AppInfoTask extends BaseTask {
     }
 
     /**
-     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-info-query-0000001158365045">Querying App Information</a>.
+     * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-info-query-0000001158365045">Querying App Information</a>
      */
     @SuppressWarnings("UnusedReturnValue")
     public void getAppInfo() {

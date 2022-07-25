@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.AppIdTask;
+import io.syslogic.agconnect.task.HelpTask;
 import io.syslogic.agconnect.task.PublishingTask;
 
 /**
@@ -63,89 +64,180 @@ class PublishingPlugin implements Plugin<Project> {
 
             /* Loop product flavors and build-types. */
             String[] buildTypes = getBuildTypes(project);
-            String[] flavors = getProductFlavors(project);
-            for (String flavor : flavors) {
+            String[] productFlavors = getProductFlavors(project);
+            String taskName;
+
+            /* TODO: consider absent productFlavors */
+            if (productFlavors.length == 0) {
+
+                /* Loop build-types. */
                 for (String buildType : buildTypes) {
 
-                    /* Loop the variants per single flavor and single build-type. */
-                    String[] variants = getVariants(new String[] {flavor}, new String[] {buildType});
-                    for (String variant : variants) {
+                    /* Loop artifact-types APK & AAB. */
+                    for (String artifactType : new String[] {ArtifactType.APK, ArtifactType.AAB}) {
 
-                        /* Loop artifact-types APK & AAB. */
-                        for (String artifactType : new String[] {ArtifactType.APK, ArtifactType.AAB}) {
+                        /* Check if file `agconnect-services.json` is present. */
+                        String appConfigFile = getAppConfigPath(project, buildType);
+                        if (appConfigFile != null) {
 
-                            /* Check if file `agconnect-services.json` is present. */
-                            String appConfigFile = getAppConfigPath(project, buildType, variant);
-                            if (appConfigFile != null) {
-
-                                /* Apply values provided by the PublishingExtension. */
-                                if (! extension.getConfigFile().isEmpty()) {
-                                    if (! new File(extension.getConfigFile()).exists()) {
-                                        System.err.println("AGConnect API config not found: " + extension.getConfigFile());
-                                        System.err.println("Reverting to the default value: " + configFile);
-                                    } else {
-                                        configFile = extension.getConfigFile();
-                                    }
+                            /* Apply values provided by the PublishingExtension. */
+                            if (! extension.getConfigFile().isEmpty()) {
+                                if (! new File(extension.getConfigFile()).exists()) {
+                                    System.err.println("AGConnect API config not found: " + extension.getConfigFile());
+                                    System.err.println("Reverting to the default value: " + configFile);
+                                } else {
+                                    configFile = extension.getConfigFile();
                                 }
-                                if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
-                                if (extension.getVerbose()) {verbose = extension.getVerbose();}
-                                String taskName;
+                            }
+                            if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
+                            if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
-                                /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
-                                if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
+                            /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
+                            if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
 
-                                    /* Register Tasks: Publish. */
-                                    taskName = "publish" + StringUtils.capitalize(variant) + StringUtils.capitalize(artifactType);
+                                /* Register Tasks: Publish. */
+                                taskName = "publish" + StringUtils.capitalize(artifactType);
+                                if (project.getTasks().findByName(taskName) == null) {
+                                    project.getTasks().register(taskName, PublishingTask.class, task -> {
+                                        task.setGroup(taskGroup);
+                                        task.getApiConfigFile().set(configFile);
+                                        task.getAppConfigFile().set(appConfigFile);
+                                        task.getArtifactType().set(artifactType);
+                                        task.getBuildType().set(buildType);
+                                        task.getLogHttp().set(logHttp);
+                                        task.getVerbose().set(verbose);
+
+                                        /* publish* tasks to depend on assemble or bundle. */
+                                        String buildTask = getBuildTask(project, artifactType, buildType);
+                                        task.dependsOn(buildTask);
+                                    });
+                                }
+                            }
+
+                            /* Register Tasks: AppInfo */
+                            taskName = "getAppInfo" + StringUtils.capitalize(buildType);
+                            if (project.getTasks().findByName(taskName) == null) {
+                                String apiConfigFile = configFile;
+                                project.getTasks().register(taskName, AppInfoTask.class, task -> {
+                                    task.setGroup(taskGroup);
+                                    task.getApiConfigFile().set(apiConfigFile);
+                                    task.getAppConfigFile().set(appConfigFile);
+                                    task.getBuildType().set(buildType);
+                                    task.getLogHttp().set(logHttp);
+                                    task.getVerbose().set(verbose);
+                                });
+                            }
+
+                            /* Register Tasks: AppId */
+                            taskName = "getAppId" + StringUtils.capitalize(buildType);
+                            if (project.getTasks().findByName(taskName) == null) {
+                                String apiConfigFile = configFile;
+                                project.getTasks().register(taskName, AppIdTask.class, task -> {
+                                    task.setGroup(taskGroup);
+                                    task.getApiConfigFile().set(apiConfigFile);
+                                    task.getAppConfigFile().set(appConfigFile);
+                                    task.getBuildType().set(buildType);
+                                    task.getLogHttp().set(logHttp);
+                                    task.getVerbose().set(verbose);
+                                });
+                            }
+                        }
+                    }
+                }
+
+            } else {
+
+                /* Loop product flavors and build-types. */
+                for (String flavor : productFlavors) {
+                    for (String buildType : buildTypes) {
+
+                        /* Loop the variants per single flavor and single build-type. */
+                        String[] variants = getVariants(new String[] {flavor}, new String[] {buildType});
+                        for (String variant : variants) {
+
+                            /* Loop artifact-types APK & AAB. */
+                            for (String artifactType : new String[] {ArtifactType.APK, ArtifactType.AAB}) {
+
+                                /* Check if file `agconnect-services.json` is present. */
+                                String appConfigFile = getAppConfigPath(project, buildType, variant);
+                                if (appConfigFile != null) {
+
+                                    /* Apply values provided by the PublishingExtension. */
+                                    if (! extension.getConfigFile().isEmpty()) {
+                                        if (! new File(extension.getConfigFile()).exists()) {
+                                            System.err.println("AGConnect API config not found: " + extension.getConfigFile());
+                                            System.err.println("Reverting to the default value: " + configFile);
+                                        } else {
+                                            configFile = extension.getConfigFile();
+                                        }
+                                    }
+                                    if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
+                                    if (extension.getVerbose()) {verbose = extension.getVerbose();}
+
+                                    /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
+                                    if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
+
+                                        /* Register Tasks: Publish. */
+                                        taskName = "publish" + StringUtils.capitalize(variant) + StringUtils.capitalize(artifactType);
+                                        if (project.getTasks().findByName(taskName) == null) {
+                                            project.getTasks().register(taskName, PublishingTask.class, task -> {
+                                                task.setGroup(taskGroup);
+                                                task.getApiConfigFile().set(configFile);
+                                                task.getAppConfigFile().set(appConfigFile);
+                                                task.getArtifactType().set(artifactType);
+                                                task.getProductFlavor().set(flavor);
+                                                task.getBuildType().set(buildType);
+                                                task.getBuildVariant().set(variant);
+                                                task.getLogHttp().set(logHttp);
+                                                task.getVerbose().set(verbose);
+
+                                                /* publish* tasks to depend on assemble or bundle. */
+                                                String buildTask = getBuildTask(project, artifactType, variant);
+                                                task.dependsOn(buildTask);
+                                            });
+                                        }
+                                    }
+
+                                    /* Register Tasks: AppInfo */
+                                    taskName = "getAppInfo" + StringUtils.capitalize(buildType);
                                     if (project.getTasks().findByName(taskName) == null) {
-                                        project.getTasks().register(taskName, PublishingTask.class, task -> {
+                                        String apiConfigFile = configFile;
+                                        project.getTasks().register(taskName, AppInfoTask.class, task -> {
                                             task.setGroup(taskGroup);
-                                            task.getApiConfigFile().set(configFile);
+                                            task.getApiConfigFile().set(apiConfigFile);
                                             task.getAppConfigFile().set(appConfigFile);
-                                            task.getArtifactType().set(artifactType);
-                                            task.getProductFlavor().set(flavor);
                                             task.getBuildType().set(buildType);
-                                            task.getBuildVariant().set(variant);
                                             task.getLogHttp().set(logHttp);
                                             task.getVerbose().set(verbose);
-
-                                            /* publish* tasks to depend on assemble or bundle. */
-                                            String buildTask = getBuildTask(project, artifactType, variant);
-                                            task.dependsOn(buildTask);
                                         });
                                     }
-                                }
 
-                                /* Register Tasks: AppInfo */
-                                taskName = "getAppInfo" + StringUtils.capitalize(buildType);
-                                if (project.getTasks().findByName(taskName) == null) {
-                                    String apiConfigFile = configFile;
-                                    project.getTasks().register(taskName, AppInfoTask.class, task -> {
-                                        task.setGroup(taskGroup);
-                                        task.getApiConfigFile().set(apiConfigFile);
-                                        task.getAppConfigFile().set(appConfigFile);
-                                        task.getBuildType().set(buildType);
-                                        task.getLogHttp().set(logHttp);
-                                        task.getVerbose().set(verbose);
-                                    });
-                                }
-
-                                /* Register Tasks: AppId */
-                                taskName = "getAppId" + StringUtils.capitalize(buildType);
-                                if (project.getTasks().findByName(taskName) == null) {
-                                    String apiConfigFile = configFile;
-                                    project.getTasks().register(taskName, AppIdTask.class, task -> {
-                                        task.setGroup(taskGroup);
-                                        task.getApiConfigFile().set(apiConfigFile);
-                                        task.getAppConfigFile().set(appConfigFile);
-                                        task.getBuildType().set(buildType);
-                                        task.getLogHttp().set(logHttp);
-                                        task.getVerbose().set(verbose);
-                                    });
+                                    /* Register Tasks: AppId */
+                                    taskName = "getAppId" + StringUtils.capitalize(buildType);
+                                    if (project.getTasks().findByName(taskName) == null) {
+                                        String apiConfigFile = configFile;
+                                        project.getTasks().register(taskName, AppIdTask.class, task -> {
+                                            task.setGroup(taskGroup);
+                                            task.getApiConfigFile().set(apiConfigFile);
+                                            task.getAppConfigFile().set(appConfigFile);
+                                            task.getBuildType().set(buildType);
+                                            task.getLogHttp().set(logHttp);
+                                            task.getVerbose().set(verbose);
+                                        });
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+
+            /* Register Tasks: Help */
+            taskName = "welp";
+            if (project.getTasks().findByName(taskName) == null) {
+                project.getTasks().register(taskName, HelpTask.class, task -> {
+                    task.setGroup(taskGroup);
+                });
             }
         });
     }
@@ -210,6 +302,16 @@ class PublishingPlugin implements Plugin<Project> {
             return false;
         }
         return true;
+    }
+
+    @Nullable
+    private String getAppConfigPath(@NotNull Project project, @NotNull String buildType) {
+        String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
+        String path = basePath + "src" + File.separator + buildType + File.separator + "agconnect-services.json";
+        if (new File(path).exists()) {return path;}
+        path = basePath + "src" + File.separator + "agconnect-services.json";
+        if (new File(path).exists()) {return path;}
+        return null;
     }
 
     @Nullable
