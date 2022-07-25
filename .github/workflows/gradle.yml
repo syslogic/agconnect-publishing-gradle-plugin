@@ -42,9 +42,10 @@ jobs:
           echo $JAVA_KEYSTORE_PROPERTIES > $GITHUB_WORKSPACE/keystore.properties && \
           mv ./buildSrc/settings.gradle ./settings.gradle && \
           mv ./buildSrc/gradle.properties ./gradle.properties && \
+          mv ./buildSrc/gradle ./gradle && \
           mv ./buildSrc/gradlew.bat ./gradlew.bat && \
           mv ./buildSrc/gradlew ./gradlew && \
-          mv ./buildSrc/gradle ./gradle && \
+          chmod+x ./gradlew
           mkdir $GITHUB_WORKSPACE/credentials && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease && \
@@ -63,7 +64,6 @@ jobs:
         env:
           AGC_PACKAGE_ID: ${{ secrets.AGC_PACKAGE_ID }}
         run: |
-          cd buildSrc
           ./gradlew :build
 
       - name: 📦 Retain Artifact (JAR)
