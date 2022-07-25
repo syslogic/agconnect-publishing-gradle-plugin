@@ -45,7 +45,7 @@ jobs:
           mv ./buildSrc/gradle ./gradle && \
           mv ./buildSrc/gradlew.bat ./gradlew.bat && \
           mv ./buildSrc/gradlew ./gradlew && \
-          chmod+x ./gradlew
+          chmod +x ./gradlew
           mkdir $GITHUB_WORKSPACE/credentials && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease && \
