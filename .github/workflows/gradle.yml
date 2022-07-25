@@ -65,7 +65,7 @@ jobs:
           AGC_PACKAGE_ID: ${{ secrets.AGC_PACKAGE_ID }}
         run: |
           ./gradlew :build
-
+          ls -la
       - name: 📦 Retain Artifact (JAR)
         id: retain-plugin-jar
         uses: actions/upload-artifact@v3
