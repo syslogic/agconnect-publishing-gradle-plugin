@@ -14,7 +14,7 @@ class PublishingTest extends BaseTestCase {
     @Test
     public void helpTest() {
         BuildResult result = runTask(":welp");
-        assertNull(result);
+        assertNotNull(result);
     }
 
 /*
