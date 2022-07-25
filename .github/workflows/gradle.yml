@@ -79,6 +79,6 @@ jobs:
         id: retain-plugin-test
         uses: actions/upload-artifact@v3
         with:
-          name: test
+          name: results
           path: ./buildSrc/build/reports/tests/test
           retention-days: 1
