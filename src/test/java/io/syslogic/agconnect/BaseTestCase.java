@@ -292,12 +292,10 @@ abstract class BaseTestCase extends TestCase {
     BuildResult runTask(String arguments) {
         BuildResult result = null;
         try {
-            GradleRunner runner =
-                    GradleRunner.create()
-                            .withProjectDir(testProject)
-                            .withGradleVersion("7.4.2")
-                            .withArguments(arguments)
-                            .withPluginClasspath();
+            GradleRunner runner = GradleRunner.create()
+                    .withProjectDir(testProject)
+                    .withArguments(arguments)
+                    .withPluginClasspath();
 
             if (!System.getenv().containsKey("CI")) {
                 runner.withDebug(true).forwardOutput();

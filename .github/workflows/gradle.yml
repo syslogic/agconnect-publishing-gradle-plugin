@@ -29,8 +29,9 @@ jobs:
 
       # Testing the plugin source requires checking out into `buildSrc`.
       - name: 🚚 Get latest code
-        uses: actions/checkout@v2
-        path: 'buildSrc'
+        uses: actions/checkout@v3
+        with:
+          path: 'buildSrc'
 
       - name: 🔢 Configure
         shell: bash
