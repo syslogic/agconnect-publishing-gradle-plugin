@@ -70,6 +70,8 @@ class PublishingPlugin implements Plugin<Project> {
             /* TODO: consider absent productFlavors */
             if (productFlavors.length == 0) {
 
+                System.out.println("\nNo product flavors configured.");
+
                 /* Loop build-types. */
                 for (String buildType : buildTypes) {
 
@@ -147,11 +149,13 @@ class PublishingPlugin implements Plugin<Project> {
 
             } else {
 
+                System.out.println("\n" + productFlavors.length + " product flavors configured.");
+
                 /* Loop product flavors and build-types. */
                 for (String flavor : productFlavors) {
                     for (String buildType : buildTypes) {
 
-                        /* Loop the variants per single flavor and single build-type. */
+                        /* Loop the variants per each single flavor and build-type. */
                         String[] variants = getVariants(new String[] {flavor}, new String[] {buildType});
                         for (String variant : variants) {
 
@@ -232,12 +236,11 @@ class PublishingPlugin implements Plugin<Project> {
                 }
             }
 
-            /* Register Tasks: Help */
+            /* Register Task: Help */
             taskName = "welp";
             if (project.getTasks().findByName(taskName) == null) {
-                project.getTasks().register(taskName, HelpTask.class, task -> {
-                    task.setGroup(taskGroup);
-                });
+                project.getTasks().register(taskName, HelpTask.class, task ->
+                        task.setGroup(taskGroup));
             }
         });
     }
