@@ -13,7 +13,7 @@ class PublishingTest extends BaseTestCase {
 
     @Test
     public void helpTest() {
-        BuildResult result = runTask(":welp");
+        BuildResult result = runTask(":tasks");
         // assertNotNull(result);
         assertTrue(true);
     }
