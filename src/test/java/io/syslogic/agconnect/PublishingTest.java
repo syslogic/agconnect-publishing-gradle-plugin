@@ -17,18 +17,4 @@ class PublishingTest extends BaseTestCase {
         // assertNotNull(result);
         assertTrue(true);
     }
-
-/*
-    @Test
-    public void bundleDebugTest() {
-        BuildResult result = runTask(":bundleDebug");
-        assertNotNull(result);
-    }
-
-    @Test
-    public void bundleReleaseTest() {
-        BuildResult result = runTask(":bundleRelease");
-        assertNotNull(result);
-    }
-*/
 }
