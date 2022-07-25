@@ -47,12 +47,12 @@ jobs:
           echo $JAVA_KEYSTORE_DEBUG > ~/.android/debug.keystore && \
           echo $JAVA_KEYSTORE_UPLOAD > ~/.android/upload.keystore && \
           echo $JAVA_KEYSTORE_PROPERTIES > $GITHUB_WORKSPACE/keystore.properties && \
+          mkdir ./.gradle  && \
           mv ./buildSrc/settings.gradle ./settings.gradle && \
           mv ./buildSrc/gradle.properties ./gradle.properties && \
           mv ./buildSrc/gradlew.bat ./gradlew.bat && \
           mv ./buildSrc/gradlew ./gradlew && \
           mv ./buildSrc/gradle ./gradle && \
-          mv ./buildSrc/.gradle ./.gradle && \
           mkdir $GITHUB_WORKSPACE/credentials && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug && \
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease && \
