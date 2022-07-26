@@ -126,14 +126,12 @@ abstract class BaseTestCase extends TestCase {
      */
     static void generateProject() {
 
-        /* Locally: Copy `buildSrc/build/libs/*.jar` to temporary project `libs` directory */
-        if (! System.getenv().containsKey("CI")) {
-            File libsDir = new File(testProject, "libs");
-            if (libsDir.exists() || libsDir.mkdir()) {
-                String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
-                File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
-                copyDirectory(libs, new File(testProject, jarFile));
-            }
+        /* Copy `buildSrc/build/libs/*.jar` to temporary project `libs` directory */
+        File libsDir = new File(testProject, "libs");
+        if (libsDir.exists() || libsDir.mkdir()) {
+            String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
+            File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
+            copyDirectory(libs, new File(testProject, jarFile));
         }
 
         /* File `keystore.properties` */
