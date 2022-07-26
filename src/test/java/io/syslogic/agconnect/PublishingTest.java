@@ -13,7 +13,7 @@ class PublishingTest extends BaseTestCase {
 
     @Test
     public void buildEnvironmentTest() {
-        BuildResult result = runTask(":mobile:buildEnvironment");
+        BuildResult result = runTask(":tasks");
         // assertTrue(true);
         assertNotNull(result);
     }
