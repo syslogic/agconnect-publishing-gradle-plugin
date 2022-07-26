@@ -130,12 +130,14 @@ abstract class BaseTestCase extends TestCase {
      */
     static void generateProject(@NotNull File projectDir) {
 
-        /* Copy `buildSrc/build/libs/*.jar` to project `libs` directory */
-        File libsDir = new File(projectDir, "libs");
-        if (libsDir.exists() || libsDir.mkdir()) {
-            String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
-            File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
-            copyDirectory(libs, new File(projectDir, jarFile));
+        /* Locally: Copy `buildSrc/build/libs` to temporary project `libs` directory */
+        if (! System.getenv().containsKey("CI")) {
+            File libsDir = new File(projectDir, "libs");
+            if (libsDir.exists() || libsDir.mkdir()) {
+                String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
+                File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
+                copyDirectory(libs, new File(projectDir, jarFile));
+            }
         }
 
         /* File `keystore.properties` */
@@ -335,13 +337,14 @@ abstract class BaseTestCase extends TestCase {
     @Nullable
     @SuppressWarnings("SameParameterValue")
     BuildResult runTask(String arguments) {
+        File projectDir = System.getenv().containsKey("CI") ?
+                new File(getProjectRootPath()) : testProject;
         BuildResult result = null;
         try {
             GradleRunner runner = GradleRunner.create()
-                    .withProjectDir(testProject)
+                    .withProjectDir(projectDir)
                     .withArguments(arguments)
                     .withPluginClasspath();
-
             if (!System.getenv().containsKey("CI")) {
                 runner.withDebug(true).forwardOutput();
             }
@@ -375,8 +378,8 @@ abstract class BaseTestCase extends TestCase {
 
     static void copyDirectory(@NotNull File source, @NotNull File destination) {
         try (
-                InputStream in = new BufferedInputStream(new FileInputStream(source));
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(destination))
+            InputStream in = new BufferedInputStream(new FileInputStream(source));
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(destination))
         ) {
             byte[] buffer = new byte[1024];
             int lengthRead;
