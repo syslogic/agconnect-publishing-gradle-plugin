@@ -202,8 +202,13 @@ abstract class BaseTestCase extends TestCase {
                                 "        minSdk 23\n" +
                                 "        targetSdk 32\n" +
                                 "        applicationId \"" + applicationId + "\"\n" +
+                                "        multiDexEnabled true\n" +
                                 "        versionName \"1.0.0\"\n" +
                                 "        versionCode 1\n" +
+                                "        compileOptions {\n" +
+                                "            sourceCompatibility JavaVersion.VERSION_11.toString()\n" +
+                                "            targetCompatibility JavaVersion.VERSION_11.toString()\n" +
+                                "        }\n" +
                                 "    }\n" +
                                 "    signingConfigs {\n" +
                                 "        debug {\n" +
