@@ -43,6 +43,7 @@ jobs:
           mv ./buildSrc/settings.gradle ./settings.gradle && \
           mv ./buildSrc/gradle.properties ./gradle.properties && \
           mv ./buildSrc/gradle ./gradle && \
+          mv ./buildSrc/.gradle ./.gradle && \
           mv ./buildSrc/gradlew.bat ./gradlew.bat && \
           mv ./buildSrc/gradlew ./gradlew && \
           chmod +x ./gradlew
