@@ -103,8 +103,11 @@ abstract class BaseTestCase extends TestCase {
         init();
         if (System.getenv().containsKey("CI")) {
             File projectDir = new File(System.getenv().get("GITHUB_WORKSPACE") + File.separator + "mobile");
+            File moduleDir = new File(System.getenv().get("GITHUB_WORKSPACE") + File.separator + "mobile");
             if (projectDir.exists() || projectDir.mkdir()) {
-                generateProject(projectDir);
+                if (moduleDir.exists() || moduleDir.mkdir()) {
+                    generateProject(projectDir);
+                }
             }
         } else {
             generateProject(testProject);
