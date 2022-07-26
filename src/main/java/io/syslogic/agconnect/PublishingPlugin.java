@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.task.AppInfoTask;
@@ -229,15 +231,8 @@ class PublishingPlugin implements Plugin<Project> {
                 task.getLogHttp().set(logHttp);
                 task.getVerbose().set(verbose);
 
-                /* the name of the build task may vary */
-                String buildTask;
-                if (buildVariant != null) {
-                    buildTask = getBuildTask(project, artifactType, buildVariant);
-                } else {
-                    buildTask = getBuildTask(project, artifactType, buildType);
-                }
-
-                /* publish* tasks depend on assemble or bundle. */
+                /* :publish* tasks depend on :assemble or :bundle tasks; where the name of the build task may vary */
+                String buildTask = getBuildTask(project, artifactType, buildVariant != null ? buildVariant : buildType);
                 task.dependsOn(buildTask);
             });
         }
@@ -299,14 +294,14 @@ class PublishingPlugin implements Plugin<Project> {
     
     /** Check if Android and AGConnect Gradle plugins were loaded. */
     public boolean preconditionsMet(@NotNull Project project) {
-        if (! project.getPluginManager().hasPlugin("com.android.application") || ! project.getPluginManager().hasPlugin("com.huawei.agconnect")) {
-            if (! project.getPluginManager().hasPlugin("com.android.application")) {
-                System.err.println("Plugin 'agconnect-publishing' depends on 'com.android.application'.");
+        String[] dependencies = new String[]{"com.android.application", "com.huawei.agconnect"};
+        Iterator<String> itr = Arrays.stream(dependencies).iterator();
+        while (itr.hasNext()) {
+            String pluginName = itr.next();
+            if (! project.getPluginManager().hasPlugin(pluginName)) {
+                System.err.println("Plugin 'agconnect-publishing' depends on '" + pluginName + "'.");
+                return false;
             }
-            if (! project.getPluginManager().hasPlugin("com.huawei.agconnect")) {
-                System.err.println("Plugin 'agconnect-publishing' depends on 'com.huawei.agconnect'.");
-            }
-            return false;
         }
         return true;
     }
