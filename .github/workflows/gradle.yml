@@ -59,7 +59,7 @@ jobs:
         run: |
           ./gradlew :build
           cd ./build/libs
-          ls -la
+          ls -la | grep jar
 
       - name: 📦 Retain Artifact (JAR)
         id: retain-plugin-jar
