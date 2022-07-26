@@ -71,18 +71,28 @@ abstract class BaseTestCase extends TestCase {
 
     /**
      * The configuration JSON string for debug builds;
-     * copied from local file (inserted from GitHub secrets).
+     * copied from local file (GitHub secrets being inserted).
      */
     static String appConfigDebug;
 
     /**
      * The configuration JSON string for release builds;
-     * copied from local file (inserted from GitHub secrets).
+     * copied from local file (GitHub secrets being inserted).
      */
     static String appConfigRelease;
 
     static String artifactName = "agconnect-publishing-gradle-plugin";
     static String artifactVersion = "7.2.1.8";
+
+    /** These config strings are being copied from the reference project */
+    static void init() {
+        apiConfig = readFile(getProjectRootPath() + "credentials" +
+                File.separator + "agc-apiclient.json");
+        appConfigRelease = readFile(getProjectRootPath() + "mobile" + File.separator + "src" +
+                File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
+        appConfigDebug = readFile(getProjectRootPath() + "mobile" + File.separator + "src" +
+                File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
+    }
 
     /**
      * Generate the configuration files required to test the plugin, which are: `build.gradle`,
@@ -114,27 +124,18 @@ abstract class BaseTestCase extends TestCase {
         }
     }
 
-    /** These config strings are being copied from the reference project */
-    static void init() {
-        apiConfig = readFile(getProjectRootPath() + "credentials" +  File.separator + "agc-apiclient.json");
-        appConfigRelease = readFile(getProjectRootPath() + "mobile" + File.separator + "src" + File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        appConfigDebug = readFile(getProjectRootPath() + "mobile" + File.separator + "src" + File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
-    }
-
     /**
      * Locally the root directory is a temporary directory
      * and on GitHub it is the workspace root.
      */
     static void generateProject(@NotNull File projectDir) {
 
-        /* Locally: Copy `buildSrc/build/libs` to temporary project `libs` directory */
-        if (! System.getenv().containsKey("CI")) {
-            File libsDir = new File(projectDir, "libs");
-            if (libsDir.exists() || libsDir.mkdir()) {
-                String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
-                File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
-                copyDirectory(libs, new File(projectDir, jarFile));
-            }
+        /* Copy `buildSrc/build/libs/*.jar` to project `libs` directory */
+        File libsDir = new File(projectDir, "libs");
+        if (libsDir.exists() || libsDir.mkdir()) {
+            String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
+            File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
+            copyDirectory(libs, new File(projectDir, jarFile));
         }
 
         /* File `keystore.properties` */
