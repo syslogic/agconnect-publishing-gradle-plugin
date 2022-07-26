@@ -103,15 +103,13 @@ abstract class BaseTestCase extends TestCase {
     @BeforeAll
     static void setup() {
 
+        init();
+
         /* GitHub Test Project `applicationId` */
         if (System.getenv().containsKey("CI")) {
             if (System.getenv().containsKey("AGC_PACKAGE_ID")) {
                 packageId = System.getenv("AGC_PACKAGE_ID");
             }
-        }
-
-        init();
-        if (System.getenv().containsKey("CI")) {
             File projectDir = new File(getProjectRootPath());
             if (projectDir.exists() || projectDir.mkdir()) {
                 generateProject(projectDir);
@@ -130,7 +128,7 @@ abstract class BaseTestCase extends TestCase {
      */
     static void generateProject(@NotNull File projectDir) {
 
-        /* Locally: Copy `buildSrc/build/libs` to temporary project `libs` directory */
+        /* Locally: Copy `buildSrc/build/libs/*.jar` to temporary project `libs` directory */
         if (! System.getenv().containsKey("CI")) {
             File libsDir = new File(projectDir, "libs");
             if (libsDir.exists() || libsDir.mkdir()) {
@@ -168,94 +166,102 @@ abstract class BaseTestCase extends TestCase {
                 srcMain = new File(src, "main");
                 if (srcMain.exists() || srcMain.mkdir()) {
                     manifestMain = new File(srcMain, "AndroidManifest.xml");
-                    writeFile(manifestMain, getManifestString("main"), false);
+                    if (! manifestMain.exists()) {
+                        writeFile(manifestMain, getManifestString(), false);
+                    }
                 }
 
-                /* Vendor: `src/debug/agconnect-services.json` */
-                srcDebug = new File(src, "debug");
+                /* Vendor: `src/huaweiDebug/agconnect-services.json` */
+                srcDebug = new File(src, "huaweiDebug");
                 if (srcDebug.exists() || srcDebug.mkdir()) {
                     File configDebug = new File(srcDebug, "agconnect-services.json");
-                    writeFile(configDebug, appConfigDebug, false);
+                    if (! configDebug.exists()) { // file may already be present
+                        writeFile(configDebug, appConfigDebug, false);
+                    }
                 }
 
-                /* Vendor: `src/release/agconnect-services.json` */
-                srcRelease = new File(src, "release");
+                /* Vendor: `src/huaweiRelease/agconnect-services.json` */
+                srcRelease = new File(src, "huaweiRelease");
                 if (srcRelease.exists() || srcRelease.mkdir()) {
                     File configRelease = new File(srcRelease, "agconnect-services.json");
-                    writeFile(configRelease, appConfigRelease, false);
+                    if (! configRelease.exists()) { // file may already be present
+                        writeFile(configRelease, appConfigRelease, false);
+                    }
                 }
 
                 /* Generic: module build.gradle */
                 projectBuildFile = new File(src, Project.DEFAULT_BUILD_FILE);
-                writeFile(projectBuildFile,
-                   "apply plugin: \"com.android.application\"\n" +
-                        "apply plugin: \"com.huawei.agconnect\"\n" +
-                        "apply plugin: \"io.syslogic.agconnect.publishing\"\n" +
-                        "android {\n" +
-                        "    compileSdk 32\n" +
-                        "    defaultConfig {\n" +
-                        "        minSdk 23\n" +
-                        "        targetSdk 32\n" +
-                        "        applicationId \"" + packageId + "\"\n" +
-                        "        versionName \"1.0.0\"\n" +
-                        "        versionCode 1\n" +
-                        "    }\n" +
-                        "    signingConfigs {\n" +
-                        "        debug {\n" +
-                        "            storeFile file(\"" + getDebugKeystorePath() + "\")\n" +
-                        "            storePassword rootProject.ext.get(\"debugKeystorePass\")\n" +
-                        "            keyAlias rootProject.ext.get(\"debugKeyAlias\")\n" +
-                        "            keyPassword rootProject.ext.get(\"debugKeyPass\")\n" +
-                        "        }\n" +
-                        "        release {\n" +
-                        "            storeFile file(\"" + getUploadKeystorePath() + "\")\n" +
-                        "            storePassword rootProject.ext.get(\"releaseKeystorePass\")\n" +
-                        "            keyAlias rootProject.ext.get(\"releaseKeyAlias\")\n" +
-                        "            keyPassword rootProject.ext.get(\"releaseKeyPass\")\n" +
-                        "        }\n"+
-                        "    }\n" +
-                        "    sourceSets {\n" +
-                        "        main {}\n" +
-                        "        huawei {\n" +
-                        "            java.srcDir \"src/huawei/java\"\n" +
-                        "        }\n" +
-                        "    }\n" +
-                        "    flavorDimensions \"vendor\"\n" +
-                        "    productFlavors {\n" +
-                        "        huawei {\n" +
-                        "            dimension \"vendor\"\n" +
-                        "            versionNameSuffix \"-huawei\"\n" +
-                        "        }\n" +
-                        "    }\n" +
-                        "    buildTypes {\n" +
-                        "        debug {\n" +
-                        "            signingConfig signingConfigs.debug\n" +
-                        "            applicationIdSuffix \".debug\"\n" +
-                        "            debuggable true\n" +
-                        "            jniDebuggable true\n" +
-                        "            zipAlignEnabled true\n" +
-                        "            renderscriptDebuggable true\n" +
-                        "            pseudoLocalesEnabled false\n" +
-                        "            shrinkResources false\n" +
-                        "            minifyEnabled false\n" +
-                        "        }\n" +
-                        "        release {\n" +
-                        "            signingConfig signingConfigs.release\n" +
-                        "            shrinkResources true\n" +
-                        "            testCoverageEnabled false\n" +
-                        "            zipAlignEnabled true\n" +
-                        "            pseudoLocalesEnabled false\n" +
-                        "            renderscriptDebuggable false\n" +
-                        "            minifyEnabled true\n" +
-                        "            jniDebuggable false\n" +
-                        "            debuggable false\n" +
-                        "        }\n"+
-                        "    }\n"+
-                        "}\n\n" + // `android`
-                        "dependencies {\n" +
-                        "}\n\n" +
-                        "agcPublishing {\n" +
-                        "}\n",false);
+                if (! projectBuildFile.exists()) {
+                    writeFile(projectBuildFile,
+                        "apply plugin: \"com.android.application\"\n" +
+                                "apply plugin: \"com.huawei.agconnect\"\n" +
+                                "apply plugin: \"io.syslogic.agconnect.publishing\"\n\n" +
+                                "android {\n" +
+                                "    compileSdk 32\n" +
+                                "    defaultConfig {\n" +
+                                "        minSdk 23\n" +
+                                "        targetSdk 32\n" +
+                                "        applicationId \"" + packageId + "\"\n" +
+                                "        versionName \"1.0.0\"\n" +
+                                "        versionCode 1\n" +
+                                "    }\n" +
+                                "    signingConfigs {\n" +
+                                "        debug {\n" +
+                                "            storeFile file(\"" + getDebugKeystorePath() + "\")\n" +
+                                "            storePassword rootProject.ext.get(\"debugKeystorePass\")\n" +
+                                "            keyAlias rootProject.ext.get(\"debugKeyAlias\")\n" +
+                                "            keyPassword rootProject.ext.get(\"debugKeyPass\")\n" +
+                                "        }\n" +
+                                "        release {\n" +
+                                "            storeFile file(\"" + getUploadKeystorePath() + "\")\n" +
+                                "            storePassword rootProject.ext.get(\"releaseKeystorePass\")\n" +
+                                "            keyAlias rootProject.ext.get(\"releaseKeyAlias\")\n" +
+                                "            keyPassword rootProject.ext.get(\"releaseKeyPass\")\n" +
+                                "        }\n"+
+                                "    }\n" +
+                                "    sourceSets {\n" +
+                                "        main {}\n" +
+                                "        huawei {\n" +
+                                "            java.srcDir \"src/huawei/java\"\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "    flavorDimensions \"vendor\"\n" +
+                                "    productFlavors {\n" +
+                                "        huawei {\n" +
+                                "            dimension \"vendor\"\n" +
+                                "            versionNameSuffix \"-huawei\"\n" +
+                                "        }\n" +
+                                "    }\n" +
+                                "    buildTypes {\n" +
+                                "        debug {\n" +
+                                "            signingConfig signingConfigs.debug\n" +
+                                "            applicationIdSuffix \".debug\"\n" +
+                                "            debuggable true\n" +
+                                "            jniDebuggable true\n" +
+                                "            zipAlignEnabled true\n" +
+                                "            renderscriptDebuggable true\n" +
+                                "            pseudoLocalesEnabled false\n" +
+                                "            shrinkResources false\n" +
+                                "            minifyEnabled false\n" +
+                                "        }\n" +
+                                "        release {\n" +
+                                "            signingConfig signingConfigs.release\n" +
+                                "            shrinkResources true\n" +
+                                "            testCoverageEnabled false\n" +
+                                "            zipAlignEnabled true\n" +
+                                "            pseudoLocalesEnabled false\n" +
+                                "            renderscriptDebuggable false\n" +
+                                "            minifyEnabled true\n" +
+                                "            jniDebuggable false\n" +
+                                "            debuggable false\n" +
+                                "        }\n"+
+                                "    }\n"+
+                                "}\n\n" + // `android`
+                                "dependencies {\n" +
+                                "}\n\n" +
+                                "agcPublishing {\n" +
+                                "}\n",false);
+                }
             }
         }
     }
@@ -322,8 +328,7 @@ abstract class BaseTestCase extends TestCase {
     }
 
     @NotNull
-    @SuppressWarnings("SameParameterValue")
-    static String getManifestString(String sourceSet) {
+    static String getManifestString() {
         return
                 "<?xml version='1.0' encoding='utf-8'?>\n"  +
                 "<manifest\n" +
