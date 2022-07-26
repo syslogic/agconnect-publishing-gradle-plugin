@@ -81,6 +81,9 @@ abstract class BaseTestCase extends TestCase {
      */
     static String appConfigRelease;
 
+    static String artifactName = "agconnect-publishing-gradle-plugin";
+    static String artifactVersion = "7.2.1.8";
+
     /**
      * Generate the configuration files required to test the plugin, which are: `build.gradle`,
      * `settings.gradle`, `agconnect-services.json`, `agc-apiclient.json` and `AndroidManifest.xml`.
@@ -128,8 +131,9 @@ abstract class BaseTestCase extends TestCase {
         if (! System.getenv().containsKey("CI")) {
             File libsDir = new File(projectDir, "libs");
             if (libsDir.exists() || libsDir.mkdir()) {
-                File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + "libs" + File.separator + "agconnect-publishing-gradle-plugin-7.2.1.8.jar");
-                copyDirectory(libs, new File(projectDir, "libs" + File.separator + "agconnect-publishing-gradle-plugin-7.2.1.8.jar"));
+                String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
+                File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
+                copyDirectory(libs, new File(projectDir, jarFile));
             }
         }
 
@@ -319,10 +323,12 @@ abstract class BaseTestCase extends TestCase {
     static String getManifestString(String sourceSet) {
         return
                 "<?xml version='1.0' encoding='utf-8'?>\n"  +
-                "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
+                "<manifest\n" +
+                "    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
                 "    package='" + packageId + "'>\n" +
-                "    <application android:hasCode=\"false\"/>" +
-                "</manifest>";
+                "    <application android:hasCode=\"false\">\n" +
+                "    </application>\n" +
+                "</manifest>\n";
     }
 
     @Nullable
@@ -367,7 +373,6 @@ abstract class BaseTestCase extends TestCase {
     }
 
     static void copyDirectory(@NotNull File source, @NotNull File destination) {
-
         try (
                 InputStream in = new BufferedInputStream(new FileInputStream(source));
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(destination))

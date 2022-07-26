@@ -9,7 +9,6 @@ buildscript {
         httpclient_version = '4.5.13'
         httpcore_version = '4.4.14'
         httpmime_version = '4.5.6'
-        lang3_version = '3.12.0'
         gson_version = '2.9.0'
         junit_version = '5.8.2'
     }
@@ -57,7 +56,6 @@ dependencies {
     implementation "org.apache.httpcomponents:httpcore:$httpcore_version"
     implementation "org.apache.httpcomponents:httpclient:$httpclient_version"
     implementation "org.apache.httpcomponents:httpmime:$httpmime_version"
-    implementation "org.apache.commons:commons-lang3:$lang3_version"
     implementation "com.google.code.gson:gson:$gson_version"
 
     testImplementation gradleTestKit()
