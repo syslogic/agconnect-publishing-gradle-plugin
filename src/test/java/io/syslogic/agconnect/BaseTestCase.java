@@ -37,7 +37,7 @@ abstract class BaseTestCase extends TestCase {
     static @TempDir File testProject;
 
     /** Local environment, not to be used by CI */
-    static String packageId = "io.syslogic.audio";
+    static String applicationId = "io.syslogic.audio";
 
     /** File `keystore.properties` */
     static File propertiesFile;
@@ -81,18 +81,17 @@ abstract class BaseTestCase extends TestCase {
      */
     static String appConfigRelease;
 
-    static String artifactName = "agconnect-publishing-gradle-plugin";
-    static String artifactVersion = "7.2.1.8";
+    static  String srcDirDebug = "mobile" + File.separator + "src" +
+            File.separator + "huaweiDebug" + File.separator;
 
-    /** These config strings are being copied from the reference project */
-    static void init() {
-        apiConfig = readFile(getProjectRootPath() + "credentials" +
-                File.separator + "agc-apiclient.json");
-        appConfigRelease = readFile(getProjectRootPath() + "mobile" + File.separator + "src" +
-                File.separator + "huaweiRelease" + File.separator + "agconnect-services.json");
-        appConfigDebug = readFile(getProjectRootPath() + "mobile" + File.separator + "src" +
-                File.separator + "huaweiDebug" + File.separator + "agconnect-services.json");
-    }
+    static  String srcDirRelease = "mobile" + File.separator + "src" +
+            File.separator + "huaweiRelease" + File.separator;
+
+    /** Name of JAR artifact to copy */
+    static String artifactName = "agconnect-publishing-gradle-plugin";
+
+    /** Version of JAR artifact to copy */
+    static String artifactVersion = "7.2.1.8";
 
     /**
      * Generate the configuration files required to test the plugin, which are: `build.gradle`,
@@ -103,19 +102,18 @@ abstract class BaseTestCase extends TestCase {
     @BeforeAll
     static void setup() {
 
-        init();
+        /* These config strings are being copied from the reference project */
+        apiConfig = readFile(getProjectRootPath() + "credentials" + File.separator + "agc-apiclient.json");
+        appConfigRelease = readFile(getProjectRootPath() + srcDirRelease + "agconnect-services.json");
+        appConfigDebug = readFile(getProjectRootPath() + srcDirDebug + "agconnect-services.json");
 
-        /* GitHub Test Project `applicationId` */
-        if (System.getenv().containsKey("CI")) {
-            if (System.getenv().containsKey("AGC_PACKAGE_ID")) {
-                packageId = System.getenv("AGC_PACKAGE_ID");
-            }
-            File projectDir = new File(getProjectRootPath());
-            if (projectDir.exists() || projectDir.mkdir()) {
-                generateProject(projectDir);
-            }
-        } else {
-            generateProject(testProject);
+        /* The test-project `applicationId` on CI must match the agconnect-services.json there. */
+        if (System.getenv().containsKey("CI") && System.getenv().containsKey("AGC_PACKAGE_ID")) {
+            applicationId = System.getenv("AGC_PACKAGE_ID");
+        }
+
+        generateProject();
+        if (! System.getenv().containsKey("CI")) {
             log(readFile(settingsFile.getAbsolutePath()));
             log(readFile(rootBuildFile.getAbsolutePath()));
             log(readFile(projectBuildFile.getAbsolutePath()));
@@ -126,38 +124,38 @@ abstract class BaseTestCase extends TestCase {
      * Locally the root directory is a temporary directory
      * and on GitHub it is the workspace root.
      */
-    static void generateProject(@NotNull File projectDir) {
+    static void generateProject() {
 
         /* Locally: Copy `buildSrc/build/libs/*.jar` to temporary project `libs` directory */
         if (! System.getenv().containsKey("CI")) {
-            File libsDir = new File(projectDir, "libs");
+            File libsDir = new File(testProject, "libs");
             if (libsDir.exists() || libsDir.mkdir()) {
                 String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
                 File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
-                copyDirectory(libs, new File(projectDir, jarFile));
+                copyDirectory(libs, new File(testProject, jarFile));
             }
         }
 
         /* File `keystore.properties` */
-        propertiesFile = new File(projectDir, "keystore.properties");
+        propertiesFile = new File(testProject, "keystore.properties");
         writeFile(propertiesFile, readFile(getProjectRootPath() + File.separator + "keystore.properties"), false);
 
         /* File `credentials/agc-apiclient.json` */
-        credentials = new File(projectDir, "credentials");
+        credentials = new File(testProject, "credentials");
         if (credentials.exists() || credentials.mkdir()) {
             writeFile(new File(credentials, "agc-apiclient.json"), apiConfig, false);
         }
 
         /* Generic: root build.gradle */
-        rootBuildFile = new File(projectDir, Project.DEFAULT_BUILD_FILE);
+        rootBuildFile = new File(testProject, Project.DEFAULT_BUILD_FILE);
         writeFile(rootBuildFile, getBuildScriptString() + getKeystorePropertiesString(), false);
 
         /* Generic: settings.gradle */
-        settingsFile = new File(projectDir, "settings.gradle");
+        settingsFile = new File(testProject, "settings.gradle");
         writeFile(settingsFile, getSettingsString(), false);
 
         /* Generic: `mobile/src` */
-        File mobile = new File(projectDir, "mobile");
+        File mobile = new File(testProject, "mobile");
         if (mobile.exists() || mobile.mkdir()) {
             src = new File(mobile, "src");
             if (src.exists() || src.mkdir()) {
@@ -201,7 +199,7 @@ abstract class BaseTestCase extends TestCase {
                                 "    defaultConfig {\n" +
                                 "        minSdk 23\n" +
                                 "        targetSdk 32\n" +
-                                "        applicationId \"" + packageId + "\"\n" +
+                                "        applicationId \"" + applicationId + "\"\n" +
                                 "        versionName \"1.0.0\"\n" +
                                 "        versionCode 1\n" +
                                 "    }\n" +
@@ -333,7 +331,7 @@ abstract class BaseTestCase extends TestCase {
                 "<?xml version='1.0' encoding='utf-8'?>\n"  +
                 "<manifest\n" +
                 "    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
-                "    package='" + packageId + "'>\n" +
+                "    package='" + applicationId + "'>\n" +
                 "    <application android:hasCode=\"false\">\n" +
                 "    </application>\n" +
                 "</manifest>\n";

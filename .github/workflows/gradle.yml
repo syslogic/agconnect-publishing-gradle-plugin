@@ -23,8 +23,6 @@ jobs:
       # Testing the plugin source requires checking out into `buildSrc`.
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
-        with:
-          path: 'buildSrc'
 
       - name: 🔢 Configure
         shell: bash
@@ -37,22 +35,16 @@ jobs:
           AGC_APP_DEBUG_CONFIG: ${{ secrets.AGC_APP_DEBUG_CONFIG }}
         run: |
           mkdir ~/.android
-          echo $JAVA_KEYSTORE_DEBUG > ~/.android/debug.keystore && \
-          echo $JAVA_KEYSTORE_UPLOAD > ~/.android/upload.keystore && \
-          echo $JAVA_KEYSTORE_PROPERTIES > $GITHUB_WORKSPACE/keystore.properties && \
-          mv ./buildSrc/settings.gradle ./settings.gradle && \
-          mv ./buildSrc/gradle.properties ./gradle.properties && \
-          mv ./buildSrc/gradle ./gradle && \
-          mv ./buildSrc/.gradle ./.gradle && \
-          mv ./buildSrc/gradlew.bat ./gradlew.bat && \
-          mv ./buildSrc/gradlew ./gradlew && \
-          chmod +x ./gradlew
-          mkdir $GITHUB_WORKSPACE/credentials && \
-          mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug && \
-          mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease && \
-          echo $AGC_API_CONFIG > $GITHUB_WORKSPACE/credentials/agc-apiclient.json && \
-          echo $AGC_APP_DEBUG_CONFIG > $GITHUB_WORKSPACE/mobile/src/huaweiDebug/agconnect-services.json && \
+          mkdir $GITHUB_WORKSPACE/credentials
+          mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug
+          mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease
+          echo $JAVA_KEYSTORE_DEBUG > ~/.android/debug.keystore
+          echo $JAVA_KEYSTORE_UPLOAD > ~/.android/upload.keystore
+          echo $JAVA_KEYSTORE_PROPERTIES > $GITHUB_WORKSPACE/keystore.properties
+          echo $AGC_API_CONFIG > $GITHUB_WORKSPACE/credentials/agc-apiclient.json
+          echo $AGC_APP_DEBUG_CONFIG > $GITHUB_WORKSPACE/mobile/src/huaweiDebug/agconnect-services.json
           echo $AGC_APP_RELEASE_CONFIG > $GITHUB_WORKSPACE/mobile/src/huaweiRelease/agconnect-services.json
+          chmod +x ./gradlew
 
       - name: ☕ Set up JDK 11
         uses: actions/setup-java@v2
@@ -66,7 +58,7 @@ jobs:
           AGC_PACKAGE_ID: ${{ secrets.AGC_PACKAGE_ID }}
         run: |
           ./gradlew :build
-          cd ./buildSrc/build/libs
+          cd ./build/libs
           ls -la
 
       - name: 📦 Retain Artifact (JAR)
@@ -74,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: buildSrc
-          path: ./buildSrc/build/libs/*.jar
+          path: ./build/libs/*.jar
           retention-days: 14
 
       - name: 📦 Retain Test Result
@@ -83,5 +75,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: results
-          path: ./buildSrc/build/reports/tests/test
+          path: ./build/reports/tests/test
           retention-days: 1
