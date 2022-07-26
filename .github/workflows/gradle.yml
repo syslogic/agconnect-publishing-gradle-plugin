@@ -24,7 +24,7 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
 
-      - name: 🔢 Configure
+      - name: 🔢 Configure build
         shell: bash
         env:
           JAVA_KEYSTORE_DEBUG: ${{ secrets.JAVA_KEYSTORE_DEBUG }}
