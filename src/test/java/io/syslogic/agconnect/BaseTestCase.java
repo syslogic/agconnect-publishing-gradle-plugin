@@ -70,28 +70,33 @@ abstract class BaseTestCase extends TestCase {
     static File srcRelease;
 
     /**
-     * The configuration JSON string for debug builds;
-     * copied from local file (GitHub secrets being inserted).
+     * The configuration JSON string for debug builds is being
+     * copied from a local file (eg. inserted by GitHub secrets).
      */
     static String appConfigDebug;
 
     /**
-     * The configuration JSON string for release builds;
-     * copied from local file (GitHub secrets being inserted).
+     * The configuration JSON string for release builds is being
+     * copied from a local file (eg. inserted by GitHub secrets).
      */
     static String appConfigRelease;
-
-    static  String srcDirDebug = "mobile" + File.separator + "src" +
-            File.separator + "huaweiDebug" + File.separator;
-
-    static  String srcDirRelease = "mobile" + File.separator + "src" +
-            File.separator + "huaweiRelease" + File.separator;
 
     /** Name of JAR artifact to copy */
     static String artifactName = "agconnect-publishing-gradle-plugin";
 
     /** Version of JAR artifact to copy */
     static String artifactVersion = "7.2.1.8";
+
+    /** Path to the JAR artifact to copy */
+    static String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
+
+    /** Path to the debug source directory */
+    static  String srcDirDebug = "mobile" + File.separator + "src" +
+            File.separator + "huaweiDebug" + File.separator;
+
+    /** Path to the release source directory */
+    static  String srcDirRelease = "mobile" + File.separator + "src" +
+            File.separator + "huaweiRelease" + File.separator;
 
     /**
      * Generate the configuration files required to test the plugin, which are: `build.gradle`,
@@ -129,7 +134,6 @@ abstract class BaseTestCase extends TestCase {
         /* Copy `buildSrc/build/libs/*.jar` to temporary project `libs` directory */
         File libsDir = new File(testProject, "libs");
         if (libsDir.exists() || libsDir.mkdir()) {
-            String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
             File libs = new File(System.getProperty("user.dir") +  File.separator + "build" + File.separator + jarFile);
             copyDirectory(libs, new File(testProject, jarFile));
         }

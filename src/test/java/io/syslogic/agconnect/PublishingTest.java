@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 class PublishingTest extends BaseTestCase {
 
     @Test
-    public void buildEnvironmentTest() {
-        BuildResult result = runTask(":tasks");
+    public void helpTest() {
+        BuildResult result = runTask(":welp");
         // assertTrue(true);
         assertNotNull(result);
     }
