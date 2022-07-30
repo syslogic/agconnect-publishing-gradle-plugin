@@ -24,6 +24,9 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -350,13 +353,14 @@ abstract class BaseTestCase extends TestCase {
     @Nullable
     @SuppressWarnings("SameParameterValue")
     BuildResult runTask(String... arguments) {
-        File projectDir = System.getenv().containsKey("CI") ?
-                new File(getProjectRootPath()) : testProject;
+        List<String> args = new ArrayList<>();
+        args.add("--stacktrace");
+        args.addAll(Arrays.asList(arguments));
         BuildResult result = null;
         try {
             GradleRunner runner = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withArguments(arguments)
+                    .withProjectDir(testProject)
+                    .withArguments(args)
                     .withPluginClasspath();
             if (!System.getenv().containsKey("CI")) {
                 runner.withDebug(true).forwardOutput();
