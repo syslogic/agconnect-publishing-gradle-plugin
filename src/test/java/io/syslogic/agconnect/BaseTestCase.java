@@ -344,9 +344,12 @@ abstract class BaseTestCase extends TestCase {
                 "</manifest>\n";
     }
 
+    /**
+     * @see <a href="https://docs.gradle.org/current/javadoc/org/gradle/testkit/runner/GradleRunner.html">GradleRunner</a>
+     */
     @Nullable
     @SuppressWarnings("SameParameterValue")
-    BuildResult runTask(String arguments) {
+    BuildResult runTask(String... arguments) {
         File projectDir = System.getenv().containsKey("CI") ?
                 new File(getProjectRootPath()) : testProject;
         BuildResult result = null;

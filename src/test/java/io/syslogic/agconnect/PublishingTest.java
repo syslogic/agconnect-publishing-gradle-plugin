@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 class PublishingTest extends BaseTestCase {
 
     @Test
-    public void helpTest() {
-        BuildResult result = runTask(":tasks");
+    public void tasksTest() {
+        BuildResult result = runTask(":tasks", "--group=\"agconnect\"");
         assertNotNull(result);
     }
 }
