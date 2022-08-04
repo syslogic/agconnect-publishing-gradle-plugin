@@ -87,8 +87,12 @@ abstract class BaseTestCase extends TestCase {
     /** Name of JAR artifact to copy */
     static String artifactName = "agconnect-publishing-gradle-plugin";
 
-    /** Version of JAR artifact to copy */
-    static String artifactVersion = "7.2.1.8";
+    /**
+     * Version of JAR artifact to copy
+     * java.io.UncheckedIOException at BaseTestCase.java:408
+     *         Caused by: java.io.FileNotFoundException at FileInputStream.java:-2
+     */
+    static String artifactVersion = "7.2.1.9";
 
     /** Path to the JAR artifact to copy */
     static String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";

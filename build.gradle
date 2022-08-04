@@ -1,9 +1,10 @@
+// :buildSrc
 buildscript {
     ext {
-        plugin_version = '8'
+        plugin_version = '9'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         agp_version = '7.2.1'
-        agcp_version = '1.7.0.300'
+        hms_version = '1.7.0.300'
         publish_version = '1.0.0'
         annotations_version = '22.0.0'
         httpclient_version = '4.5.13'
@@ -14,7 +15,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
-        classpath "com.huawei.agconnect:agcp:$agcp_version"
+        classpath "com.huawei.agconnect:agcp:$hms_version"
         classpath "com.gradle.publish:plugin-publish-plugin:$publish_version"
     }
     repositories {
@@ -28,20 +29,20 @@ buildscript {
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '1.0.0'
+    id 'com.gradle.plugin-publish' version "$publish_version"
 }
 
 wrapper {
     distributionType Wrapper.DistributionType.BIN
     version '7.4.2'
 }
-
+/*
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
     }
 }
-
+*/
 repositories {
     google()
     mavenCentral()
