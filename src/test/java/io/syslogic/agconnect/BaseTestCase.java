@@ -92,7 +92,7 @@ abstract class BaseTestCase extends TestCase {
      * java.io.UncheckedIOException at BaseTestCase.java:408
      *         Caused by: java.io.FileNotFoundException at FileInputStream.java:-2
      */
-    static String artifactVersion = "7.2.1.9";
+    static String artifactVersion = "7.2.2.9";
 
     /** Path to the JAR artifact to copy */
     static String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";

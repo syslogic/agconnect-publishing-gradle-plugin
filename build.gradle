@@ -3,7 +3,7 @@ buildscript {
     ext {
         plugin_version = '9'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
-        agp_version = '7.2.1'
+        agp_version = '7.2.2'
         hms_version = '1.7.0.300'
         publish_version = '1.0.0'
         annotations_version = '22.0.0'
