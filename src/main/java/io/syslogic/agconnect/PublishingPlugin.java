@@ -98,7 +98,7 @@ class PublishingPlugin implements Plugin<Project> {
                             if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                             if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
-                            /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
+                            /* Task :publishDebugAab will fail, because the AAB is not being signed with the upload key. */
                             if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
 
                                 /* Register Tasks: Publish. */
@@ -238,12 +238,6 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
-    @NotNull
-    String stringArrayToCsv(@NotNull String[] data) {
-        if (data.length == 0) {return "";}
-        return String.join(", ", data);
-    }
-
     /** Obtain Android ApplicationBuildType, which have a ApkSigningConfig. */
     @NotNull
     @SuppressWarnings("UnstableApiUsage")
@@ -291,10 +285,16 @@ class PublishingPlugin implements Plugin<Project> {
         }
         return items.toArray(new String[0]);
     }
-    
+
+    @NotNull
+    private String stringArrayToCsv(@NotNull String[] data) {
+        if (data.length == 0) {return "";}
+        return String.join(", ", data);
+    }
+
     /** Check if Android and AGConnect Gradle plugins were loaded. */
     public boolean preconditionsMet(@NotNull Project project) {
-        String[] dependencies = new String[]{"com.android.application", "com.huawei.agconnect"};
+        String[] dependencies = new String[] {"com.android.application", "com.huawei.agconnect"};
         Iterator<String> itr = Arrays.stream(dependencies).iterator();
         while (itr.hasNext()) {
             String pluginName = itr.next();
@@ -318,11 +318,21 @@ class PublishingPlugin implements Plugin<Project> {
 
     @Nullable
     private String getAppConfigPath(@NotNull Project project, @NotNull String buildType, @NotNull String variant) {
+
+        /* try the buildType source set */
         String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
         String path = basePath + "src" + File.separator + buildType + File.separator + "agconnect-services.json";
         if (new File(path).exists()) {return path;}
+
+        /* try the variant source set */
         path = basePath + "src" + File.separator + variant + File.separator + "agconnect-services.json";
         if (new File(path).exists()) {return path;}
+
+        /* also try the main source set */
+        path = basePath + "src" + File.separator + "main" + File.separator + "agconnect-services.json";
+        if (new File(path).exists()) {return path;}
+
+        /* not found */
         return null;
     }
 

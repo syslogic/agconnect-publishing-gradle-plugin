@@ -42,19 +42,22 @@ abstract class BaseTestCase extends TestCase {
     /** Local environment, not to be used by CI */
     static String applicationId = "io.syslogic.audio";
 
-    /** File `keystore.properties` */
-    static File propertiesFile;
-
     /** File `settings.gradle` is required to look up `aapt2` */
     static File settingsFile;
 
+    /** File `keystore.properties` */
+    static File propertiesFile;
+
+    /** File `build.gradle` (root project) */
+    static File rootBuildFile;
+
     /** File `build.gradle` */
     static File projectBuildFile;
-    static File rootBuildFile;
 
     /** Directory `credentials` */
     static File credentials;
 
+    /** API config file path */
     static String apiConfig;
 
     /** Directory `src` */
@@ -87,15 +90,18 @@ abstract class BaseTestCase extends TestCase {
     /** Name of JAR artifact to copy */
     static String artifactName = "agconnect-publishing-gradle-plugin";
 
-    /**
-     * Version of JAR artifact to copy
-     * java.io.UncheckedIOException at BaseTestCase.java:408
-     *         Caused by: java.io.FileNotFoundException at FileInputStream.java:-2
-     */
-    static String artifactVersion = "7.2.2.9";
+    /** */
+    static String agpVersion = "7.2.2";
+
+    /** */
+    static String agcpVersion = "1.7.0.300";
+
+    /** */
+    static String artifactVersion = "9";
 
     /** Path to the JAR artifact to copy */
-    static String jarFile = "libs" + File.separator + artifactName + "-" + artifactVersion + ".jar";
+    static String jarFile = "libs" + File.separator + artifactName +
+            "-" + agpVersion + "." + artifactVersion + ".jar";
 
     /** Path to the debug source directory */
     static  String srcDirDebug = "mobile" + File.separator + "src" +
@@ -315,9 +321,9 @@ abstract class BaseTestCase extends TestCase {
                 "        flatDir { dirs \"libs\" }\n" +
                 "    }\n" +
                 "    dependencies {\n" +
-                "        classpath \"com.android.tools.build:gradle:7.2.1\"\n" +
-                "        classpath \"com.huawei.agconnect:agcp:1.7.0.300\"\n" +
-                "        classpath \"io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.8\"\n" +
+                "        classpath \"com.android.tools.build:gradle:" + agpVersion + "\"\n" +
+                "        classpath \"com.huawei.agconnect:agcp:" + agcpVersion + "\"\n" +
+                "        classpath \"io.syslogic:agconnect-publishing-gradle-plugin:" + agpVersion + "." + artifactVersion + "\"\n" +
                 "    }\n" +
                 "}\n\n";
     }
@@ -351,9 +357,7 @@ abstract class BaseTestCase extends TestCase {
                 "</manifest>\n";
     }
 
-    /**
-     * @see <a href="https://docs.gradle.org/current/javadoc/org/gradle/testkit/runner/GradleRunner.html">GradleRunner</a>
-     */
+    /** @see <a href="https://docs.gradle.org/current/javadoc/org/gradle/testkit/runner/GradleRunner.html">GradleRunner</a> */
     @Nullable
     @SuppressWarnings("SameParameterValue")
     BuildResult runTask(String... arguments) {
