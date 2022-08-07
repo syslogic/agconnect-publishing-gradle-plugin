@@ -97,7 +97,7 @@ abstract class BaseTestCase extends TestCase {
     static String agcpVersion = "1.7.0.300";
 
     /** */
-    static String artifactVersion = "9";
+    static String artifactVersion = "10";
 
     /** Path to the JAR artifact to copy */
     static String jarFile = "libs" + File.separator + artifactName +

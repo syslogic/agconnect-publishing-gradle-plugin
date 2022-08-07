@@ -34,9 +34,9 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath 'com.huawei.agconnect:agcp:1.7.0.300'
-        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:7.2.1.8'
+        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:7.2.2.10'
     }
 }
 ````
@@ -61,9 +61,9 @@ plugins {
 
 ````groovy
 agcPublishing {
-    configFile = "${rootProject.getProjectDir().absolutePath}${File.separator}distribution${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
+    configFile = "${rootProject.getProjectDir().absolutePath}${File.separator}distribution${File.separator}agc-apiclient.json"
     assetDirectory = 'play'
-    logHttp = false
+    logHttp = true
     verbose = true
 }
 ````
