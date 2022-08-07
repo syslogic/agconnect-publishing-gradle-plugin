@@ -61,7 +61,7 @@ plugins {
 
 ````groovy
 agcPublishing {
-    configFile = "${rootProject.getProjectDir().absolutePath}${File.separator}credentials${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
+    configFile = "${rootProject.getProjectDir().absolutePath}${File.separator}distribution${File.separator}agc-apiclient-000000000000000000-0000000000000000000.json"
     assetDirectory = 'play'
     logHttp = false
     verbose = true
@@ -70,7 +70,7 @@ agcPublishing {
 
 These properties are all optional, while:
 
- - providing the config file at the default location: `credentials/agc-apiclient.json`.
+ - providing the config file at the default location: `distribution/agc-apiclient.json`.
  - being happy with the default local assets name `agconnect`.
  - not needing any debug console output, but only results.
 

@@ -14,8 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.task.AppInfoTask;
@@ -44,15 +43,12 @@ class PublishingPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project project) {
 
-        /* Check Preconditions. */
-        if (! preconditionsMet(project)) {return;}
-
         /* Create project extension `agcPublishing`. */
         this.extension = project.getExtensions().create("agcPublishing", PublishingExtensionImpl.class);
 
         /* Apply the default path for the API client configuration file. */
         this.configFile = project.getRootProject().getProjectDir().getAbsolutePath() +
-                File.separator + "credentials" + File.separator + "agc-apiclient.json";
+                File.separator + "distribution" + File.separator + "agc-apiclient.json";
 
         /* Project before evaluate: register task `:welp` */
         registerHelpTask(project,"welp");
@@ -74,7 +70,7 @@ class PublishingPlugin implements Plugin<Project> {
             /* TODO: consider absent productFlavors */
             if (productFlavors.length == 0) {
 
-                System.out.println("\nNo product flavors were detected.");
+                System.out.println("\nNo product flavors detected.");
 
                 /* Loop build-types. */
                 for (String buildType : buildTypes) {
@@ -119,7 +115,7 @@ class PublishingPlugin implements Plugin<Project> {
 
             } else {
 
-                System.out.println("\n" + productFlavors.length + " product flavors were detected: " + stringArrayToCsv(productFlavors));
+                System.out.println("\n> " + productFlavors.length + " product flavors detected: " + stringArrayToCsv(productFlavors));
 
                 /* Loop product flavors and build-types. */
                 for (String productFlavor : productFlavors) {
@@ -133,11 +129,11 @@ class PublishingPlugin implements Plugin<Project> {
                             for (String artifactType : new String[] {ArtifactType.APK, ArtifactType.AAB}) {
 
                                 /* Check if file `agconnect-services.json` is present. */
-                                String appConfigFile = getAppConfigPath(project, buildType, buildVariant);
+                                String appConfigFile = getAppConfigPath(project, productFlavor, buildType, buildVariant);
                                 if (appConfigFile != null) {
 
                                     /* Apply values provided by the PublishingExtension. */
-                                    if (! extension.getConfigFile().isEmpty()) {
+                                    if (extension.getConfigFile() != null && !extension.getConfigFile().isEmpty()) {
                                         if (! new File(extension.getConfigFile()).exists()) {
                                             System.err.println("AGConnect API config not found: " + extension.getConfigFile());
                                             System.err.println("Reverting to the default value: " + configFile);
@@ -153,6 +149,7 @@ class PublishingPlugin implements Plugin<Project> {
 
                                         /* Register Tasks: Publish. */
                                         taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
+                                        if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
                                         registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor);
                                     }
 
@@ -292,20 +289,6 @@ class PublishingPlugin implements Plugin<Project> {
         return String.join(", ", data);
     }
 
-    /** Check if Android and AGConnect Gradle plugins were loaded. */
-    public boolean preconditionsMet(@NotNull Project project) {
-        String[] dependencies = new String[] {"com.android.application", "com.huawei.agconnect"};
-        Iterator<String> itr = Arrays.stream(dependencies).iterator();
-        while (itr.hasNext()) {
-            String pluginName = itr.next();
-            if (! project.getPluginManager().hasPlugin(pluginName)) {
-                System.err.println("Plugin 'agconnect-publishing' depends on '" + pluginName + "'.");
-                return false;
-            }
-        }
-        return true;
-    }
-
     @Nullable
     private String getAppConfigPath(@NotNull Project project, @NotNull String buildType) {
         String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
@@ -317,7 +300,7 @@ class PublishingPlugin implements Plugin<Project> {
     }
 
     @Nullable
-    private String getAppConfigPath(@NotNull Project project, @NotNull String buildType, @NotNull String variant) {
+    private String getAppConfigPath(@NotNull Project project, @NotNull String productFlavor, @NotNull String buildType, @NotNull String variant) {
 
         /* try the buildType source set */
         String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
@@ -328,7 +311,11 @@ class PublishingPlugin implements Plugin<Project> {
         path = basePath + "src" + File.separator + variant + File.separator + "agconnect-services.json";
         if (new File(path).exists()) {return path;}
 
-        /* also try the main source set */
+        /* try the product flavor source set */
+        path = basePath + "src" + File.separator + productFlavor + File.separator + "agconnect-services.json";
+        if (new File(path).exists()) {return path;}
+
+        /* try the main source set */
         path = basePath + "src" + File.separator + "main" + File.separator + "agconnect-services.json";
         if (new File(path).exists()) {return path;}
 

@@ -41,7 +41,7 @@ jobs:
           echo $JAVA_KEYSTORE_DEBUG > ~/.android/debug.keystore
           echo $JAVA_KEYSTORE_UPLOAD > ~/.android/upload.keystore
           echo $JAVA_KEYSTORE_PROPERTIES > $GITHUB_WORKSPACE/keystore.properties
-          echo $AGC_API_CONFIG > $GITHUB_WORKSPACE/credentials/agc-apiclient.json
+          echo $AGC_API_CONFIG > $GITHUB_WORKSPACE/distribution/agc-apiclient.json
           echo $AGC_APP_DEBUG_CONFIG > $GITHUB_WORKSPACE/mobile/src/huaweiDebug/agconnect-services.json
           echo $AGC_APP_RELEASE_CONFIG > $GITHUB_WORKSPACE/mobile/src/huaweiRelease/agconnect-services.json
           chmod +x ./gradlew

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Abstract Model: ApiConfig
  *
- * This is file credentials/agc-apiclient.json.
+ * This is file distribution/agc-apiclient.json.
  *
  * @author Martin Zeitler
  */

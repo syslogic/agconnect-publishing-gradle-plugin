@@ -54,8 +54,8 @@ abstract class BaseTestCase extends TestCase {
     /** File `build.gradle` */
     static File projectBuildFile;
 
-    /** Directory `credentials` */
-    static File credentials;
+    /** Directory `distribution` */
+    static File distribution;
 
     /** API config file path */
     static String apiConfig;
@@ -121,7 +121,7 @@ abstract class BaseTestCase extends TestCase {
     static void setup() {
 
         /* These config strings are being copied from the reference project */
-        apiConfig = readFile(getProjectRootPath() + "credentials" + File.separator + "agc-apiclient.json");
+        apiConfig = readFile(getProjectRootPath() + "distribution" + File.separator + "agc-apiclient.json");
         appConfigRelease = readFile(getProjectRootPath() + srcDirRelease + "agconnect-services.json");
         appConfigDebug = readFile(getProjectRootPath() + srcDirDebug + "agconnect-services.json");
 
@@ -155,10 +155,10 @@ abstract class BaseTestCase extends TestCase {
         propertiesFile = new File(testProject, "keystore.properties");
         writeFile(propertiesFile, readFile(getProjectRootPath() + File.separator + "keystore.properties"), false);
 
-        /* File `credentials/agc-apiclient.json` */
-        credentials = new File(testProject, "credentials");
-        if (credentials.exists() || credentials.mkdir()) {
-            writeFile(new File(credentials, "agc-apiclient.json"), apiConfig, false);
+        /* File `distribution/agc-apiclient.json` */
+        distribution = new File(testProject, "distribution");
+        if (distribution.exists() || distribution.mkdir()) {
+            writeFile(new File(distribution, "agc-apiclient.json"), apiConfig, false);
         }
 
         /* Generic: root build.gradle */
