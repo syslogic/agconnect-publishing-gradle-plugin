@@ -61,7 +61,7 @@ plugins {
 
 ````groovy
 agcPublishing {
-    configFile = "${rootProject.getProjectDir().absolutePath}${File.separator}distribution${File.separator}agc-apiclient.json"
+    configFile = rootProject.file("distribution${File.separator}agc-apiclient.json").absolutePath
     assetDirectory = 'play'
     logHttp = true
     verbose = true
