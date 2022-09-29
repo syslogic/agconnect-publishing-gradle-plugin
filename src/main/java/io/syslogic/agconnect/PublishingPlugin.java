@@ -94,7 +94,7 @@ class PublishingPlugin implements Plugin<Project> {
                             if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
                             if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
-                            /* Task :publishDebugAab will fail, because the AAB is not being signed with the upload key. */
+                            /* Task :publishDebugAab always fails, because the AAB is not signed with the upload key. */
                             if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
 
                                 /* Register Tasks: Publish. */
