@@ -67,6 +67,9 @@ class PublishingPlugin implements Plugin<Project> {
             String[] productFlavors = getProductFlavors(project);
             String taskName;
 
+            if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
+            if (extension.getVerbose()) {verbose = extension.getVerbose();}
+
             /* TODO: consider absent productFlavors */
             if (productFlavors.length == 0) {
 
@@ -89,10 +92,9 @@ class PublishingPlugin implements Plugin<Project> {
                                     System.err.println("Reverting to the default value: " + configFile);
                                 } else {
                                     configFile = extension.getConfigFile();
+                                    if (verbose) {System.out.println("AGConnect API config: " + configFile);}
                                 }
                             }
-                            if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
-                            if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
                             /* Task :publishDebugAab always fails, because the AAB is not signed with the upload key. */
                             if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
@@ -109,6 +111,9 @@ class PublishingPlugin implements Plugin<Project> {
                             /* Register Tasks: AppId */
                             taskName = "getAppId" + StringUtils.capitalize(buildType);
                             registerAppIdTask(project, taskName, appConfigFile, buildType);
+
+                        } else if (verbose) {
+                            System.out.println("config not found for: " + artifactType);
                         }
                     }
                 }
@@ -139,10 +144,9 @@ class PublishingPlugin implements Plugin<Project> {
                                             System.err.println("Reverting to the default value: " + configFile);
                                         } else {
                                             configFile = extension.getConfigFile();
+                                            if (verbose) {System.out.println("AGConnect API config: " + configFile);}
                                         }
                                     }
-                                    if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
-                                    if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
                                     /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
                                     if (! artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
@@ -160,6 +164,9 @@ class PublishingPlugin implements Plugin<Project> {
                                     /* Register Tasks: AppId */
                                     taskName = "getAppId" + StringUtils.capitalize(buildType);
                                     registerAppIdTask(project, taskName, appConfigFile, buildType);
+
+                                } else if (verbose) {
+                                    System.out.println("config not found for: " + artifactType);
                                 }
                             }
                         }
