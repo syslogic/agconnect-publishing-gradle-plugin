@@ -5,8 +5,10 @@ import org.gradle.internal.impldep.junit.framework.TestCase;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.UnexpectedBuildResultException;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -20,10 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.UncheckedIOException;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -388,7 +391,7 @@ abstract class BaseTestCase extends TestCase {
             Stream<String> stream = Files.lines(Paths.get(path), StandardCharsets.UTF_8);
             stream.forEach(s -> sb.append(s).append("\n"));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         return sb.toString();
     }
@@ -396,8 +399,9 @@ abstract class BaseTestCase extends TestCase {
     static void writeFile(@NotNull File file, @NotNull String data, @SuppressWarnings("SameParameterValue") boolean append) {
         try (PrintWriter p = new PrintWriter(new FileOutputStream(file.getAbsolutePath(), append))) {
             p.println(data);
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -413,7 +417,8 @@ abstract class BaseTestCase extends TestCase {
                 out.flush();
             }
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            // throw new UncheckedIOException(e);
+            System.err.println(e.getMessage());
         }
     }
 
