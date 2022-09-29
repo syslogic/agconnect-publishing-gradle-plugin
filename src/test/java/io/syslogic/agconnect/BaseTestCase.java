@@ -93,14 +93,14 @@ abstract class BaseTestCase extends TestCase {
     /** Name of JAR artifact to copy */
     static String artifactName = "agconnect-publishing-gradle-plugin";
 
-    /** */
-    static String agpVersion = "7.2.2";
+    /** TODO: version number should not be hardcoded. */
+    static String agpVersion = "7.3.0";
 
-    /** */
-    static String agcpVersion = "1.7.0.300";
+    /** TODO: version number should not be hardcoded. */
+    static String agcpVersion = "1.7.2.300";
 
-    /** */
-    static String artifactVersion = "10";
+    /** TODO: version number should not be hardcoded. */
+    static String artifactVersion = "11";
 
     /** Path to the JAR artifact to copy */
     static String jarFile = "libs" + File.separator + artifactName +
@@ -213,11 +213,12 @@ abstract class BaseTestCase extends TestCase {
                                 "apply plugin: \"com.huawei.agconnect\"\n" +
                                 "apply plugin: \"io.syslogic.agconnect.publishing\"\n\n" +
                                 "android {\n" +
-                                "    compileSdk 32\n" +
+                                "    compileSdk 33\n" +
                                 "    defaultConfig {\n" +
                                 "        minSdk 23\n" +
-                                "        targetSdk 32\n" +
+                                "        targetSdk 33\n" +
                                 "        applicationId \"" + applicationId + "\"\n" +
+                                "        namespace \"" + applicationId + "\"\n" +
                                 "        multiDexEnabled true\n" +
                                 "        versionName \"1.0.0\"\n" +
                                 "        versionCode 1\n" +
@@ -364,9 +365,8 @@ abstract class BaseTestCase extends TestCase {
     @Nullable
     @SuppressWarnings("SameParameterValue")
     BuildResult runTask(String... arguments) {
-        List<String> args = new ArrayList<>();
-        args.add("--stacktrace");
-        args.addAll(Arrays.asList(arguments));
+        List<String> args = new ArrayList<>(Arrays.asList(arguments));
+        // args.add("--stacktrace");
         BuildResult result = null;
         try {
             GradleRunner runner = GradleRunner.create()

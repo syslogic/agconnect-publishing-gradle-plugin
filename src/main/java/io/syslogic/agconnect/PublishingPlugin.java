@@ -308,22 +308,23 @@ class PublishingPlugin implements Plugin<Project> {
 
     @Nullable
     private String getAppConfigPath(@NotNull Project project, @NotNull String productFlavor, @NotNull String buildType, @NotNull String variant) {
+        String fileName = File.separator + "agconnect-services.json";
 
         /* try the buildType source set */
         String basePath = project.getProjectDir().getAbsolutePath() + File.separator;
-        String path = basePath + "src" + File.separator + buildType + File.separator + "agconnect-services.json";
+        String path = basePath + "src" + File.separator + buildType + fileName;
         if (new File(path).exists()) {return path;}
 
         /* try the variant source set */
-        path = basePath + "src" + File.separator + variant + File.separator + "agconnect-services.json";
+        path = basePath + "src" + File.separator + variant + fileName;
         if (new File(path).exists()) {return path;}
 
         /* try the product flavor source set */
-        path = basePath + "src" + File.separator + productFlavor + File.separator + "agconnect-services.json";
+        path = basePath + "src" + File.separator + productFlavor + fileName;
         if (new File(path).exists()) {return path;}
 
         /* try the main source set */
-        path = basePath + "src" + File.separator + "main" + File.separator + "agconnect-services.json";
+        path = basePath + "src" + File.separator + "main" + fileName;
         if (new File(path).exists()) {return path;}
 
         /* not found */
