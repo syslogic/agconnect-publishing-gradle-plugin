@@ -5,7 +5,7 @@ buildscript {
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_version = '11'
         agp_version = '7.3.0'
-        hms_version = '1.7.1.300'
+        hms_version = '1.7.2.300'
         publish_version = '1.0.0'
         annotations_version = '22.0.0'
         httpclient_version = '4.5.13'
