@@ -247,20 +247,18 @@ abstract public class PublishingTask extends BaseTask {
     }
 
     /**
+     * It logs the {@link CompilePackageState}
      * @param packageIds package IDs, separated by commas.
      */
     public void getCompileStatus(@NotNull String packageIds) {
-
         HttpGet request = new HttpGet();
         request.setHeaders(getDefaultHeaders());
-
         try {
             request.setURI(new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("pkgIds", packageIds)
                     .build()
             );
-
             HttpResponse response = this.client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
             HttpEntity httpEntity = response.getEntity();
@@ -268,8 +266,11 @@ abstract public class PublishingTask extends BaseTask {
             if (statusCode == HttpStatus.SC_OK) {
                 CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
                 for (CompilePackageState item : data.getPackageState()) {
-                    /* Logging the package compilation status. */
-                    if (getVerbose().get()) {this.stdOut(item.toString());}
+                    if (item.getStatus() == 1 && getVerbose().get()) {
+                        this.stdOut("   Package:  " + EndpointUrl.AG_CONNECT_PACKAGE_INFO
+                                .replace("{appId}", String.valueOf(this.appId))
+                                .replace("{packageId}", item.getPackageId()));
+                    }
                 }
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
