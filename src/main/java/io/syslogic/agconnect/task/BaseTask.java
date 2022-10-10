@@ -83,19 +83,7 @@ abstract public class BaseTask extends DefaultTask {
         this.ua = "Gradle/" + project.getGradle().getGradleVersion();
         this.client = this.getHttpClient(logHttp);
 
-        File file = new File(appConfig);
-        if (file.exists() && file.canRead()) {
-            if (verbose) {this.stdOut("App Config: " + appConfig);}
-            AppConfigFile config = new Gson().fromJson(readFile(file), AppConfigFile.class);
-            this.appId = config.getAppInfo().getAppId();
-            this.packageName = config.getAppInfo().getPackageName();
-        } else {
-            this.stdErr("AppId not found:");
-            this.stdErr(file.getAbsolutePath());
-            return false;
-        }
-
-        file = new File(apiConfig);
+        File file = new File(apiConfig);
         if (file.exists() && file.canRead()) {
             if (verbose) {this.stdOut("API Config: " + apiConfig);}
             ApiConfigFile config = new Gson().fromJson(readFile(file), ApiConfigFile.class);
@@ -112,6 +100,18 @@ abstract public class BaseTask extends DefaultTask {
             this.stdErr("API client credentials not found:");
             this.stdOut(file.getAbsolutePath());
             this.stdOut(EndpointUrl.AG_CONNECT_API_CLIENT);
+            return false;
+        }
+
+        file = new File(appConfig);
+        if (file.exists() && file.canRead()) {
+            if (verbose) {this.stdOut("App Config: " + appConfig);}
+            AppConfigFile config = new Gson().fromJson(readFile(file), AppConfigFile.class);
+            this.appId = config.getAppInfo().getAppId();
+            this.packageName = config.getAppInfo().getPackageName();
+        } else {
+            this.stdErr("AppId not found:");
+            this.stdErr(file.getAbsolutePath());
             return false;
         }
 

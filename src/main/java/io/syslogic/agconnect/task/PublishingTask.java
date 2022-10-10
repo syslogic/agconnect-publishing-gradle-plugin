@@ -266,7 +266,7 @@ abstract public class PublishingTask extends BaseTask {
             if (statusCode == HttpStatus.SC_OK) {
                 CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
                 for (CompilePackageState item : data.getPackageState()) {
-                    if (item.getStatus() == 1 && getVerbose().get()) {
+                    if (item.getStatus() == 1) {
                         this.stdOut("   Package: " + EndpointUrl.AG_CONNECT_PACKAGE_INFO
                                 .replace("{appId}", String.valueOf(this.appId))
                                 .replace("{packageId}", item.getPackageId()));
