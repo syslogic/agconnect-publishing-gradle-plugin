@@ -3,10 +3,9 @@ buildscript {
     ext {
         github_handle = 'syslogic'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
-        plugin_version = '11'
+        plugin_version = '12'
         agp_version = '7.3.0'
-        hms_version = '1.7.2.300'
-        publish_version = '1.0.0'
+        plugin_publish_version = '1.0.0'
         annotations_version = '22.0.0'
         httpclient_version = '4.5.13'
         httpcore_version = '4.4.14'
@@ -14,23 +13,12 @@ buildscript {
         gson_version = '2.9.0'
         junit_version = '5.8.2'
     }
-    dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
-        classpath "com.huawei.agconnect:agcp:$hms_version"
-        classpath "com.gradle.publish:plugin-publish-plugin:$publish_version"
-    }
-    repositories {
-        google()
-        maven { url 'https://developer.huawei.com/repo/' }
-        gradlePluginPortal()
-        mavenCentral()
-    }
 }
 
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version "$publish_version"
+    id 'com.gradle.plugin-publish' version "$plugin_publish_version"
 }
 
 wrapper {

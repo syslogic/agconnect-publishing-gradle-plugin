@@ -248,7 +248,8 @@ abstract public class PublishingTask extends BaseTask {
                         message.equals("[cds]add apk failed, additional msg is [app bundle must do app signature.]")
                 ) {
                     /* Display an error message along with the URL to the relevant console page. */
-                    this.stdErr("Please enable App Signing in order to publish App Bundle format.");
+                    this.stdErr("Please enable App Signing in order to publish App Bundle format (" + fileName + ").");
+                    this.stdOut("In case the following URL does not lead to the expected package, validate agconnect-services.json.");
                     this.stdOut(EndpointUrl.AG_CONNECT_CERTIFICATES.replace("{appId}", String.valueOf(this.appId)));
                 } else {
                     this.stdErr("\nCode " + code + ": " + message);

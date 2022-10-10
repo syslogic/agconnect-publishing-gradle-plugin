@@ -32,12 +32,11 @@ import io.syslogic.agconnect.util.StringUtils;
 @SuppressWarnings("unused")
 class PublishingPlugin implements Plugin<Project> {
 
+    private @NotNull final String taskGroup = "agconnect";
+    private @Nullable PublishingExtension extension;
     private @Nullable String configFile = null;
     private @NotNull Boolean logHttp = false;
     private @NotNull Boolean verbose = false;
-
-    private @Nullable PublishingExtension extension;
-    private @NotNull final String taskGroup = "agconnect";
 
     /** It depends on :assembleRelease or :bundleRelease */
     @Override
