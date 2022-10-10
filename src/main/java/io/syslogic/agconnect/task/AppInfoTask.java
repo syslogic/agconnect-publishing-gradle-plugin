@@ -9,8 +9,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 
 import org.apache.http.util.EntityUtils;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.model.AppInfoResponse;
@@ -23,21 +21,6 @@ import io.syslogic.agconnect.constants.EndpointUrl;
  */
 abstract public class AppInfoTask extends BaseTask {
 
-    @Input
-    abstract public Property<String> getApiConfigFile();
-
-    @Input
-    abstract public Property<String> getAppConfigFile();
-
-    @Input
-    abstract public Property<String> getBuildType();
-
-    @Input
-    public abstract Property<Boolean> getLogHttp();
-
-    @Input
-    public abstract Property<Boolean> getVerbose();
-
     /**
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-reference-langtype-0000001158245079">Languages</a>.
      */
@@ -47,7 +30,7 @@ abstract public class AppInfoTask extends BaseTask {
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
+        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get(), null)) {
             if (getVerbose().get()) {this.stdOut("Query AppInfo for appId " + this.appId + ".");}
             if (this.authenticate()) {
                 this.getAppInfo();

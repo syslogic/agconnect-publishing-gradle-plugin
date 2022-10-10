@@ -19,6 +19,7 @@ import org.apache.http.message.BasicHeader;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
+import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +44,24 @@ import io.syslogic.agconnect.model.TokenResponse;
  */
 abstract public class BaseTask extends DefaultTask {
 
+    @Input
+    abstract public Property<String> getApiConfigFile();
+
+    @Input
+    abstract public Property<String> getAppConfigFile();
+
+    @Input
+    abstract public Property<String> getBuildType();
+
+    @Input
+    public abstract Property<Boolean> getLogHttp();
+
+    @Input
+    public abstract Property<Boolean> getVerbose();
+
+    /** Release Type: value 1=network, 5=phased. */
+    protected int releaseType  = 1;
+
     String ua;
     HttpClient client;
 
@@ -54,7 +73,11 @@ abstract public class BaseTask extends DefaultTask {
     String accessToken = null;
 
     /** It sets up HttpClient and parses two JSON config files. */
-    boolean configure(@NotNull Project project, String appConfig, String apiConfig, boolean logHttp, boolean verbose) {
+    boolean configure(@NotNull Project project, String appConfig, String apiConfig, Boolean logHttp, Boolean verbose, Integer releaseType) {
+
+        if (releaseType != null && releaseType == 5) {
+            this.releaseType = releaseType;
+        }
 
         /* PoolingHttpClientConnectionManager is required for subsequent requests. */
         this.ua = "Gradle/" + project.getGradle().getGradleVersion();
@@ -95,6 +118,7 @@ abstract public class BaseTask extends DefaultTask {
         /* Log Configuration */
         if (verbose) {
             this.stdOut("     AppId: " + this.appId);
+            this.stdOut("   Release: " + (this.releaseType == 1 ? "network":"phased"));
             if (this.clientId != null && this.clientSecret != null) {
                 this.stdOut("  ClientId: " + this.clientId);
                 this.stdOut("    Secret: " + this.clientSecret);

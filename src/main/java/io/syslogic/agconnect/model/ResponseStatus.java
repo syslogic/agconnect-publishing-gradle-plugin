@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Martin Zeitler
  */
+@SuppressWarnings("unused")
 public class ResponseStatus {
 
     @SerializedName(value="errorCode", alternate={"code"})

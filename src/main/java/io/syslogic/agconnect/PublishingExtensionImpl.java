@@ -1,5 +1,7 @@
 package io.syslogic.agconnect;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Public API for Gradle build scripts.
  *
@@ -8,6 +10,7 @@ package io.syslogic.agconnect;
 public class PublishingExtensionImpl implements PublishingExtension {
 
     private String configFile = null;
+    private Integer releaseType = 1;
     private String assetDirectory = null;
     private Boolean verbose = false;
     private Boolean logHttp = false;
@@ -19,8 +22,20 @@ public class PublishingExtensionImpl implements PublishingExtension {
      * @param value the absolute path to the configuration JSON.
      */
     @SuppressWarnings("unused")
-    public void setConfigFile(String value) {
+    public void setConfigFile(@NotNull String value) {
         this.configFile = value;
+    }
+
+    /**
+     * Release Type.
+     * <br><br>
+     * <code>agcPublishing { releaseType = 1 }</code>
+     * @param value 1=network, 5=phased.
+     */
+    public void setReleaseType(@NotNull Integer value) {
+        if (value == 1 || value == 5) {
+            this.releaseType = value;
+        }
     }
 
     /**
@@ -31,7 +46,7 @@ public class PublishingExtensionImpl implements PublishingExtension {
      * @param value the directory name to use instead of `agconnect`.
      */
     @SuppressWarnings("unused")
-    public void setAssetDirectory(String value) {
+    public void setAssetDirectory(@NotNull String value) {
         this.assetDirectory = value;
     }
 
@@ -42,7 +57,7 @@ public class PublishingExtensionImpl implements PublishingExtension {
      * @param value whether true or false.
      */
     @SuppressWarnings("unused")
-    public void setVerbose(Boolean value) {
+    public void setVerbose(@NotNull Boolean value) {
         this.verbose = value;
     }
 
@@ -53,7 +68,7 @@ public class PublishingExtensionImpl implements PublishingExtension {
      * @param value whether true or false.
      */
     @SuppressWarnings("unused")
-    public void setLogHttp(Boolean value) {
+    public void setLogHttp(@NotNull Boolean value) {
         this.logHttp = value;
     }
 
@@ -61,6 +76,18 @@ public class PublishingExtensionImpl implements PublishingExtension {
     @Override
     public String getConfigFile() {
         return this.configFile;
+    }
+
+    /**
+     * Release Type.
+     *
+     * <code>agcPublishing { releaseType = 1 }</code>
+     *
+     * @return value 1=network, 5=phased.
+     */
+    @Override
+    public Integer getReleaseType() {
+        return this.releaseType;
     }
 
     /** @return the name of the asset directory. */

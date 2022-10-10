@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 public class FileInfoUpdateRequest {
 
     @SerializedName("lang")
@@ -18,6 +18,7 @@ public class FileInfoUpdateRequest {
     private int fileType = 5;
 
     // only one item!
+    @SuppressWarnings("FieldCanBeLocal")
     @SerializedName("files")
     private FileUploadInfo fileInfo;
 

@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 public class FileUploadInfo {
 
     @SerializedName("fileName")

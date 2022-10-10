@@ -84,6 +84,11 @@ class PublishingPlugin implements Plugin<Project> {
                         String appConfigFile = getAppConfigPath(project, buildType);
                         if (appConfigFile != null) {
 
+                            int releaseType = 1; // 1 is the default and the are only 2 possible values.
+                            if (extension.getReleaseType() != null && extension.getReleaseType() == 5) {
+                                releaseType = extension.getReleaseType();
+                            }
+
                             /* Apply values provided by the PublishingExtension. */
                             if (! extension.getConfigFile().isEmpty()) {
                                 if (! new File(extension.getConfigFile()).exists()) {
@@ -100,7 +105,7 @@ class PublishingPlugin implements Plugin<Project> {
 
                                 /* Register Tasks: Publish. */
                                 taskName = "publish" + StringUtils.capitalize(artifactType);
-                                registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, null, null);
+                                registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, null, null, releaseType);
                             }
 
                             /* Register Tasks: AppInfo */
@@ -136,6 +141,11 @@ class PublishingPlugin implements Plugin<Project> {
                                 String appConfigFile = getAppConfigPath(project, productFlavor, buildType, buildVariant);
                                 if (appConfigFile != null) {
 
+                                    int releaseType = 1; // 1 is the default and the are only 2 possible values.
+                                    if (extension.getReleaseType() != null && extension.getReleaseType() == 5) {
+                                        releaseType = extension.getReleaseType();
+                                    }
+
                                     /* Apply values provided by the PublishingExtension. */
                                     if (extension.getConfigFile() != null && !extension.getConfigFile().isEmpty()) {
                                         if (! new File(extension.getConfigFile()).exists()) {
@@ -153,7 +163,7 @@ class PublishingPlugin implements Plugin<Project> {
                                         /* Register Tasks: Publish. */
                                         taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                                         if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
-                                        registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor);
+                                        registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
                                     }
 
                                     /* Register Tasks: AppInfo */
@@ -219,12 +229,14 @@ class PublishingPlugin implements Plugin<Project> {
     void registerPublishingTask(
             @NotNull Project project, @NotNull String taskName, @NotNull String appConfigFile,
             @NotNull String artifactType, @NotNull String buildType,
-            @Nullable String buildVariant, @Nullable String productFlavor
+            @Nullable String buildVariant, @Nullable String productFlavor,
+            @Nullable Integer releaseType
     ) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
             project.getTasks().register(taskName, PublishingTask.class, task -> {
                 task.setGroup(taskGroup);
+                task.getReleaseType().set(releaseType);
                 task.getApiConfigFile().set(apiConfigFile);
                 task.getAppConfigFile().set(appConfigFile);
                 task.getArtifactType().set(artifactType);

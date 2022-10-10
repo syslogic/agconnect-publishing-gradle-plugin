@@ -16,6 +16,14 @@ public interface PublishingExtension {
     String getConfigFile();
 
     /**
+     * Release Type.
+     *
+     * <code>agcPublishing { releaseType = 1 }</code>
+     * @return value 1=network, 5=phased.
+     */
+    Integer getReleaseType();
+
+    /**
      * Define the dirname for the directory into which to download the assets.
      * Note: It is intended to provide compatibility to to Play Store publisher.
      *

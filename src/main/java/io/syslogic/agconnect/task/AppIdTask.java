@@ -9,8 +9,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.model.AppIdListResponse;
@@ -24,25 +22,10 @@ import io.syslogic.agconnect.constants.EndpointUrl;
  */
 abstract public class AppIdTask extends BaseTask {
 
-    @Input
-    abstract public Property<String> getApiConfigFile();
-
-    @Input
-    abstract public Property<String> getAppConfigFile();
-
-    @Input
-    abstract public Property<String> getBuildType();
-
-    @Input
-    public abstract Property<Boolean> getLogHttp();
-
-    @Input
-    public abstract Property<Boolean> getVerbose();
-
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
+        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get(), null)) {
             if (getVerbose().get()) {this.stdOut("Getting ID list for package " + this.packageName + ".");}
             if (this.authenticate()) {
                 this.getAppIdList();

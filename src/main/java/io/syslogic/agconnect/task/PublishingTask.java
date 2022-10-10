@@ -55,10 +55,7 @@ import io.syslogic.agconnect.model.UploadUrlResponse;
 abstract public class PublishingTask extends BaseTask {
 
     @Input
-    abstract public Property<String> getApiConfigFile();
-
-    @Input
-    abstract public Property<String> getAppConfigFile();
+    abstract public Property<Integer> getReleaseType();
 
     @Input
     abstract public Property<String> getArtifactType();
@@ -67,30 +64,17 @@ abstract public class PublishingTask extends BaseTask {
     abstract public Property<String> getProductFlavor();
 
     @Input
-    abstract public Property<String> getBuildType();
-
-    @Input
     abstract public Property<String> getBuildVariant();
-
-    @Input
-    public abstract Property<Boolean> getLogHttp();
-
-    @Input
-    public abstract Property<Boolean> getVerbose();
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String chunkUrl  = null;
     private String uploadUrl = null;
     private String authCode  = null;
 
-    /** Release Type: value 1=network, 5=phased. */
-    @SuppressWarnings("FieldMayBeFinal")
-    private int releaseType  = 1;
-
     /** The default {@link TaskAction}. */
     @TaskAction
     public void run() {
-        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get())) {
+        if (this.configure(getProject(), getAppConfigFile().get(), getApiConfigFile().get(), getLogHttp().get(), getVerbose().get(), getReleaseType().get())) {
             if (this.authenticate()) {
                 this.getUploadUrl(getArtifactType().get());
                 if (checkBuildOutput()) {
