@@ -14,7 +14,7 @@ The official Huawei repositories can be found there: [@HMS-Core](https://github.
 
 ### Development
 
-The plugin source can be installed into any Android Gradle project with `git clone`:
+The plugin source code can be swiftly installed into any Android Gradle project with `git clone`:
 
 ````bash
 git clone https://github.com/syslogic/agconnect-publishing-gradle-plugin.git ./buildSrc
