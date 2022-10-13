@@ -55,13 +55,14 @@ plugins {
 `PublicationExtension` can be configured with the following properties:
 
  - `configFile`: The path to the API client credentials file is absolute.
- - `verbose`: Verbose logging on/off
- - `logHttp`: HTTP logging on/off.
+ - `releaseType`: Release Type: 1=network (default), 5=phased
+ - `verbose`: Verbose logging: on/off
+ - `logHttp`: HTTP logging: on/off.
 
 ````groovy
 agcPublishing {
     configFile = rootProject.file("distribution${File.separator}agc-apiclient.json").absolutePath
-    releaseType = 1 // 1=network (default), 5=phased
+    releaseType = 1
     logHttp = true
     verbose = true
 }
