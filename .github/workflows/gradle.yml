@@ -35,7 +35,7 @@ jobs:
           AGC_APP_DEBUG_CONFIG: ${{ secrets.AGC_APP_DEBUG_CONFIG }}
         run: |
           mkdir ~/.android
-          mkdir $GITHUB_WORKSPACE/credentials
+          mkdir $GITHUB_WORKSPACE/distribution
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiDebug
           mkdir -p $GITHUB_WORKSPACE/mobile/src/huaweiRelease
           echo $JAVA_KEYSTORE_DEBUG > ~/.android/debug.keystore
