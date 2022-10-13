@@ -10,7 +10,7 @@ The official Huawei repositories can be found there: [@HMS-Core](https://github.
  ---
 ### Features
 
- - It builds and uploads signed Android packages to the AppGallery Connect Publishing API.
+ - It uploads signed Android packages to the AppGallery Connect Publishing API.
 
 ### Development
 
