@@ -60,8 +60,8 @@ plugins {
 
 ````groovy
 agcPublishing {
-    releaseType = 1 // 1=network, 5=phased
     configFile = rootProject.file("distribution${File.separator}agc-apiclient.json").absolutePath
+    releaseType = 1 // 1=network (default), 5=phased
     logHttp = true
     verbose = true
 }
@@ -70,7 +70,6 @@ agcPublishing {
 These properties are all optional, while:
 
  - providing the config file at the default location: `distribution/agc-apiclient.json`.
- - not needing any debug console output, but only results.
 
 ### Plugin Tasks
 
