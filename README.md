@@ -55,7 +55,6 @@ plugins {
 `PublicationExtension` can be configured with the following properties:
 
  - `configFile`: The path to the API client credentials file is absolute.
- - `assetDirectory`: Permits overriding the default asset directory name (work in progress).
  - `verbose`: Verbose logging on/off
  - `logHttp`: HTTP logging on/off.
 
