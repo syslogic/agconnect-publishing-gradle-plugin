@@ -63,7 +63,6 @@ plugins {
 agcPublishing {
     releaseType = 1 // 1=network, 5=phased
     configFile = rootProject.file("distribution${File.separator}agc-apiclient.json").absolutePath
-    assetDirectory = 'play' // still experimental
     logHttp = true
     verbose = true
 }
@@ -72,7 +71,6 @@ agcPublishing {
 These properties are all optional, while:
 
  - providing the config file at the default location: `distribution/agc-apiclient.json`.
- - being happy with the default local assets name `agconnect`.
  - not needing any debug console output, but only results.
 
 ### Plugin Tasks
