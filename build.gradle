@@ -2,9 +2,13 @@
 buildscript {
     ext {
         github_handle = 'syslogic'
+        plugin_display_name = 'AppGallery Connect Publishing Plugin'
+        plugin_description = 'It uploads to Huawei AppGallery Connect Publishing API'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
-        plugin_version = '12'
-        agp_version = '7.3.0'
+        plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
+        plugin_id = 'io.syslogic.agconnect.publishing'
+        plugin_version = '13'
+        agp_version = '7.3.1'
         plugin_publish_version = '1.0.0'
         annotations_version = '22.0.0'
         httpclient_version = '4.5.13'
@@ -35,12 +39,12 @@ repositories {
 dependencies {
 
     compileOnly gradleApi()
-    implementation "com.android.tools.build:gradle-api:$agp_version"
-    implementation "org.jetbrains:annotations:$annotations_version"
-    implementation "org.apache.httpcomponents:httpcore:$httpcore_version"
-    implementation "org.apache.httpcomponents:httpclient:$httpclient_version"
-    implementation "org.apache.httpcomponents:httpmime:$httpmime_version"
-    implementation "com.google.code.gson:gson:$gson_version"
+    implementation "com.android.tools.build:gradle-api:${agp_version}"
+    implementation "org.jetbrains:annotations:${annotations_version}"
+    implementation "org.apache.httpcomponents:httpcore:${httpcore_version}"
+    implementation "org.apache.httpcomponents:httpclient:${httpclient_version}"
+    implementation "org.apache.httpcomponents:httpmime:${httpmime_version}"
+    implementation "com.google.code.gson:gson:${gson_version}"
 
     testImplementation gradleTestKit()
     testImplementation "org.jetbrains:annotations:$annotations_version"
@@ -51,16 +55,16 @@ dependencies {
 pluginBundle {
     website = "https://github.com/${github_handle}/${plugin_identifier}"
     vcsUrl = "https://github.com/${github_handle}/${plugin_identifier}.git"
-    tags = [ 'android', 'huawei', 'appgallery', 'connect', 'publish' ]
+    tags = [ 'android', 'huawei', 'appgallery', 'agconnect', 'publish', 'plugin' ]
 }
 
 gradlePlugin {
     plugins {
         PublishingPlugin {
-            id = 'io.syslogic.agconnect.publishing'
-            displayName = "AppGallery Connect Publishing Plugin"
-            description = 'It uploads to Huawei AppGallery Connect Publishing API'
-            implementationClass = 'io.syslogic.agconnect.PublishingPlugin'
+            id = "${plugin_id}"
+            displayName = "${plugin_display_name}"
+            description = "${plugin_description}"
+            implementationClass = "${plugin_class}"
         }
     }
 }
@@ -114,8 +118,8 @@ afterEvaluate {
                 from components.getByName("java")
                 version = "${agp_version}.${plugin_version}"
                 pom {
-                    name = 'AppGallery Connect Publishing Plugin'
-                    description = 'It uploads to Huawei AppGallery Connect Publishing API'
+                    name = "${plugin_display_name}"
+                    description = "${plugin_description}"
                     url = "https://github.com/${github_handle}/${plugin_identifier}"
                     scm {
                         connection = "scm:git:git://github.com/${github_handle}/${plugin_identifier}.git"
