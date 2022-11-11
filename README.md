@@ -35,7 +35,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.1'
-        classpath 'com.huawei.agconnect:agcp:1.7.2.300'
+        classpath 'com.huawei.agconnect:agcp:1.7.3.300'
         classpath 'io.syslogic:agconnect-publishing-gradle-plugin:7.3.1.13'
     }
 }
