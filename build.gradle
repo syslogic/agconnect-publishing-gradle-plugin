@@ -9,20 +9,13 @@ buildscript {
         plugin_id = 'io.syslogic.agconnect.publishing'
         plugin_version = '13'
         agp_version = '7.3.1'
-        plugin_publish_version = '1.0.0'
-        annotations_version = '22.0.0'
-        httpclient_version = '4.5.13'
-        httpcore_version = '4.4.14'
-        httpmime_version = '4.5.6'
-        gson_version = '2.9.0'
-        junit_version = '5.8.2'
     }
 }
 
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version "$plugin_publish_version"
+    id 'com.gradle.plugin-publish' version "1.0.0"
 }
 
 wrapper {
@@ -40,15 +33,15 @@ dependencies {
 
     compileOnly gradleApi()
     implementation "com.android.tools.build:gradle-api:${agp_version}"
-    implementation "org.jetbrains:annotations:${annotations_version}"
-    implementation "org.apache.httpcomponents:httpcore:${httpcore_version}"
-    implementation "org.apache.httpcomponents:httpclient:${httpclient_version}"
-    implementation "org.apache.httpcomponents:httpmime:${httpmime_version}"
-    implementation "com.google.code.gson:gson:${gson_version}"
+    implementation "org.jetbrains:annotations:22.0.0"
+    implementation "org.apache.httpcomponents:httpcore:4.4.14"
+    implementation "org.apache.httpcomponents:httpclient:4.5.13"
+    implementation "org.apache.httpcomponents:httpmime:4.5.6"
+    implementation "com.google.code.gson:gson:2.9.0"
 
     testImplementation gradleTestKit()
-    testImplementation "org.jetbrains:annotations:$annotations_version"
-    testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
+    testImplementation "org.jetbrains:annotations:22.0.0"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
     testImplementation(project)
 }
 
