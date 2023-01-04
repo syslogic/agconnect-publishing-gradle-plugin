@@ -297,7 +297,9 @@ abstract public class PublishingTask extends BaseTask {
      */
     @Nullable
     private String getArtifactPath() {
-        String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
+        if (getBuildType() == null) {
+            return null; // return early.
+        }
         String buildType = getBuildType().get();
         String flavor = getProductFlavor().get();
         String suffix = getArtifactType().get();
@@ -309,6 +311,7 @@ abstract public class PublishingTask extends BaseTask {
                 variant + File.separator
         );
         if (new File(output).exists()) {
+            String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
             String fileName = output.concat(baseName + "-" + buildType + "." + suffix);
             if (new File(fileName).exists()) {
                 return fileName;
