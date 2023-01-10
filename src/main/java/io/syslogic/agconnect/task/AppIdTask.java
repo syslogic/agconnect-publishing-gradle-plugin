@@ -11,9 +11,9 @@ import org.apache.http.util.EntityUtils;
 
 import org.gradle.api.tasks.TaskAction;
 
+import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.AppIdListResponse;
 import io.syslogic.agconnect.model.AppInfoAppId;
-import io.syslogic.agconnect.constants.EndpointUrl;
 
 /**
  * Abstract AppId {@link BaseTask}

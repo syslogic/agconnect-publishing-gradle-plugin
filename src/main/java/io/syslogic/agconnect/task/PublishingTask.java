@@ -16,12 +16,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.EntityUtils;
-
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,12 +35,12 @@ import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.constants.EndpointUrl;
+import io.syslogic.agconnect.constants.ResultCode;
 import io.syslogic.agconnect.model.CompilePackageState;
 import io.syslogic.agconnect.model.CompileStateResponse;
 import io.syslogic.agconnect.model.FileInfoUpdateRequest;
 import io.syslogic.agconnect.model.FileInfoUpdateResponse;
 import io.syslogic.agconnect.model.ResponseStatus;
-import io.syslogic.agconnect.constants.ResultCode;
 import io.syslogic.agconnect.model.UploadFileItem;
 import io.syslogic.agconnect.model.UploadResponseWrap;
 import io.syslogic.agconnect.model.UploadUrlResponse;

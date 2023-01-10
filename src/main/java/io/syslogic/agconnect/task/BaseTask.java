@@ -13,14 +13,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
-
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -31,9 +31,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
+import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
-import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.TokenRequest;
 import io.syslogic.agconnect.model.TokenResponse;
 

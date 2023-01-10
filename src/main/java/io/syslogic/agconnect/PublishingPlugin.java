@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
-import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.AppIdTask;
+import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.HelpTask;
 import io.syslogic.agconnect.task.PublishingTask;
 import io.syslogic.agconnect.util.StringUtils;
