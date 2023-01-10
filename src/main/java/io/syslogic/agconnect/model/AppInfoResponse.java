@@ -19,6 +19,7 @@ public class AppInfoResponse {
     public ResponseStatus getRet() {
         return this.ret;
     }
+
     public AppInfo getAppInfo() {
         return this.appInfo;
     }

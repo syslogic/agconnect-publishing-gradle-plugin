@@ -7,7 +7,7 @@ buildscript {
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
-        plugin_version = '14'
+        plugin_version = '15'
         agp_version = '7.3.1'
     }
 }

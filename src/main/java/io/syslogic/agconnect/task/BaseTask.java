@@ -54,6 +54,9 @@ abstract public class BaseTask extends DefaultTask {
     abstract public Property<String> getBuildType();
 
     @Input
+    abstract public Property<Integer> getReleaseType();
+
+    @Input
     public abstract Property<Boolean> getLogHttp();
 
     @Input

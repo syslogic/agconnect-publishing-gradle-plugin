@@ -18,6 +18,8 @@ import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.task.AppIdTask;
+import io.syslogic.agconnect.task.AppInfoUpdateLocalizationTask;
+import io.syslogic.agconnect.task.AppInfoUpdateBasicTask;
 import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.HelpTask;
 import io.syslogic.agconnect.task.PublishingTask;
@@ -166,13 +168,21 @@ class PublishingPlugin implements Plugin<Project> {
                                         registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
                                     }
 
+                                    /* Register Tasks: AppId */
+                                    taskName = "getAppId" + StringUtils.capitalize(buildType);
+                                    registerAppIdTask(project, taskName, appConfigFile, buildType);
+
                                     /* Register Tasks: AppInfo */
                                     taskName = "getAppInfo" + StringUtils.capitalize(buildType);
                                     registerAppInfoTask(project, taskName, appConfigFile, buildType);
 
-                                    /* Register Tasks: AppId */
-                                    taskName = "getAppId" + StringUtils.capitalize(buildType);
-                                    registerAppIdTask(project, taskName, appConfigFile, buildType);
+                                    /* Register Tasks: AppInfoUpdate */
+                                    taskName = "updateAppInfo" + StringUtils.capitalize(buildType);
+                                    registerAppInfoUpdateTask(project, taskName, appConfigFile, buildType, releaseType);
+
+                                    /* Register Tasks: AppInfoLocalized */
+                                    taskName = "updateAppInfoLocalized" + StringUtils.capitalize(buildType);
+                                    registerAppInfoLocalizedTask(project, taskName, appConfigFile, buildType);
 
                                 } else if (verbose) {
                                     System.out.println("config not found for: " + artifactType);
@@ -216,6 +226,41 @@ class PublishingPlugin implements Plugin<Project> {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
             project.getTasks().register(taskName, AppInfoTask.class, task -> {
+                task.setGroup(taskGroup);
+                task.getApiConfigFile().set(apiConfigFile);
+                task.getAppConfigFile().set(appConfigFile);
+                task.getBuildType().set(buildType);
+                task.getLogHttp().set(logHttp);
+                task.getVerbose().set(verbose);
+            });
+        }
+    }
+
+    void registerAppInfoUpdateTask(
+            @NotNull Project project, @NotNull String taskName,
+            @NotNull String appConfigFile, @NotNull String buildType,
+            int releaseType) {
+        if (project.getTasks().findByName(taskName) == null) {
+            String apiConfigFile = configFile;
+            project.getTasks().register(taskName, AppInfoUpdateBasicTask.class, task -> {
+                task.setGroup(taskGroup);
+                task.getApiConfigFile().set(apiConfigFile);
+                task.getAppConfigFile().set(appConfigFile);
+                task.getBuildType().set(buildType);
+                task.getReleaseType().set(releaseType);
+                task.getLogHttp().set(logHttp);
+                task.getVerbose().set(verbose);
+            });
+        }
+    }
+
+    void registerAppInfoLocalizedTask(
+            @NotNull Project project, @NotNull String taskName,
+            @NotNull String appConfigFile, @NotNull String buildType
+    ) {
+        if (project.getTasks().findByName(taskName) == null) {
+            String apiConfigFile = configFile;
+            project.getTasks().register(taskName, AppInfoUpdateLocalizationTask.class, task -> {
                 task.setGroup(taskGroup);
                 task.getApiConfigFile().set(apiConfigFile);
                 task.getAppConfigFile().set(appConfigFile);
