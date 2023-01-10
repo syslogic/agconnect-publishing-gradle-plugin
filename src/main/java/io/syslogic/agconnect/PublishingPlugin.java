@@ -18,8 +18,8 @@ import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.task.AppIdTask;
-import io.syslogic.agconnect.task.AppInfoUpdateLocalizationTask;
-import io.syslogic.agconnect.task.AppInfoUpdateBasicTask;
+import io.syslogic.agconnect.task.AppInfoLocalizationTask;
+import io.syslogic.agconnect.task.AppInfoBasicTask;
 import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.HelpTask;
 import io.syslogic.agconnect.task.PublishingTask;
@@ -176,13 +176,13 @@ class PublishingPlugin implements Plugin<Project> {
                                     taskName = "getAppInfo" + StringUtils.capitalize(buildType);
                                     registerAppInfoTask(project, taskName, appConfigFile, buildType);
 
-                                    /* Register Tasks: AppInfoUpdate */
-                                    taskName = "updateAppInfo" + StringUtils.capitalize(buildType);
-                                    registerAppInfoUpdateTask(project, taskName, appConfigFile, buildType, releaseType);
+                                    /* Register Tasks: AppInfoBasic */
+                                    taskName = "updateAppInfoBasic" + StringUtils.capitalize(buildType);
+                                    registerAppInfoBasicTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                     /* Register Tasks: AppInfoLocalized */
-                                    taskName = "updateAppInfoLocalized" + StringUtils.capitalize(buildType);
-                                    registerAppInfoLocalizedTask(project, taskName, appConfigFile, buildType);
+                                    taskName = "updateAppInfoLocalization" + StringUtils.capitalize(buildType);
+                                    registerAppInfoLocalizationTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                 } else if (verbose) {
                                     System.out.println("config not found for: " + artifactType);
@@ -236,13 +236,13 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
-    void registerAppInfoUpdateTask(
+    void registerAppInfoBasicTask(
             @NotNull Project project, @NotNull String taskName,
             @NotNull String appConfigFile, @NotNull String buildType,
             int releaseType) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
-            project.getTasks().register(taskName, AppInfoUpdateBasicTask.class, task -> {
+            project.getTasks().register(taskName, AppInfoBasicTask.class, task -> {
                 task.setGroup(taskGroup);
                 task.getApiConfigFile().set(apiConfigFile);
                 task.getAppConfigFile().set(appConfigFile);
@@ -254,17 +254,18 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
-    void registerAppInfoLocalizedTask(
+    void registerAppInfoLocalizationTask(
             @NotNull Project project, @NotNull String taskName,
-            @NotNull String appConfigFile, @NotNull String buildType
-    ) {
+            @NotNull String appConfigFile, @NotNull String buildType,
+            int releaseType) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
-            project.getTasks().register(taskName, AppInfoUpdateLocalizationTask.class, task -> {
+            project.getTasks().register(taskName, AppInfoLocalizationTask.class, task -> {
                 task.setGroup(taskGroup);
                 task.getApiConfigFile().set(apiConfigFile);
                 task.getAppConfigFile().set(appConfigFile);
                 task.getBuildType().set(buildType);
+                task.getReleaseType().set(releaseType);
                 task.getLogHttp().set(logHttp);
                 task.getVerbose().set(verbose);
             });
