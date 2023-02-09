@@ -20,7 +20,7 @@ plugins {
 
 wrapper {
     distributionType Wrapper.DistributionType.BIN
-    version '7.5.0'
+    version '7.5'
 }
 
 repositories {
