@@ -15,7 +15,7 @@ buildscript {
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version "1.0.0"
+    id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
 wrapper {
@@ -94,13 +94,12 @@ task sourcesJar(type: Jar) {
     archiveClassifier.set('sources')
 }
 
+group = 'io.syslogic'
+version = "${agp_version}.${plugin_version}"
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
-
-group = 'io.syslogic'
-version = "${agp_version}.${plugin_version}"
 
 afterEvaluate {
     publishing {
