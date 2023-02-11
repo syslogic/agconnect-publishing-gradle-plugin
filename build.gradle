@@ -37,7 +37,7 @@ dependencies {
     implementation "org.apache.httpcomponents:httpcore:4.4.14"
     implementation "org.apache.httpcomponents:httpclient:4.5.13"
     implementation "org.apache.httpcomponents:httpmime:4.5.6"
-    implementation "com.google.code.gson:gson:2.9.0"
+    implementation "com.google.code.gson:gson:2.10.1"
 
     testImplementation gradleTestKit()
     testImplementation "org.jetbrains:annotations:22.0.0"
