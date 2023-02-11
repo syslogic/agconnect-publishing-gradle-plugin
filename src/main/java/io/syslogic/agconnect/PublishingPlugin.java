@@ -98,7 +98,9 @@ class PublishingPlugin implements Plugin<Project> {
                                     System.err.println("Reverting to the default value: " + configFile);
                                 } else {
                                     configFile = extension.getConfigFile();
-                                    if (verbose) {System.out.println("AGConnect API config: " + configFile);}
+                                    if (verbose) {
+                                        System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " " + configFile);
+                                    }
                                 }
                             }
 
@@ -119,7 +121,7 @@ class PublishingPlugin implements Plugin<Project> {
                             registerAppIdTask(project, taskName, appConfigFile, buildType);
 
                         } else if (verbose) {
-                            System.out.println("config not found for: " + artifactType);
+                            System.out.println("config not found for: " + buildType + " " + artifactType);
                         }
                     }
                 }
@@ -155,7 +157,9 @@ class PublishingPlugin implements Plugin<Project> {
                                             System.err.println("Reverting to the default value: " + configFile);
                                         } else {
                                             configFile = extension.getConfigFile();
-                                            if (verbose) {System.out.println("AGConnect API config: " + configFile);}
+                                            if (verbose) {
+                                                System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " " + configFile);
+                                            }
                                         }
                                     }
 
@@ -185,7 +189,7 @@ class PublishingPlugin implements Plugin<Project> {
                                     registerAppInfoLocalizationTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                 } else if (verbose) {
-                                    System.out.println("config not found for: " + artifactType);
+                                    System.out.println("config not found for: " + productFlavor + " " + buildType + " " + artifactType);
                                 }
                             }
                         }
