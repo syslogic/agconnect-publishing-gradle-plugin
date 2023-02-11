@@ -105,11 +105,13 @@ class PublishingPlugin implements Plugin<Project> {
                             }
 
                             /* Task :publishDebugAab always fails, because the AAB is not signed with the upload key. */
+                            taskName = "publish" + StringUtils.capitalize(artifactType);
                             if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
-
                                 /* Register Tasks: Publish. */
-                                taskName = "publish" + StringUtils.capitalize(artifactType);
+                                if (verbose) {System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
                                 registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, null, null, releaseType);
+                            } else if(verbose) {
+                                System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName + " skipped");
                             }
 
                             /* Register Tasks: AppInfo */
@@ -121,7 +123,7 @@ class PublishingPlugin implements Plugin<Project> {
                             registerAppIdTask(project, taskName, appConfigFile, buildType);
 
                         } else if (verbose) {
-                            System.out.println("config not found for: " + buildType + " " + artifactType);
+                            System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " config not found");
                         }
                     }
                 }
@@ -164,12 +166,13 @@ class PublishingPlugin implements Plugin<Project> {
                                     }
 
                                     /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
+                                    taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                                     if (! artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
-
                                         /* Register Tasks: Publish. */
-                                        taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                                         if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
                                         registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
+                                    } else if(verbose) {
+                                        System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName + " skipped");
                                     }
 
                                     /* Register Tasks: AppId */
@@ -189,7 +192,7 @@ class PublishingPlugin implements Plugin<Project> {
                                     registerAppInfoLocalizationTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                 } else if (verbose) {
-                                    System.out.println("config not found for: " + productFlavor + " " + buildType + " " + artifactType);
+                                    System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " config not found");
                                 }
                             }
                         }
