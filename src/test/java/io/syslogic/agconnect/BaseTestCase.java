@@ -90,13 +90,13 @@ abstract class BaseTestCase extends TestCase {
     static String artifactName = "agconnect-publishing-gradle-plugin";
 
     /** TODO: version number should not be hardcoded. */
-    static String agpVersion = "7.3.0";
+    static String agpVersion = "7.4.1";
 
     /** TODO: version number should not be hardcoded. */
     static String agcpVersion = "1.7.2.300";
 
     /** TODO: version number should not be hardcoded. */
-    static String artifactVersion = "11";
+    static String artifactVersion = "18";
 
     /** Path to the JAR artifact to copy */
     static String jarFile = "libs" + File.separator + artifactName +
@@ -206,79 +206,79 @@ abstract class BaseTestCase extends TestCase {
                 if (! projectBuildFile.exists()) {
                     writeFile(projectBuildFile,
                         "apply plugin: \"com.android.application\"\n" +
-                                "apply plugin: \"com.huawei.agconnect\"\n" +
-                                "apply plugin: \"io.syslogic.agconnect.publishing\"\n\n" +
-                                "android {\n" +
-                                "    compileSdk 33\n" +
-                                "    defaultConfig {\n" +
-                                "        minSdk 23\n" +
-                                "        targetSdk 33\n" +
-                                "        applicationId \"" + applicationId + "\"\n" +
-                                "        namespace \"" + applicationId + "\"\n" +
-                                "        multiDexEnabled true\n" +
-                                "        versionName \"1.0.0\"\n" +
-                                "        versionCode 1\n" +
-                                "        compileOptions {\n" +
-                                "            sourceCompatibility JavaVersion.VERSION_11.toString()\n" +
-                                "            targetCompatibility JavaVersion.VERSION_11.toString()\n" +
-                                "        }\n" +
-                                "    }\n" +
-                                "    signingConfigs {\n" +
-                                "        debug {\n" +
-                                "            storeFile file(\"" + getDebugKeystorePath() + "\")\n" +
-                                "            storePassword rootProject.ext.get(\"debugKeystorePass\")\n" +
-                                "            keyAlias rootProject.ext.get(\"debugKeyAlias\")\n" +
-                                "            keyPassword rootProject.ext.get(\"debugKeyPass\")\n" +
-                                "        }\n" +
-                                "        release {\n" +
-                                "            storeFile file(\"" + getUploadKeystorePath() + "\")\n" +
-                                "            storePassword rootProject.ext.get(\"releaseKeystorePass\")\n" +
-                                "            keyAlias rootProject.ext.get(\"releaseKeyAlias\")\n" +
-                                "            keyPassword rootProject.ext.get(\"releaseKeyPass\")\n" +
-                                "        }\n"+
-                                "    }\n" +
-                                "    sourceSets {\n" +
-                                "        main {}\n" +
-                                "        huawei {\n" +
-                                "            java.srcDir \"src/huawei/java\"\n" +
-                                "        }\n" +
-                                "    }\n" +
-                                "    flavorDimensions \"vendor\"\n" +
-                                "    productFlavors {\n" +
-                                "        huawei {\n" +
-                                "            dimension \"vendor\"\n" +
-                                "            versionNameSuffix \"-huawei\"\n" +
-                                "        }\n" +
-                                "    }\n" +
-                                "    buildTypes {\n" +
-                                "        debug {\n" +
-                                "            signingConfig signingConfigs.debug\n" +
-                                "            applicationIdSuffix \".debug\"\n" +
-                                "            debuggable true\n" +
-                                "            jniDebuggable true\n" +
-                                "            zipAlignEnabled true\n" +
-                                "            renderscriptDebuggable true\n" +
-                                "            pseudoLocalesEnabled false\n" +
-                                "            shrinkResources false\n" +
-                                "            minifyEnabled false\n" +
-                                "        }\n" +
-                                "        release {\n" +
-                                "            signingConfig signingConfigs.release\n" +
-                                "            shrinkResources true\n" +
-                                "            testCoverageEnabled false\n" +
-                                "            zipAlignEnabled true\n" +
-                                "            pseudoLocalesEnabled false\n" +
-                                "            renderscriptDebuggable false\n" +
-                                "            minifyEnabled true\n" +
-                                "            jniDebuggable false\n" +
-                                "            debuggable false\n" +
-                                "        }\n"+
-                                "    }\n"+
-                                "}\n\n" + // `android`
-                                "dependencies {\n" +
-                                "}\n\n" +
-                                "agcPublishing {\n" +
-                                "}\n",false);
+                        "apply plugin: \"com.huawei.agconnect\"\n" +
+                        "apply plugin: \"io.syslogic.agconnect.publishing\"\n\n" +
+                        "android {\n" +
+                        "    compileSdk 33\n" +
+                        "    defaultConfig {\n" +
+                        "        minSdk 23\n" +
+                        "        targetSdk 33\n" +
+                        "        applicationId \"" + applicationId + "\"\n" +
+                        "        namespace \"" + applicationId + "\"\n" +
+                        "        multiDexEnabled true\n" +
+                        "        versionName \"1.0.0\"\n" +
+                        "        versionCode 1\n" +
+                        "        compileOptions {\n" +
+                        "            sourceCompatibility JavaVersion.VERSION_11.toString()\n" +
+                        "            targetCompatibility JavaVersion.VERSION_11.toString()\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    signingConfigs {\n" +
+                        "        debug {\n" +
+                        "            storeFile file(\"" + getDebugKeystorePath() + "\")\n" +
+                        "            storePassword rootProject.ext.get(\"debugKeystorePass\")\n" +
+                        "            keyAlias rootProject.ext.get(\"debugKeyAlias\")\n" +
+                        "            keyPassword rootProject.ext.get(\"debugKeyPass\")\n" +
+                        "        }\n" +
+                        "        release {\n" +
+                        "            storeFile file(\"" + getUploadKeystorePath() + "\")\n" +
+                        "            storePassword rootProject.ext.get(\"releaseKeystorePass\")\n" +
+                        "            keyAlias rootProject.ext.get(\"releaseKeyAlias\")\n" +
+                        "            keyPassword rootProject.ext.get(\"releaseKeyPass\")\n" +
+                        "        }\n"+
+                        "    }\n" +
+                        "    sourceSets {\n" +
+                        "        main {}\n" +
+                        "        huawei {\n" +
+                        "            java.srcDir \"src/huawei/java\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    flavorDimensions \"vendor\"\n" +
+                        "    productFlavors {\n" +
+                        "        huawei {\n" +
+                        "            dimension \"vendor\"\n" +
+                        "            versionNameSuffix \"-huawei\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    buildTypes {\n" +
+                        "        debug {\n" +
+                        "            signingConfig signingConfigs.debug\n" +
+                        "            applicationIdSuffix \".debug\"\n" +
+                        "            debuggable true\n" +
+                        "            jniDebuggable true\n" +
+                        "            zipAlignEnabled true\n" +
+                        "            renderscriptDebuggable true\n" +
+                        "            pseudoLocalesEnabled false\n" +
+                        "            shrinkResources false\n" +
+                        "            minifyEnabled false\n" +
+                        "        }\n" +
+                        "        release {\n" +
+                        "            signingConfig signingConfigs.release\n" +
+                        "            shrinkResources true\n" +
+                        "            testCoverageEnabled false\n" +
+                        "            zipAlignEnabled true\n" +
+                        "            pseudoLocalesEnabled false\n" +
+                        "            renderscriptDebuggable false\n" +
+                        "            minifyEnabled true\n" +
+                        "            jniDebuggable false\n" +
+                        "            debuggable false\n" +
+                        "        }\n"+
+                        "    }\n"+
+                        "}\n\n" + // `android`
+                        "dependencies {\n" +
+                        "}\n\n" +
+                        "agcPublishing {\n" +
+                        "}\n",false);
                 }
             }
         }
