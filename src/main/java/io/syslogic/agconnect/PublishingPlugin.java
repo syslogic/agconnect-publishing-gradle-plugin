@@ -361,6 +361,9 @@ class PublishingPlugin implements Plugin<Project> {
     @NotNull
     private String stringArrayToCsv(@NotNull String[] data) {
         if (data.length == 0) {return "";}
+        for(var i = 0; i < data.length; i++) {
+            data[i] = data[i].substring(0, 1).toUpperCase() + data[i].substring(1);
+        }
         return String.join(", ", data);
     }
 
