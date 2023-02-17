@@ -1,5 +1,7 @@
 package io.syslogic.agconnect;
 
+import org.gradle.api.tasks.Optional;
+
 /**
  * Public API for Gradle build scripts.
  *

@@ -116,11 +116,11 @@ class PublishingPlugin implements Plugin<Project> {
 
                             /* Register Tasks: AppInfo */
                             taskName = "getAppInfo" + StringUtils.capitalize(buildType);
-                            registerAppInfoTask(project, taskName, appConfigFile, buildType);
+                            registerAppInfoTask(project, taskName, appConfigFile, buildType, releaseType);
 
                             /* Register Tasks: AppId */
                             taskName = "getAppId" + StringUtils.capitalize(buildType);
-                            registerAppIdTask(project, taskName, appConfigFile, buildType);
+                            registerAppIdTask(project, taskName, appConfigFile, buildType, releaseType);
 
                         } else if (verbose) {
                             System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " config not found");
@@ -177,11 +177,11 @@ class PublishingPlugin implements Plugin<Project> {
 
                                     /* Register Tasks: AppId */
                                     taskName = "getAppId" + StringUtils.capitalize(buildType);
-                                    registerAppIdTask(project, taskName, appConfigFile, buildType);
+                                    registerAppIdTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                     /* Register Tasks: AppInfo */
                                     taskName = "getAppInfo" + StringUtils.capitalize(buildType);
-                                    registerAppInfoTask(project, taskName, appConfigFile, buildType);
+                                    registerAppInfoTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                     /* Register Tasks: AppInfoBasic */
                                     taskName = "updateAppInfoBasic" + StringUtils.capitalize(buildType);
@@ -211,7 +211,8 @@ class PublishingPlugin implements Plugin<Project> {
 
     void registerAppIdTask(
             @NotNull Project project, @NotNull String taskName,
-            @NotNull String appConfigFile, @NotNull String buildType
+            @NotNull String appConfigFile, @NotNull String buildType,
+            int releaseType
     ) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
@@ -220,6 +221,7 @@ class PublishingPlugin implements Plugin<Project> {
                 task.getApiConfigFile().set(apiConfigFile);
                 task.getAppConfigFile().set(appConfigFile);
                 task.getBuildType().set(buildType);
+                task.getReleaseType().set(releaseType);
                 task.getLogHttp().set(logHttp);
                 task.getVerbose().set(verbose);
             });
@@ -228,7 +230,8 @@ class PublishingPlugin implements Plugin<Project> {
 
     void registerAppInfoTask(
             @NotNull Project project, @NotNull String taskName,
-            @NotNull String appConfigFile, @NotNull String buildType
+            @NotNull String appConfigFile, @NotNull String buildType,
+            int releaseType
     ) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
@@ -237,6 +240,7 @@ class PublishingPlugin implements Plugin<Project> {
                 task.getApiConfigFile().set(apiConfigFile);
                 task.getAppConfigFile().set(appConfigFile);
                 task.getBuildType().set(buildType);
+                task.getReleaseType().set(releaseType);
                 task.getLogHttp().set(logHttp);
                 task.getVerbose().set(verbose);
             });
