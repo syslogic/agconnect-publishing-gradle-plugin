@@ -18,11 +18,6 @@ plugins {
     id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
-wrapper {
-    distributionType Wrapper.DistributionType.BIN
-    version '7.5'
-}
-
 repositories {
     google()
     mavenCentral()
