@@ -60,11 +60,15 @@ plugins {
  - `logHttp`: HTTP logging, on/off.
 
 ````groovy
-agcPublishing {
-    configFile = rootProject.file("distribution${File.separator}agc-apiclient.json").absolutePath
-    releaseType = 1
-    logHttp = true
-    verbose = true
+/** Huawei AppGallery Connect: agc-apiclient.json */
+def json_agc = "distribution${File.separator}agc-apiclient.json"
+if (rootProject.file(json_agc).exists()) {
+    agcPublishing {
+        configFile = rootProject.file(json_agc).absolutePath
+        releaseType = 1
+        logHttp = true
+        verbose = true
+    }
 }
 ````
 
