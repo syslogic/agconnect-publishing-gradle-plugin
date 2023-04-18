@@ -27,7 +27,6 @@ import io.syslogic.agconnect.util.StringUtils;
 
 /**
  * Huawei AppGallery Connect Publishing Plugin
- *
  * @see <a href="https://developer.huawei.com/consumer/en/service/josp/agc/index.html">Console</a>
  * @author Martin Zeitler
  */

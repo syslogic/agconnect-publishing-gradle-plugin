@@ -4,14 +4,12 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Public API for Gradle build scripts.
- *
  * @author Martin Zeitler
  */
 public class PublishingExtensionImpl implements PublishingExtension {
 
     private String configFile = null;
     private Integer releaseType = 1;
-    private String assetDirectory = null;
     private Boolean verbose = false;
     private Boolean logHttp = false;
 
@@ -36,18 +34,6 @@ public class PublishingExtensionImpl implements PublishingExtension {
         if (value == 1 || value == 5) {
             this.releaseType = value;
         }
-    }
-
-    /**
-     * Define the dirname for the directory into which to download the assets.
-     * Note: It is intended to provide compatibility to to Play Store publisher.
-     * <br><br>
-     * <code>agcPublishing {assetDirectory = "play"}</code>
-     * @param value the directory name to use instead of `agconnect`.
-     */
-    @SuppressWarnings("unused")
-    public void setAssetDirectory(@NotNull String value) {
-        this.assetDirectory = value;
     }
 
     /**
@@ -88,12 +74,6 @@ public class PublishingExtensionImpl implements PublishingExtension {
     @Override
     public Integer getReleaseType() {
         return this.releaseType;
-    }
-
-    /** @return the name of the asset directory. */
-    @Override
-    public String getAssetDirectory() {
-        return this.assetDirectory;
     }
 
     /** @return the current value for verbose logging. */
