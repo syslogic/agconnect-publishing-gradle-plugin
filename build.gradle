@@ -40,11 +40,13 @@ dependencies {
     testImplementation(project)
 }
 
+/*
 pluginBundle {
     website = "https://github.com/${github_handle}/${plugin_identifier}"
     vcsUrl = "https://github.com/${github_handle}/${plugin_identifier}.git"
     tags = [ 'android', 'huawei', 'appgallery', 'agconnect', 'publish', 'plugin' ]
 }
+*/
 
 gradlePlugin {
     plugins {
