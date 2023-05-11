@@ -68,12 +68,3 @@ jobs:
           name: buildSrc
           path: ./build/libs/*.jar
           retention-days: 14
-
-      - name: 📦 Retain Test Result
-        if: always()
-        id: retain-plugin-test
-        uses: actions/upload-artifact@v3
-        with:
-          name: results
-          path: ./build/reports/tests/test
-          retention-days: 1
