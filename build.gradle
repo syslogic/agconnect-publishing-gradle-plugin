@@ -15,7 +15,7 @@ buildscript {
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '1.0.0'
+    id 'com.gradle.plugin-publish' version '1.2.0'
 }
 
 repositories {
@@ -39,14 +39,6 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
     testImplementation(project)
 }
-
-/*
-pluginBundle {
-    website = "https://github.com/${github_handle}/${plugin_identifier}"
-    vcsUrl = "https://github.com/${github_handle}/${plugin_identifier}.git"
-    tags = [ 'android', 'huawei', 'appgallery', 'agconnect', 'publish', 'plugin' ]
-}
-*/
 
 gradlePlugin {
     plugins {
