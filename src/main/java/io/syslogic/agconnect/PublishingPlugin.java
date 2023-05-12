@@ -122,14 +122,14 @@ class PublishingPlugin implements Plugin<Project> {
                             registerAppIdTask(project, taskName, appConfigFile, buildType, releaseType);
 
                         } else if (verbose) {
-                            System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " config not found");
+                            System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " · agc-apiclient.json not found");
                         }
                     }
                 }
 
             } else {
 
-                System.out.println("\n> " + productFlavors.length + " product flavors detected: " + stringArrayToCsv(productFlavors));
+                System.out.println("\n> " + productFlavors.length + " product flavors detected: " + stringArrayToCsv(productFlavors) + ".");
 
                 /* Loop product flavors and build-types. */
                 for (String productFlavor : productFlavors) {
@@ -159,7 +159,7 @@ class PublishingPlugin implements Plugin<Project> {
                                         } else {
                                             configFile = extension.getConfigFile();
                                             if (verbose) {
-                                                System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " " + configFile);
+                                                System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · " + configFile);
                                             }
                                         }
                                     }
@@ -168,10 +168,10 @@ class PublishingPlugin implements Plugin<Project> {
                                     taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                                     if (! artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
                                         /* Register Tasks: Publish. */
-                                        if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
+                                        if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · :" + taskName);}
                                         registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
                                     } else if(verbose) {
-                                        System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName + " skipped");
+                                        System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · :" + taskName + " skipped");
                                     }
 
                                     /* Register Tasks: AppId */
@@ -191,7 +191,7 @@ class PublishingPlugin implements Plugin<Project> {
                                     registerAppInfoLocalizationTask(project, taskName, appConfigFile, buildType, releaseType);
 
                                 } else if (verbose) {
-                                    System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " config not found");
+                                    System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · agc-apiclient.json not found");
                                 }
                             }
                         }
