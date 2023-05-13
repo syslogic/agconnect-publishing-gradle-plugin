@@ -1,8 +1,19 @@
+import org.gradle.api.initialization.resolve.RepositoriesMode
+
 // settings.gradle
 pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
         google()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
     }
 }
