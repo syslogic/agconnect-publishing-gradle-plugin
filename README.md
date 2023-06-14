@@ -34,9 +34,9 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.1'
+        classpath 'com.android.tools.build:gradle:8.0.2'
         classpath 'com.huawei.agconnect:agcp:1.9.0.300'
-        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:8.0.1.23'
+        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:8.0.2.24'
     }
 }
 ````
