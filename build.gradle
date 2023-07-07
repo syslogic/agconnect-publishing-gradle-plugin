@@ -8,7 +8,7 @@ buildscript {
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
         agp_version = '8.0.2'
-        plugin_version = '24'
+        plugin_version = '25'
     }
 }
 

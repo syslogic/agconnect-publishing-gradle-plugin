@@ -70,10 +70,13 @@ class PublishingPlugin implements Plugin<Project> {
             if (extension.getLogHttp()) {logHttp = extension.getLogHttp();}
             if (extension.getVerbose()) {verbose = extension.getVerbose();}
 
-            /* TODO: consider absent productFlavors */
+            /* 0 or N product flavors. */
             if (productFlavors.length == 0) {
 
-                System.out.println("\nNo product flavors detected.");
+                /* Product flavors not configured. */
+                if (verbose) {
+                    System.out.println("\nProduct flavors not configured.");
+                }
 
                 /* Loop build-types. */
                 for (String buildType : buildTypes) {
@@ -129,7 +132,10 @@ class PublishingPlugin implements Plugin<Project> {
 
             } else {
 
-                System.out.println("\n> " + productFlavors.length + " product flavors detected: " + stringArrayToCsv(productFlavors) + ".");
+                /* Multiple product flavors configured */
+                if (verbose) {
+                    System.out.println("\n> " + productFlavors.length + " product flavors configured: " + stringArrayToCsv(productFlavors) + ".");
+                }
 
                 /* Loop product flavors and build-types. */
                 for (String productFlavor : productFlavors) {
@@ -311,7 +317,6 @@ class PublishingPlugin implements Plugin<Project> {
 
     /** Obtain Android ApplicationBuildType, which have a ApkSigningConfig. */
     @NotNull
-    @SuppressWarnings("UnstableApiUsage")
     String[] getBuildTypes(@NotNull Project project) {
         ArrayList<String> buildTypes = new ArrayList<>();
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
@@ -329,7 +334,6 @@ class PublishingPlugin implements Plugin<Project> {
         return buildTypes.toArray(new String[0]);
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void setDebugSigningConfig(@NotNull Project project) {
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
         NamedDomainObjectContainer<? extends ApplicationBuildType> buildTypes = android.getBuildTypes();
