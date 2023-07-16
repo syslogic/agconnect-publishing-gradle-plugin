@@ -55,7 +55,7 @@ tasks.withType(Test).configureEach {
 }
 
 task javadocs(type: Javadoc) {
-    title = "AppGallery Connect Publishing Plugin ${agp_version} API"
+    title = "${plugin_display_name} ${agp_version}.API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
     configurations.implementation.setCanBeResolved(true)
