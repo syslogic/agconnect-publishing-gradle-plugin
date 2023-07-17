@@ -1,4 +1,4 @@
-### Huawei AppGallery Connect Publishing Plugin
+### Huawei AppGallery Connect Publishing Gradle Plugin
 
 ![Social Media Preview](https://raw.githubusercontent.com/syslogic/agconnect-publishing-gradle-plugin/master/screenshots/repository.png)
 
