@@ -3,7 +3,7 @@ buildscript {
     ext {
         github_handle = 'syslogic'
         plugin_display_name = 'AppGallery Connect Publishing Plugin'
-        plugin_description = 'It uploads to Huawei AppGallery Connect Publishing API'
+        plugin_description = 'It uploads Android APK/ABB packages to the AppGallery Connect Publishing API'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'

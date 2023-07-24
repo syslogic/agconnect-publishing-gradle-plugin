@@ -10,7 +10,7 @@ The official Huawei repositories can be found there: [@HMS-Core](https://github.
  ---
 ### Features
 
- - It uploads signed Android APK/ABB packages to the AppGallery Connect Publishing API.
+ - It uploads Android APK/ABB packages to the AppGallery Connect Publishing API.
 
 ### Development
 
@@ -114,4 +114,4 @@ AAB file someapp_1.0.0.aab has been uploaded.
 
 [![Release](https://jitpack.io/v/syslogic/agconnect-publishing-gradle-plugin.svg)](https://jitpack.io/#io.syslogic/agconnect-publishing-gradle-plugin)
 
-[![MIT License](https://img.shields.io/github/license/syslogic/agconnect-publishing-gradle-plugin)](https://github.com/syslogic/agconnect-publishing-gradle-plugin/blob/master/LICENSE)
+[![MIT License](https://img.shields.io/github/license/syslogic/agconnect-publishing-gradle-plugin)](https://github.com/syslogic/agconnect-publishing-gradle-plugin/blob/master/LICENSE)<!-- @IGNORE PREVIOUS: link -->
