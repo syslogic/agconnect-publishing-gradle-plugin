@@ -83,7 +83,7 @@ These properties are all optional, while:
 ### Example Log Output
 
 The log output for task `:mobile:publishReleaseAab` explains what it does.<br/>
-To be precise, it only uploads APK/ABB packages, but not releases them (yet).
+To be precise, it only uploads APK/ABB packages, but does not release them.
 
 ````
 > Task :mobile:bundleRelease
