@@ -7,8 +7,8 @@ buildscript {
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
-        agp_version = '8.0.2'
-        plugin_version = '25'
+        plugin_version = '1.2.6'
+        agp_version = '8.1.0'
     }
 }
 
@@ -54,7 +54,7 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-task javadocs(type: Javadoc) {
+tasks.register('javadocs', Javadoc) {
     title = "${plugin_display_name} ${agp_version}.API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
@@ -67,12 +67,13 @@ task javadocs(type: Javadoc) {
     failOnError false
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
     archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     from java.sourceSets.main.java.srcDirs
     archiveClassifier.set('sources')
 }
