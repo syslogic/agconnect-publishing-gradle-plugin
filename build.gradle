@@ -3,12 +3,11 @@ buildscript {
     ext {
         github_handle = 'syslogic'
         plugin_display_name = 'AppGallery Connect Publishing Plugin'
-        plugin_description = 'It uploads Android APK/ABB packages to the AppGallery Connect Publishing API'
+        plugin_description = 'It uploads Android APK/ABB packages to the AppGallery Connect Publishing API.'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
         plugin_version = '1.2.6'
-        agp_version = '8.1.0'
     }
 }
 
@@ -21,7 +20,7 @@ plugins {
 dependencies {
 
     compileOnly gradleApi()
-    implementation "com.android.tools.build:gradle-api:${agp_version}"
+    implementation "com.android.tools.build:gradle-api:8.1.0"
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.apache.httpcomponents:httpcore:4.4.15'
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
@@ -47,7 +46,7 @@ gradlePlugin {
 
 tasks.withType(Jar).configureEach {
     archiveBaseName.set(plugin_identifier)
-    archiveVersion.set("${agp_version}.${plugin_version}")
+    archiveVersion.set("${plugin_version}")
 }
 
 tasks.withType(Test).configureEach {
@@ -79,7 +78,7 @@ tasks.register('sourcesJar', Jar) {
 }
 
 group = 'io.syslogic'
-version = "${agp_version}.${plugin_version}"
+version = "${plugin_version}"
 artifacts {
     archives javadocJar
     archives sourcesJar
@@ -92,7 +91,7 @@ afterEvaluate {
                 groupId = group
                 artifactId = "${plugin_identifier}"
                 from components.getByName("java")
-                version = "${agp_version}.${plugin_version}"
+                version = "${plugin_version}"
                 pom {
                     name = "${plugin_display_name}"
                     description = "${plugin_description}"
