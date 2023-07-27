@@ -54,7 +54,7 @@ tasks.withType(Test).configureEach {
 }
 
 tasks.register('javadocs', Javadoc) {
-    title = "${plugin_display_name} ${agp_version}.API"
+    title = "${plugin_display_name} ${plugin_version}.API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
     configurations.implementation.setCanBeResolved(true)
