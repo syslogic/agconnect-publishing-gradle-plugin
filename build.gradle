@@ -53,8 +53,8 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-tasks.register('javadocs', Javadoc) {
-    title = "${plugin_display_name} ${plugin_version}.API"
+task javadocs(type: Javadoc) {
+    title = "${plugin_display_name} ${plugin_version} API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
     configurations.implementation.setCanBeResolved(true)
@@ -66,13 +66,13 @@ tasks.register('javadocs', Javadoc) {
     failOnError false
 }
 
-tasks.register('javadocJar', Jar) {
+task javadocJar(type: Jar, dependsOn: javadoc) {
     dependsOn javadoc
     archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
-tasks.register('sourcesJar', Jar) {
+task sourcesJar(type: Jar) {
     from java.sourceSets.main.java.srcDirs
     archiveClassifier.set('sources')
 }
