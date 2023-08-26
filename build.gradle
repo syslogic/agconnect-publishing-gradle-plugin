@@ -7,7 +7,7 @@ buildscript {
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
-        plugin_version = '1.2.7'
+        plugin_version = '1.2.8'
     }
 }
 
@@ -52,13 +52,12 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-tasks.register('javadocs', Javadoc) {
+//noinspection ConfigurationAvoidance
+task javadocs(type: Javadoc) {
     title = "${plugin_display_name} ${plugin_version} API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = file("${project.buildDir}/outputs/javadoc/")
-    configurations.implementation.incoming.beforeResolve {
-        configurations.implementation.setCanBeResolved(true)
-    }
+    configurations.implementation.setCanBeResolved(true)
     classpath = files(new File(System.getProperty('java.home') + File.separator + 'lib' + File.separator + 'rt.jar'))
     classpath += configurations.implementation
     options.links "https://docs.oracle.com/en/java/javase/17/docs/api/"
@@ -67,13 +66,15 @@ tasks.register('javadocs', Javadoc) {
     failOnError false
 }
 
-tasks.register('javadocJar', Jar) {
+//noinspection ConfigurationAvoidance
+task javadocJar(type: Jar, dependsOn: javadoc) {
     dependsOn javadoc
     archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
-tasks.register('sourcesJar', Jar) {
+//noinspection ConfigurationAvoidance
+task sourcesJar(type: Jar) {
     from java.sourceSets.main.java.srcDirs
     archiveClassifier.set('sources')
 }
