@@ -91,8 +91,8 @@ afterEvaluate {
             maven {
                 url = System.getenv("JB_SPACE_MAVEN_REPO")
                 credentials {
-                    username = "$System.env.JB_SPACE_CLIENT_ID"
-                    password = "$System.env.JB_SPACE_CLIENT_SECRET"
+                    username = System.getenv("JB_SPACE_CLIENT_ID")
+                    password = System.getenv("JB_SPACE_CLIENT_SECRET")
                 }
             }
         }
