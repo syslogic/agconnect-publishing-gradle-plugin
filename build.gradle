@@ -7,7 +7,7 @@ buildscript {
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
-        plugin_version = '1.2.8'
+        plugin_version = '1.2.9'
     }
 }
 
@@ -21,8 +21,8 @@ dependencies {
     compileOnly gradleApi()
     implementation "com.android.tools.build:gradle-api:8.1.1"
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'org.apache.httpcomponents:httpcore:4.4.15'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.16'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation 'org.apache.httpcomponents:httpmime:4.5.6'
     implementation 'org.jetbrains:annotations:22.0.0'
 
@@ -87,6 +87,15 @@ artifacts {
 
 afterEvaluate {
     publishing {
+        repositories {
+            maven {
+                url = System.getenv("JB_SPACE_MAVEN_REPO")
+                credentials {
+                    username = "$System.env.JB_SPACE_CLIENT_ID"
+                    password = "$System.env.JB_SPACE_CLIENT_SECRET"
+                }
+            }
+        }
         publications {
             release(MavenPublication) {
                 groupId = group
