@@ -10,12 +10,12 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     private String configFile = null;
     private Integer releaseType = 1;
-    private Boolean verbose = false;
     private Boolean logHttp = false;
+
+    private Boolean verbose = false;
 
     /**
      * Define the path to the API client configuration file.
-     * <br><br>
      * <code>agcPublishing {configFile = ""}</code>
      * @param value the absolute path to the configuration JSON.
      */
@@ -26,10 +26,10 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     /**
      * Release Type.
-     * <br><br>
      * <code>agcPublishing { releaseType = 1 }</code>
      * @param value 1=network, 5=phased.
      */
+    @SuppressWarnings("unused")
     public void setReleaseType(@NotNull Integer value) {
         if (value == 1 || value == 5) {
             this.releaseType = value;
@@ -37,8 +37,17 @@ public class PublishingExtensionImpl implements PublishingExtension {
     }
 
     /**
-     * Verbose logging.
-     * <br><br>
+     * HTTP logging
+     * <code>agcPublishing {logHttp = true}</code>
+     * @param value whether true or false.
+     */
+    @SuppressWarnings("unused")
+    public void setLogHttp(@NotNull Boolean value) {
+        this.logHttp = value;
+    }
+
+    /**
+     * Verbose logging
      * <code>agcPublishing {verbose = true}</code>
      * @param value whether true or false.
      */
@@ -48,27 +57,16 @@ public class PublishingExtensionImpl implements PublishingExtension {
     }
 
     /**
-     * HTTP logging.
-     * <br><br>
-     * <code>agcPublishing {logHttp = true}</code>
-     * @param value whether true or false.
+     * @return the path to the API client configuration JSON file.
      */
-    @SuppressWarnings("unused")
-    public void setLogHttp(@NotNull Boolean value) {
-        this.logHttp = value;
-    }
-
-    /** @return the path to the API client configuration JSON file. */
     @Override
     public String getConfigFile() {
         return this.configFile;
     }
 
     /**
-     * Release Type.
-     *
+     * Release Type
      * <code>agcPublishing { releaseType = 1 }</code>
-     *
      * @return value 1=network, 5=phased.
      */
     @Override
@@ -76,15 +74,21 @@ public class PublishingExtensionImpl implements PublishingExtension {
         return this.releaseType;
     }
 
-    /** @return the current value for verbose logging. */
-    @Override
-    public Boolean getVerbose() {
-        return this.verbose;
-    }
-
-    /** @return the current value for HTTP logging. */
+    /**
+     * HTTP logging
+     * @return the current value for HTTP logging.
+     */
     @Override
     public Boolean getLogHttp() {
         return this.logHttp;
+    }
+
+    /**
+     * Verbose logging
+     * @return the current value for verbose logging.
+     */
+    @Override
+    public Boolean getVerbose() {
+        return this.verbose;
     }
 }
