@@ -87,15 +87,6 @@ artifacts {
 
 afterEvaluate {
     publishing {
-        repositories {
-            maven {
-                url = System.getenv("JB_SPACE_MAVEN_REPO")
-                credentials {
-                    username = System.getenv("JB_SPACE_CLIENT_ID")
-                    password = System.getenv("JB_SPACE_CLIENT_SECRET")
-                }
-            }
-        }
         publications {
             release(MavenPublication) {
                 groupId = group
@@ -111,6 +102,19 @@ afterEvaluate {
                         developerConnection = "scm:git:ssh://github.com/${github_handle}/${plugin_identifier}.git"
                         url = "https://github.com/${github_handle}/${plugin_identifier}/"
                     }
+                }
+            }
+        }
+        repositories {
+            /*
+             * JetBrains Spaces Repository (private)
+             * https://lp.jetbrains.com/space-source-code-management/
+             */
+            maven {
+                url = System.getenv("JB_SPACE_MAVEN_REPO")
+                credentials {
+                    username = System.getenv("JB_SPACE_CLIENT_ID")
+                    password = System.getenv("JB_SPACE_CLIENT_SECRET")
                 }
             }
         }
