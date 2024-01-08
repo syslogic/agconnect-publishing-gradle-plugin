@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class StringUtils {
 
+    /**
+     * It capitlizes a given string.
+     * @param string the input string.
+     * @return the capitalized string.
+     */
     @NotNull
     public static String capitalize(@NotNull String string) {
         int strLen = string.length();

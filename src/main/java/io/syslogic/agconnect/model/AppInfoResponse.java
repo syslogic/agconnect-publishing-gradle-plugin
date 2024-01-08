@@ -16,10 +16,12 @@ public class AppInfoResponse {
     @SerializedName("appInfo")
     private AppInfo appInfo;
 
+    /** @return response status. */
     public ResponseStatus getRet() {
         return this.ret;
     }
 
+    /** @return app information. */
     public AppInfo getAppInfo() {
         return this.appInfo;
     }

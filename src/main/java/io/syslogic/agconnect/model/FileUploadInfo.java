@@ -16,9 +16,14 @@ public class FileUploadInfo {
     @SerializedName("fileDestUrl")
     private String fileDestUrl;
 
-    public FileUploadInfo(String name, String url) {
-        this.fileName = name;
-        this.fileDestUrl = url;
+    /**
+     * Constructor
+     * @param fileName the local file-name
+     * @param destFileUrl the destination URL
+     */
+    public FileUploadInfo(String fileName, String destFileUrl) {
+        this.fileName = fileName;
+        this.fileDestUrl = destFileUrl;
     }
 
     @Override

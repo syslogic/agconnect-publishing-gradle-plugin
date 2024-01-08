@@ -18,9 +18,12 @@ public class AppConfigFile {
     @SerializedName("app_info")
     private AppConfigInfo appInfo;
 
+    /** @return the configVersion. */
     public String getConfigVersion() {
         return this.configVersion;
     }
+
+    /** @return the AppConfigInfo. */
     public AppConfigInfo getAppInfo() {
         return this.appInfo;
     }

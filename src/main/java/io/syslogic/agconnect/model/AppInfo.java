@@ -45,6 +45,8 @@ public class AppInfo {
 
     // for easier identification.
     private String packageName;
+
+    /** @param value the packageName. */
     public void setPackageName(String value) {
         this.packageName = value;
     }

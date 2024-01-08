@@ -19,6 +19,12 @@ public class UploadUrlRequest {
     @SerializedName("releaseType")
     private int releaseType; // 1, 8
 
+    /**
+     * Constructor
+     * @param appId the appId.
+     * @param suffix the file-name suffix.
+     * @param type the release type.
+     */
     public UploadUrlRequest(String appId, String suffix, int type) {
         this.appId = appId;
         this.suffix = suffix;

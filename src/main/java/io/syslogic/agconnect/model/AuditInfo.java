@@ -59,30 +59,37 @@ public class AuditInfo {
     @SerializedName("recordAuditOpinion")
     private String recordAuditOpinion;
 
+    /** @return audit opinion. */
     public String getAuditOpinion() {
         return this.auditOpinion;
     }
 
+    /** @return copyright audit result. */
     public Integer getCopyRightAuditResult() {
         return this.copyRightAuditResult;
     }
 
+    /** @return copyright audit opinion. */
     public String getCopyRightAuditOpinion() {
         return this.copyRightAuditOpinion;
     }
 
+    /** @return copyright code-audit result. */
     public Integer getCopyRightCodeAuditResult() {
         return this.copyRightCodeAuditResult;
     }
 
+    /** @return copyright code-audit opinion. */
     public String getCopyRightCodeAuditOpinion() {
         return this.copyRightCodeAuditOpinion;
     }
 
+    /** @return record audit result. */
     public Integer getRecordAuditResult() {
         return this.recordAuditResult;
     }
 
+    /** @return record audit opinion. */
     public String getRecordAuditOpinion() {
         return this.recordAuditOpinion;
     }

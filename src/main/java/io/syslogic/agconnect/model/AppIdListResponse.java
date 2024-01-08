@@ -18,10 +18,12 @@ public class AppIdListResponse {
     @SerializedName("appids")
     private List<AppInfoAppId> appIds;
 
+    /** @return the ResponseStatus. */
     public ResponseStatus getStatus() {
         return this.ret;
     }
 
+    /** @return list of appIds. */
     public List<AppInfoAppId> getAppIds() {
         return this.appIds;
     }

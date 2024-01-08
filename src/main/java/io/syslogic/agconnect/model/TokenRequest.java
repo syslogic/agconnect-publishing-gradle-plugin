@@ -19,6 +19,11 @@ public class TokenRequest {
     @SerializedName("client_secret")
     private String clientSecret;
 
+    /**
+     * Constructor
+     * @param clientId the client ID
+     * @param secret the client secret
+     */
     public TokenRequest(String clientId, String secret) {
         this.clientId = clientId;
         this.clientSecret = secret;

@@ -22,11 +22,17 @@ public class FileInfoUpdateRequest {
     @SerializedName("files")
     private FileUploadInfo fileInfo;
 
-    public String toJson() {
-        return new Gson().toJson(this);
-    }
-
+    /**
+     * Constructor
+     * @param fileName the local file-name
+     * @param destFileUrl the destination URL
+     */
     public FileInfoUpdateRequest(String fileName, String destFileUrl) {
         this.fileInfo = new FileUploadInfo(fileName, destFileUrl);
+    }
+
+    /** @return JSON string. */
+    public String toJson() {
+        return new Gson().toJson(this);
     }
 }

@@ -48,22 +48,27 @@ public class PhasedReleaseInfo {
     @SerializedName("phasedReleaseDescription")
     private String phasedReleaseDescription;
 
+    /** @return the state. */
     public String getState() {
         return this.state;
     }
 
+    /** @return phased release start-time. */
     public String getPhasedReleaseStartTime() {
         return this.phasedReleaseStartTime;
     }
 
+    /** @return phased release end-time. */
     public String getPhasedReleaseEndTime() {
         return this.phasedReleaseEndTime;
     }
 
+    /** @return phased release percent. */
     public String getPhasedReleasePercent() {
         return this.phasedReleasePercent;
     }
 
+    /** @return phased release description. */
     public String getPhasedReleaseDescription() {
         return this.phasedReleaseDescription;
     }

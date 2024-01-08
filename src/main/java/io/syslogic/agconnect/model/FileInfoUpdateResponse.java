@@ -16,10 +16,12 @@ public class FileInfoUpdateResponse {
     @SerializedName("pkgVersion")
     private String[] versions;
 
+    /** @return response status. */
     public ResponseStatus getStatus() {
         return this.status;
     }
 
+    /** @return an array of package versions. */
     public String[] getVersions() {
         return this.versions;
     }

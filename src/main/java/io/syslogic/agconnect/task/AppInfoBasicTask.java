@@ -36,6 +36,7 @@ abstract public class AppInfoBasicTask extends BaseTask {
         }
     }
 
+    /** It updates basic app information. */
     public void updateAppInfoBasic() {
 
         HttpPut request = new HttpPut();

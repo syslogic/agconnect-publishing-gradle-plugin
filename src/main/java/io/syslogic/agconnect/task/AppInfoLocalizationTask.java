@@ -35,6 +35,7 @@ abstract public class AppInfoLocalizationTask extends BaseTask {
         }
     }
 
+    /** It updates localized app information. */
     public void updateAppInfoLocalization() {
 
         HttpPut request = new HttpPut();

@@ -18,10 +18,12 @@ public class AppConfigInfo {
     @SerializedName("package_name")
     private String packageName;
 
+    /** @return the appId. */
     public Long getAppId() {
         return this.appId;
     }
 
+    /** @return the packageName. */
     public String getPackageName() {
         return this.packageName;
     }
