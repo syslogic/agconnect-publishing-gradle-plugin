@@ -287,8 +287,10 @@ abstract public class PublishingTask extends BaseTask {
     @NotNull
     String getUploadFileName() {
         String baseName = String.valueOf(getProject().getProperties().get("archivesBaseName"));
+        String flavor = getProductFlavor().get();
+        String buildType = getBuildType().get();
         String suffix = getArtifactType().get().toLowerCase(Locale.ROOT);
-        return baseName + "." + suffix;
+        return baseName + "-" + flavor + "-" + buildType + "." + suffix;
     }
 
     /**
