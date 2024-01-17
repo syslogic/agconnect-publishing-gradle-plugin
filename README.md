@@ -35,8 +35,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.1.1'
-        classpath 'com.huawei.agconnect:agcp:1.9.1.300'
-        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:1.2.9'
+        classpath 'com.huawei.agconnect:agcp:1.9.1.303'
+        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:1.3.1'
     }
 }
 ````
@@ -99,7 +99,7 @@ To be precise, it only uploads APK/ABB packages, but does not release them.
 > GET /api/publish/v2/package/compile/status?appId=000000000&pkgIds=00000000000000000 HTTP/1.1
 > HTTP/1.1 200 OK
 
-AAB file someapp_1.0.0.aab has been uploaded.
+AAB file someapp_1.0.0-huawei-release.aab has been uploaded.
 13.1 MB in 14s equals a transfer-rate of 957.0 kB/s.
 ````
 
