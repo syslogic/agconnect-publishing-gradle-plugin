@@ -18,7 +18,7 @@ plugins {
 }
 
 dependencies {
-    implementation 'com.android.tools.build:gradle-api:8.3.0'
+    implementation 'com.android.tools.build:gradle-api:8.3.1'
     implementation 'org.apache.httpcomponents:httpcore:4.4.16'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation 'org.apache.httpcomponents:httpmime:4.5.6'
