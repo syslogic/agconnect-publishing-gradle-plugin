@@ -15,4 +15,11 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenLocal()
     }
+    versionCatalogs {
+        libs {
+            from(files("libs.versions.toml"))
+        }
+    }
 }
+
+rootProject.name = "PublishingPlugin"

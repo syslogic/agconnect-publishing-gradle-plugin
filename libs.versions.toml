@@ -1,0 +1,26 @@
+[versions]
+plugin_version = '1.3.2'
+gradle_api     = '8.3.1'
+gradle_publish = '1.2.1'
+gson           = '2.10.1'
+junit          = '5.8.2'
+annotations    = '23.0.0'
+httpcore       = '4.4.16'
+httpclient     = '4.5.14'
+httpmime       = '4.5.6'
+
+[plugins]
+gradle_publish = { id = "com.gradle.plugin-publish", version.ref = "gradle_publish" }
+
+[libraries]
+gradle_api     = { module = "com.android.tools.build:gradle-api", version.ref = "gradle_api" }
+gson           = { module = "com.google.code.gson:gson", version.ref = "gson" }
+junit          = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+annotations    = { module = "org.jetbrains:annotations", version.ref = "annotations" }
+httpcore       = { module = "org.apache.httpcomponents:httpcore", version.ref = "httpcore" }
+httpclient     = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
+httpmime       = { module = "org.apache.httpcomponents:httpmime", version.ref = "httpmime" }
+
+[bundles]
+httpcomponents = ["httpcore", "httpclient", "httpmime"]
+
