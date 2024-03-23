@@ -23,4 +23,3 @@ httpmime       = { module = "org.apache.httpcomponents:httpmime", version.ref = 
 
 [bundles]
 httpcomponents = ["httpcore", "httpclient", "httpmime"]
-
