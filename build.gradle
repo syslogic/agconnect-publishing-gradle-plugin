@@ -18,13 +18,18 @@ plugins {
 }
 
 dependencies {
+    //noinspection DependencyNotationArgument
     implementation libs.gradle.api
+    //noinspection DependencyNotationArgument
     implementation libs.annotations
+    //noinspection DependencyNotationArgument
     implementation libs.bundles.httpcomponents
+    //noinspection DependencyNotationArgument
     implementation libs.gson
     compileOnly gradleApi()
 
     testImplementation libs.junit
+    //noinspection DependencyNotationArgument
     testImplementation libs.annotations
     testImplementation gradleTestKit()
     testImplementation(project)
