@@ -9,7 +9,6 @@ import java.util.Locale;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
 public class UploadFileItem {
 
     @SerializedName("fileDestUlr")

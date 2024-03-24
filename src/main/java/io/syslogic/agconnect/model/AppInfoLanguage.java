@@ -9,7 +9,6 @@ import java.util.List;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
 public class AppInfoLanguage {
 
     @SerializedName("lang")

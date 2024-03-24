@@ -4,12 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Abstract Model: ApiConfig
- *
  * This is file distribution/agc-apiclient.json.
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
 public class ApiConfigFile {
 
     @SerializedName("configuration_version")

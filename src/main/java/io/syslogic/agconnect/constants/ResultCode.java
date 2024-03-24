@@ -28,6 +28,9 @@ public class ResultCode {
     /** API result code. */
 
     public static final int FAILED_TO_UPLOAD_PACKAGE = 204144646;
+
+    public static final int FAILED_TO_UPDATE_PACKAGE = 204144647;
+
     /** API result code. */
     public static final int ADD_APK_HAS_FAILED       = 204144662;
 }

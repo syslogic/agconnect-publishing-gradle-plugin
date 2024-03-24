@@ -5,7 +5,6 @@ package io.syslogic.agconnect.model;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
 public class AppInfoDeviceMaterial {
 
     @Override

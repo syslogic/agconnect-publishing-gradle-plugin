@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Martin Zeitler
  */
-@SuppressWarnings("unused")
 public class UploadResponse {
 
     @SerializedName("resultCode")
