@@ -27,11 +27,11 @@ public class PublishingExtensionImpl implements PublishingExtension {
     /**
      * Release Type.
      * <code>agcPublishing { releaseType = 1 }</code>
-     * @param value 1=network, 5=phased.
+     * @param value 1=network, 3=phased.
      */
     @SuppressWarnings("unused")
     public void setReleaseType(@NotNull Integer value) {
-        if (value == 1 || value == 5) {
+        if (value == 1 || value == 3) {
             this.releaseType = value;
         }
     }
@@ -65,9 +65,9 @@ public class PublishingExtensionImpl implements PublishingExtension {
     }
 
     /**
-     * Release Type
+     * Release-Type
      * <code>agcPublishing { releaseType = 1 }</code>
-     * @return value 1=network, 5=phased.
+     * @return value 1=network, 3=phased.
      */
     @Override
     public Integer getReleaseType() {

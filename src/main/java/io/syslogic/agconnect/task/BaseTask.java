@@ -34,6 +34,7 @@ import java.util.Locale;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
+import io.syslogic.agconnect.model.AppConfigInfo;
 import io.syslogic.agconnect.model.TokenRequest;
 import io.syslogic.agconnect.model.TokenResponse;
 
@@ -74,17 +75,17 @@ abstract public class BaseTask extends DefaultTask {
     String ua;
     HttpClient client;
 
-    Long appId = 0L;
-    String packageName = null;
-
     String clientId = null;
     String clientSecret = null;
     String accessToken = null;
 
+    String packageName = null;
+    Long appId = 0L;
+
     /** It sets up HttpClient and parses two JSON config files. */
     boolean configure(@NotNull Project project, String appConfig, String apiConfig, Boolean logHttp, Boolean verbose, Integer releaseType) {
 
-        if (releaseType != null && releaseType == 5) {
+        if (releaseType != null && releaseType == 3) {
             this.releaseType = releaseType;
         }
 
@@ -114,23 +115,21 @@ abstract public class BaseTask extends DefaultTask {
 
         file = new File(appConfig);
         if (file.exists() && file.canRead()) {
+
             if (verbose) {this.stdOut("App Config: " + appConfig);}
             AppConfigFile config = new Gson().fromJson(readFile(file), AppConfigFile.class);
-            this.appId = config.getAppInfo().getAppId();
-            this.packageName = config.getAppInfo().getPackageName();
-        } else {
-            this.stdErr("AppId not found:");
-            this.stdErr(file.getAbsolutePath());
-            return false;
-        }
 
-        /* Log Configuration */
-        if (verbose) {
-            this.stdOut("     AppId: " + this.appId);
-            this.stdOut("   Release: " + (this.releaseType == 1 ? "network":"phased"));
-            if (this.clientId != null && this.clientSecret != null) {
-                this.stdOut("  ClientId: " + this.clientId);
-                this.stdOut("    Secret: " + this.clientSecret);
+            // TODO: the detection could be improved.
+            AppConfigInfo item = null;
+            if (getBuildType().get().equals("release")) {
+                item = config.getAppInfos().get(0);
+            } else if (getBuildType().get().equals("debug")) {
+                item = config.getAppInfos().get(1);
+            }
+
+            if (item != null) {
+                this.appId       = item.getAppId();
+                this.packageName = item.getPackageName();
             }
         }
         return true;

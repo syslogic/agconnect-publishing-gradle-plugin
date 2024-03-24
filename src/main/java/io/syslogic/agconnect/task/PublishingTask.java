@@ -35,6 +35,7 @@ import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
 import io.syslogic.agconnect.constants.EndpointUrl;
+import io.syslogic.agconnect.constants.ErrorMessage;
 import io.syslogic.agconnect.constants.ResultCode;
 import io.syslogic.agconnect.model.CompilePackageState;
 import io.syslogic.agconnect.model.CompileStateResponse;
@@ -213,6 +214,15 @@ abstract public class PublishingTask extends BaseTask {
             request.setEntity(entity);
 
             HttpResponse response = this.client.execute(request);
+            logResponse(fileName, response);
+
+        } catch (IOException | URISyntaxException e) {
+            this.stdErr(e.getMessage());
+        }
+    }
+
+    private void logResponse(@NotNull String fileName, @NotNull HttpResponse response) {
+        try {
             HttpEntity httpEntity = response.getEntity();
             String result = EntityUtils.toString(httpEntity);
 
@@ -229,21 +239,21 @@ abstract public class PublishingTask extends BaseTask {
                         String packageIds = String.join(",", Arrays.asList(data.getVersions()));
                         this.getCompileStatus(packageIds);
                     }
-                } else if (
-                        code == ResultCode.ADD_APK_HAS_FAILED &&
-                        message.equals("[cds]add apk failed, additional msg is [app bundle must do app signature.]")
-                ) {
-                    /* Display an error message along with the URL to the relevant console page. */
+                } else if (code == ResultCode.ADD_APK_HAS_FAILED && message.equals(ErrorMessage.APP_SIGNING_NOT_ENABLED)) {
                     this.stdErr("Please enable App Signing in order to publish App Bundle format (" + fileName + ").");
-                    this.stdOut("In case the following URL does not lead to the expected package, validate agconnect-services.json.");
+                    this.stdErr("In case the following URL does not lead to the expected package, validate agconnect-services.json.");
                     this.stdOut(EndpointUrl.AG_CONNECT_CERTIFICATES.replace("{appId}", String.valueOf(this.appId)));
+                } else if (code == ResultCode.FAILED_TO_UPDATE_PACKAGE && message.equals(ErrorMessage.ONGOING_INTEGRATION_CHECK)) {
+                    this.stdErr("The package may be under review or may already have been released (" + fileName + ").");
+                    this.stdErr("If not released, please cancel the ongoing review if you still wish to update.");
+                    this.stdOut(EndpointUrl.AG_CONNECT_INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
                 } else {
                     this.stdErr("\nCode " + code + ": " + message);
                 }
             } else {
                 this.stdErr(response.getStatusLine().toString());
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             this.stdErr(e.getMessage());
         }
     }

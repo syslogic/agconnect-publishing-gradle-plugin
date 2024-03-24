@@ -15,9 +15,9 @@ public interface PublishingExtension {
     String getConfigFile();
 
     /**
-     * Release Type
+     * Release-Type
      * <code>agcPublishing { releaseType = 1 }</code>
-     * @return value 1=network, 5=phased.
+     * @return value 1=network, 3=phased.
      */
     Integer getReleaseType();
 
@@ -44,7 +44,7 @@ public interface PublishingExtension {
     /**
      * Set the Release Type.
      * <code>agcPublishing { releaseType = 1 }</code>
-     * @param value 1=network, 5=phased.
+     * @param value 1=network, 3=phased.
      */
      void setReleaseType(Integer value);
 

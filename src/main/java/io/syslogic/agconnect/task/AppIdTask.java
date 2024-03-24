@@ -34,7 +34,6 @@ abstract public class AppIdTask extends BaseTask {
     }
 
     /** */
-    @SuppressWarnings("UnusedReturnValue")
     public void getAppIdList() {
 
         HttpGet request = new HttpGet();
