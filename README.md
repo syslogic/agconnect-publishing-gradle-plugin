@@ -60,6 +60,14 @@ plugins {
 }
 ````
 
+````groovy
+plugins {
+    id 'com.android.application'
+    id 'com.huawei.agconnect'
+    alias(libs.plugins.agconnect.publishing)
+}
+````
+
 ### Configuration
 
 `PublicationExtension` can be configured with the following properties:
