@@ -114,6 +114,8 @@ AAB file someapp_1.0.0-huawei-release.aab has been uploaded.
 13.1 MB in 14s equals a transfer-rate of 957.0 kB/s.
 ````
 
+Note: After this, some app-information still needs to be manually completed.
+
 The log output for task `:mobile:submitReleaseAab` explains what it does.<br/>
 To be precise, it submits an <u>already uploaded</u> APK/ABB package for review.
 
