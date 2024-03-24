@@ -14,13 +14,13 @@ buildscript {
 plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'maven-publish'
-    alias libs.plugins.gradle.publish
+    alias(libs.plugins.gradle.publish)
 }
 
 dependencies {
     implementation libs.gradle.api
-    implementation libs.bundles.httpcomponents
     implementation libs.annotations
+    implementation libs.bundles.httpcomponents
     implementation libs.gson
     compileOnly gradleApi()
 
