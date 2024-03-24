@@ -41,7 +41,7 @@ buildscript {
 }
 ````
 
-Or as version-catalog `gradle/libs.versions.toml`:
+Or in the version-catalog `gradle/libs.versions.toml`:
 ````toml
 [versions]
 agconnect_publishing_plugin = '1.3.2'
@@ -50,20 +50,13 @@ agconnect_publishing_plugin = '1.3.2'
 agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = "agconnect_publishing_plugin" }
 ````
 
-
 Then they can be applied in the module's `build.gradle`:
 ````groovy
 plugins {
     id 'com.android.application'
     id 'com.huawei.agconnect'
-    id 'io.syslogic.agconnect.publishing'
-}
-````
-
-````groovy
-plugins {
-    id 'com.android.application'
-    id 'com.huawei.agconnect'
+    
+    // id 'io.syslogic.agconnect.publishing'
     alias(libs.plugins.agconnect.publishing)
 }
 ````
