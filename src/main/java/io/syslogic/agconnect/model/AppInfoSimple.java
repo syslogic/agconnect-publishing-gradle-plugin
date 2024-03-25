@@ -15,9 +15,12 @@ public class AppInfoSimple {
     @SerializedName("package_name")
     private String packageName;
 
+    /** @return the App ID. */
     public Long getAppId() {
         return this.appId;
     }
+
+    /** @return the Package-Name. */
     public String getPackageName() {
         return this.packageName;
     }

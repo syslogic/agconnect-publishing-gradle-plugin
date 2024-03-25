@@ -43,5 +43,8 @@ public class EndpointUrl {
     public static final String AG_CONNECT_INTEGRATION  = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myProject/99536292102543196/97458334310914194?appId={appId}";
 
     /** Link to AppGallery Connect Console */
+    public static final String AG_CONNECT_MAPPING_FILES  ="https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myProject/99536292102543196/9249519184596033624?appId={appId}";
+
+    /** Link to AppGallery Connect Console */
     public static final String AG_CONNECT_API_CLIENT   = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/ups/9249519184595983326";
 }
