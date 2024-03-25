@@ -22,8 +22,8 @@ import io.syslogic.agconnect.task.AppInfoLocalizationTask;
 import io.syslogic.agconnect.task.AppInfoBasicTask;
 import io.syslogic.agconnect.task.AppInfoTask;
 import io.syslogic.agconnect.task.HelpTask;
-import io.syslogic.agconnect.task.PublishingTask;
-import io.syslogic.agconnect.task.SubmitReleaseTask;
+import io.syslogic.agconnect.task.UploadPackageTask;
+import io.syslogic.agconnect.task.PublishReleaseTask;
 import io.syslogic.agconnect.util.StringUtils;
 
 /**
@@ -107,21 +107,21 @@ class PublishingPlugin implements Plugin<Project> {
                                 }
                             }
 
-                            /* Register Task: Publish. */
-                            /* Task :publishDebugAab always fails, because the AAB is not signed with the upload key. */
-                            taskName = "publish" + StringUtils.capitalize(artifactType);
+                            /* Register Task: Upload Package */
+                            /* Task :uploadDebugAab always fails, because the AAB is not signed with the upload key. */
+                            taskName = "upload" + StringUtils.capitalize(artifactType);
                             if (!artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
                                 if (verbose) {System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
-                                registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, null, null, releaseType);
+                                registerUploadPackageTask(project, taskName, appConfigFile, artifactType, buildType, null, null, releaseType);
                             } else if(verbose) {
                                 System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName + " skipped");
                             }
 
-                            /* Register Task: Submit Release */
-                            taskName = "submit" + StringUtils.capitalize(artifactType);
+                            /* Register Task: Publish Release */
+                            taskName = "publish" + StringUtils.capitalize(artifactType);
                             if (! buildType.equals("debug")) {
                                 if (verbose) {System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName);}
-                                registerSubmitReleaseTask(project, taskName, appConfigFile, artifactType, buildType, null, null, releaseType);
+                                registerPublishReleaseTask(project, taskName, appConfigFile, artifactType, buildType, null, null, releaseType);
                             } else if(verbose) {
                                 System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " :" + taskName + " skipped");
                             }
@@ -135,7 +135,7 @@ class PublishingPlugin implements Plugin<Project> {
                             registerAppIdTask(project, taskName, appConfigFile, buildType, releaseType);
 
                         } else if (verbose) {
-                            System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " · agc-apiclient.json not found");
+                            System.out.println("> " + buildType + " " + artifactType.toUpperCase(Locale.ROOT) + " · agconnect_apiclient.json not found");
                         }
                     }
                 }
@@ -180,22 +180,21 @@ class PublishingPlugin implements Plugin<Project> {
                                         }
                                     }
 
-                                    /* Task :publishDebugAab will fail, because the AAB is signed with the upload key. */
-                                    taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
+                                    /* Register Task: Upload Package */
+                                    taskName = "upload" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
+                                    /* Task :uploadDebugAab will fail, because the AAB is signed with the upload key. */
                                     if (! artifactType.equals(ArtifactType.AAB) || !buildType.equals("debug")) {
-                                        /* Register Tasks: Publish. */
                                         if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · :" + taskName);}
-                                        registerPublishingTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
+                                        registerUploadPackageTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
                                     } else if (verbose) {
                                         System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · :" + taskName + " skipped");
                                     }
 
-                                    /* Register Task: Submit Release */
-                                    taskName = "submit" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
+                                    /* Register Task: Publish Release */
+                                    taskName = "publish" + StringUtils.capitalize(buildVariant) + StringUtils.capitalize(artifactType);
                                     if (! buildType.equals("debug")) {
-                                        /* Register Tasks: Submit Release. */
                                         if (verbose) {System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · :" + taskName);}
-                                        registerSubmitReleaseTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
+                                        registerPublishReleaseTask(project, taskName, appConfigFile, artifactType, buildType, buildVariant, productFlavor, releaseType);
                                     } else if (verbose) {
                                         System.out.println("> " + buildVariant + " " + artifactType.toUpperCase(Locale.ROOT) + " · :" + taskName + " skipped");
                                     }
@@ -227,6 +226,7 @@ class PublishingPlugin implements Plugin<Project> {
         });
     }
 
+    /** Register {@link HelpTask}. */
     @SuppressWarnings("SameParameterValue")
     void registerHelpTask(@NotNull Project project, @NotNull String taskName) {
         if (project.getTasks().findByName(taskName) == null) {
@@ -234,6 +234,7 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
+    /** Register {@link AppIdTask}. */
     void registerAppIdTask(
             @NotNull Project project, @NotNull String taskName,
             @NotNull String appConfigFile, @NotNull String buildType,
@@ -253,6 +254,7 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
+    /** Register {@link AppInfoTask}. */
     void registerAppInfoTask(
             @NotNull Project project, @NotNull String taskName,
             @NotNull String appConfigFile, @NotNull String buildType,
@@ -272,6 +274,7 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
+    /** Register {@link AppInfoBasicTask}. */
     void registerAppInfoBasicTask(
             @NotNull Project project, @NotNull String taskName,
             @NotNull String appConfigFile, @NotNull String buildType,
@@ -290,6 +293,7 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
+    /** Register {@link AppInfoLocalizationTask}. */
     void registerAppInfoLocalizationTask(
             @NotNull Project project, @NotNull String taskName,
             @NotNull String appConfigFile, @NotNull String buildType,
@@ -308,7 +312,8 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
-    void registerPublishingTask(
+    /** Register {@link UploadPackageTask}. */
+    void registerUploadPackageTask(
             @NotNull Project project, @NotNull String taskName, @NotNull String appConfigFile,
             @NotNull String artifactType, @NotNull String buildType,
             @Nullable String buildVariant, @Nullable String productFlavor,
@@ -316,7 +321,7 @@ class PublishingPlugin implements Plugin<Project> {
     ) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
-            project.getTasks().register(taskName, PublishingTask.class, task -> {
+            project.getTasks().register(taskName, UploadPackageTask.class, task -> {
                 task.setGroup(taskGroup);
                 task.getReleaseType().set(releaseType);
                 task.getApiConfigFile().set(apiConfigFile);
@@ -335,7 +340,8 @@ class PublishingPlugin implements Plugin<Project> {
         }
     }
 
-    void registerSubmitReleaseTask(
+    /** Register {@link PublishReleaseTask}. */
+    void registerPublishReleaseTask(
             @NotNull Project project, @NotNull String taskName, @NotNull String appConfigFile,
             @NotNull String artifactType, @NotNull String buildType,
             @Nullable String buildVariant, @Nullable String productFlavor,
@@ -343,7 +349,7 @@ class PublishingPlugin implements Plugin<Project> {
     ) {
         if (project.getTasks().findByName(taskName) == null) {
             String apiConfigFile = configFile;
-            project.getTasks().register(taskName, SubmitReleaseTask.class, task -> {
+            project.getTasks().register(taskName, PublishReleaseTask.class, task -> {
                 task.setGroup(taskGroup);
                 task.getReleaseType().set(releaseType);
                 task.getApiConfigFile().set(apiConfigFile);
@@ -374,6 +380,7 @@ class PublishingPlugin implements Plugin<Project> {
         return buildTypes.toArray(new String[0]);
     }
 
+    /** Apply the {@link ApkSigningConfig} from build-type "release" to "debug". */
     private void setDebugSigningConfig(@NotNull Project project) {
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
         NamedDomainObjectContainer<? extends ApplicationBuildType> buildTypes = android.getBuildTypes();

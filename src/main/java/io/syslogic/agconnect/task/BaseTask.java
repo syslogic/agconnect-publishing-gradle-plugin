@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
+import io.syslogic.agconnect.constants.ConsoleUrl;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
@@ -103,13 +104,13 @@ abstract public class BaseTask extends DefaultTask {
                 this.clientId = config.getClientId();
             } else {
                 this.stdErr("API client credentials must have role \"App administrator\"; provided: \"Administrator\"");
-                this.stdOut(EndpointUrl.AG_CONNECT_API_CLIENT);
+                this.stdOut(ConsoleUrl.API_CLIENT_CREDENTIALS);
                 return false;
             }
         } else {
             this.stdErr("API client credentials not found:");
             this.stdOut(file.getAbsolutePath());
-            this.stdOut(EndpointUrl.AG_CONNECT_API_CLIENT);
+            this.stdOut(ConsoleUrl.API_CLIENT_CREDENTIALS);
             return false;
         }
 

@@ -11,6 +11,7 @@ import org.apache.http.util.EntityUtils;
 
 import org.gradle.api.tasks.TaskAction;
 
+import io.syslogic.agconnect.constants.ConsoleUrl;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.AppInfoResponse;
 
@@ -70,7 +71,7 @@ abstract public class AppInfoTask extends BaseTask {
 
                 /* Logging the URL to the "App information" page. */
                 if (getVerbose().get()) {
-                    this.stdOut(EndpointUrl.AG_CONNECT_APP_INFO.replace("{appId}", String.valueOf(this.appId)));
+                    this.stdOut(ConsoleUrl.APP_INFO.replace("{appId}", String.valueOf(this.appId)));
                 }
             } else {
                 this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());

@@ -25,10 +25,11 @@ public class ResultCode {
 
     /** API result code. */
     public static final int OBTAIN_UPLOAD_AUTH_CODE  = 204144645;
-    /** API result code. */
 
+    /** API result code. */
     public static final int FAILED_TO_UPLOAD_PACKAGE = 204144646;
 
+    /** API result code (apparently undocumented). */
     public static final int FAILED_TO_UPDATE_PACKAGE = 204144647;
 
     /** API result code. */

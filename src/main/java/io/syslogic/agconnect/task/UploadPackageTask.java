@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.syslogic.agconnect.constants.ArtifactType;
+import io.syslogic.agconnect.constants.ConsoleUrl;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.constants.ErrorMessage;
 import io.syslogic.agconnect.constants.ResultCode;
@@ -51,7 +52,7 @@ import io.syslogic.agconnect.model.UploadUrlResponse;
  *
  * @author Martin Zeitler
  */
-abstract public class PublishingTask extends BaseTask {
+abstract public class UploadPackageTask extends BaseTask {
 
     /** @return ReleaseType */
     @Input
@@ -242,11 +243,11 @@ abstract public class PublishingTask extends BaseTask {
                 } else if (code == ResultCode.ADD_APK_HAS_FAILED && message.equals(ErrorMessage.APP_SIGNING_NOT_ENABLED)) {
                     this.stdErr("Please enable App Signing in order to publish App Bundle format (" + fileName + ").");
                     this.stdErr("In case the following URL does not lead to the expected package, validate agconnect-services.json.");
-                    this.stdOut(EndpointUrl.AG_CONNECT_CERTIFICATES.replace("{appId}", String.valueOf(this.appId)));
+                    this.stdOut(ConsoleUrl.CERTIFICATES.replace("{appId}", String.valueOf(this.appId)));
                 } else if (code == ResultCode.FAILED_TO_UPDATE_PACKAGE && message.equals(ErrorMessage.ONGOING_INTEGRATION_CHECK)) {
                     this.stdErr("The package may be under review or may already have been released (" + fileName + ").");
-                    this.stdErr("If not released, please cancel the ongoing review if you still wish to update.");
-                    this.stdOut(EndpointUrl.AG_CONNECT_INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
+                    this.stdErr("If not released, please cancel the pending review if you wish to perform an update.");
+                    this.stdOut(ConsoleUrl.INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
                 } else {
                     this.stdErr("\nCode " + code + ": " + message);
                 }
@@ -279,7 +280,7 @@ abstract public class PublishingTask extends BaseTask {
                 CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
                 for (CompilePackageState item : data.getPackageState()) {
                     if (item.getStatus() == 1) {
-                        this.stdOut("   Package: " + EndpointUrl.AG_CONNECT_PACKAGE_INFO
+                        this.stdOut("   Package: " + ConsoleUrl.PACKAGE_INFO
                                 .replace("{appId}", String.valueOf(this.appId))
                                 .replace("{packageId}", item.getPackageId()));
                     }

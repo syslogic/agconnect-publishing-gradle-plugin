@@ -37,7 +37,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.3.1'
         classpath 'com.huawei.agconnect:agcp:1.9.1.303'
-        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:1.3.3'
+        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:1.3.4'
     }
 }
 ````
@@ -45,7 +45,7 @@ buildscript {
 Or in the version-catalog `gradle/libs.versions.toml`:
 ````toml
 [versions]
-agconnect_publishing_plugin = '1.3.3'
+agconnect_publishing_plugin = '1.3.4'
 
 [plugins]
 agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = "agconnect_publishing_plugin" }
@@ -93,12 +93,12 @@ These properties are all optional, while:
 
 ### Example Log Output
 
-The log output for task `:mobile:publishReleaseAab` explains what it does.<br/>
+The log output for task `:mobile:uploadReleaseAab` explains what it does.<br/>
 To be precise, it only uploads APK/ABB packages, but does not release them.
 
 ````
 > Task :mobile:bundleRelease
-> Task :mobile:publishReleaseAab
+> Task :mobile:uploadReleaseAab
 > POST /api/oauth2/v1/token HTTP/1.1
 > HTTP/1.1 200 OK
 > GET /api/publish/v2/upload-url?appId=000000000&releaseType=1&suffix=aab HTTP/1.1
@@ -116,11 +116,11 @@ AAB file someapp_1.0.0-huawei-release.aab has been uploaded.
 
 Note: After this, some app-information still needs to be manually completed.
 
-The log output for task `:mobile:submitReleaseAab` explains what it does.<br/>
+The log output for task `:mobile:publishReleaseAab` explains what it does.<br/>
 To be precise, it submits an <u>already uploaded</u> APK/ABB package for review.
 
 ````
-> Task :mobile:submitReleaseAab
+> Task :mobile:publishReleaseAab
 > POST /api/oauth2/v1/token HTTP/1.1
 > HTTP/1.1 200 OK
 > POST /api/publish/v2/app-submit?appId=000000000&releaseType=1 HTTP/1.1

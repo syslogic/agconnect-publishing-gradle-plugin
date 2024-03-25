@@ -10,6 +10,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 import org.gradle.api.tasks.TaskAction;
 
+import io.syslogic.agconnect.constants.ConsoleUrl;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.constants.ResultCode;
 import io.syslogic.agconnect.model.AppSubmitResponse;
@@ -20,7 +21,7 @@ import io.syslogic.agconnect.model.ResponseStatus;
  *
  * @author Martin Zeitler
  */
-abstract public class SubmitReleaseTask extends BaseTask {
+abstract public class PublishReleaseTask extends BaseTask {
 
     /** The default {@link TaskAction}. */
     @TaskAction
@@ -57,7 +58,7 @@ abstract public class SubmitReleaseTask extends BaseTask {
                 ResponseStatus status = response1.getRet();
                 if (status.getCode() == ResultCode.SUCCESS) {
                     this.stdOut("Submitted for release: " + this.packageName + " (" + this.appId + ").");
-                    this.stdOut(EndpointUrl.AG_CONNECT_INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
+                    this.stdOut(ConsoleUrl.INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
                 } else if (status.getCode() == ResultCode.INVALID_INPUT_PARAMETER) {
                     this.stdErr("Submitted for release: " + this.packageName + " (" + this.appId + ").");
                     this.stdErr("Error " + status.getCode() + ": " + status.getMessage());

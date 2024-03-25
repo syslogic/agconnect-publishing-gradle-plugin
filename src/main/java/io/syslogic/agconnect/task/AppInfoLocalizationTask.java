@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.nio.charset.StandardCharsets;
 
+import io.syslogic.agconnect.constants.ConsoleUrl;
 import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.AppInfoLocalization;
 
@@ -58,7 +59,7 @@ abstract public class AppInfoLocalizationTask extends BaseTask {
             if (statusCode == HttpStatus.SC_OK) {
                 // AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
                 if (getVerbose().get()) { /* Logging the URL to the "App information" page. */
-                    this.stdOut(EndpointUrl.AG_CONNECT_APP_INFO.replace("{appId}", String.valueOf(this.appId)));
+                    this.stdOut(ConsoleUrl.APP_INFO.replace("{appId}", String.valueOf(this.appId)));
                 } else {
                     this.stdOut("> AppInfo localization updated");
                     this.stdOut("> " + result);
