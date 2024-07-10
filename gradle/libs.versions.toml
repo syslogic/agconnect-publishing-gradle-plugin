@@ -5,7 +5,7 @@ gradle_publish         = '1.2.1'
 annotations            = '23.0.0'
 httpcore               = '4.4.16'
 httpclient             = '4.5.14'
-httpmime               = '4.5.6'
+httpmime               = '4.5.14'
 junit                  = '5.8.2'
 gson                   = '2.10.1'
 
