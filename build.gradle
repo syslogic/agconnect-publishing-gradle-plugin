@@ -23,7 +23,7 @@ dependencies {
     //noinspection DependencyNotationArgument
     implementation libs.annotations
     //noinspection DependencyNotationArgument
-    implementation libs.bundles.httpcomponents
+    implementation libs.bundles.http.components
     //noinspection DependencyNotationArgument
     implementation libs.gson
     compileOnly gradleApi()
