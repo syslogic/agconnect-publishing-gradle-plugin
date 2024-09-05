@@ -3,7 +3,7 @@ buildscript {
     ext {
         github_handle = 'syslogic'
         plugin_display_name = 'AppGallery Connect Publishing Plugin'
-        plugin_description = 'It uploads Android APK/ABB artifacts to the AppGallery Connect Publishing API.'
+        plugin_description = 'It uploads Android APK/ABB artifacts with AppGallery Connect Publishing API.'
         plugin_identifier = 'agconnect-publishing-gradle-plugin'
         plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
         plugin_id = 'io.syslogic.agconnect.publishing'
@@ -12,8 +12,8 @@ buildscript {
 }
 
 plugins {
-    id 'org.gradle.java-gradle-plugin'
-    id 'maven-publish'
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.gradle.plugin)
     alias(libs.plugins.gradle.publish)
 }
 
@@ -34,7 +34,6 @@ dependencies {
     testImplementation gradleTestKit()
     testImplementation(project)
 }
-
 gradlePlugin {
     plugins {
         PublishingPlugin {
@@ -45,6 +44,7 @@ gradlePlugin {
         }
     }
 }
+
 
 tasks.withType(Jar).configureEach {
     archiveBaseName.set(plugin_identifier)
