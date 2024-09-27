@@ -18,15 +18,13 @@ plugins {
 }
 
 dependencies {
+    compileOnly gradleApi()
     //noinspection DependencyNotationArgument
-    implementation libs.gradle.api
+    implementation libs.android.gradle
     //noinspection DependencyNotationArgument
     implementation libs.annotations
     //noinspection DependencyNotationArgument
     implementation libs.bundles.http.components
-    //noinspection DependencyNotationArgument
-    implementation libs.gson
-    compileOnly gradleApi()
 
     testImplementation libs.junit
     //noinspection DependencyNotationArgument
@@ -34,6 +32,7 @@ dependencies {
     testImplementation gradleTestKit()
     testImplementation(project)
 }
+
 gradlePlugin {
     plugins {
         PublishingPlugin {
@@ -45,7 +44,6 @@ gradlePlugin {
     }
 }
 
-
 tasks.withType(Jar).configureEach {
     archiveBaseName.set(plugin_identifier)
     archiveVersion.set("${plugin_version}")
@@ -55,8 +53,7 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-//noinspection ConfigurationAvoidance
-task javadocs(type: Javadoc) {
+tasks.register('javadocs', Javadoc) {
     title = "${plugin_display_name} ${plugin_version} API"
     source = java.sourceSets.main.java.srcDirs
     destinationDir = project.file('/build/outputs/javadoc')
@@ -68,15 +65,14 @@ task javadocs(type: Javadoc) {
     failOnError false
 }
 
-//noinspection ConfigurationAvoidance
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
     dependsOn javadoc
     archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
-//noinspection ConfigurationAvoidance
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     from java.sourceSets.main.java.srcDirs
     archiveClassifier.set('sources')
 }
