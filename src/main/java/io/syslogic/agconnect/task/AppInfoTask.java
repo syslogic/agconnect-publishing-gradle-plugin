@@ -17,7 +17,6 @@ import io.syslogic.agconnect.model.AppInfoResponse;
 
 /**
  * Abstract AppInfo {@link BaseTask}
- *
  * @author Martin Zeitler
  */
 abstract public class AppInfoTask extends BaseTask {

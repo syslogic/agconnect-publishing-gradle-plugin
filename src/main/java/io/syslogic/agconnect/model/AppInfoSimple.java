@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AppInfo Simple
- *
+ * Data Model: AppInfo Simple
  * @author Martin Zeitler
  */
 public class AppInfoSimple {

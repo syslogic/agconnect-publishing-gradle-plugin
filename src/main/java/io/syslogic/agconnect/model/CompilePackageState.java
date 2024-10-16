@@ -3,7 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: CompilePackageState
+ * Data Model: CompilePackageState
  * Note: `aabCompileStatus` and `failReason` will be deprecated.
  * @author Martin Zeitler
  */
@@ -26,7 +26,6 @@ public class CompilePackageState {
 
     /**
      * App package status
-     *
      * 0: normal
      * 1: being parsed or failed (indicating that the app package is unavailable)
      * @return either 0 or 1.

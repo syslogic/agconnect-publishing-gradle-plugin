@@ -3,9 +3,8 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: ApiConfig
+ * Data Model: ApiConfig
  * This is file distribution/agc-apiclient.json.
- *
  * @author Martin Zeitler
  */
 public class ApiConfigFile {

@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AppInfoResponse
- *
+ * Data Model: AppInfoResponse
  * @author Martin Zeitler
  */
 public class AppInfoResponse {
@@ -16,6 +15,7 @@ public class AppInfoResponse {
     private AppInfo appInfo;
 
     /** @return response status. */
+    @SuppressWarnings({"unused"})
     public ResponseStatus getRet() {
         return this.ret;
     }

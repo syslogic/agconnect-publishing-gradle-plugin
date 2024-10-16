@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: TokenRequest
- *
+ * Data Model: TokenRequest
  * @author Martin Zeitler
  */
 @SuppressWarnings({"FieldMayBeFinal"})
@@ -14,9 +13,11 @@ public class TokenRequest {
     private String grantType = "client_credentials";
 
     @SerializedName("client_id")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String clientId;
-
+    
     @SerializedName("client_secret")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String clientSecret;
 
     /**

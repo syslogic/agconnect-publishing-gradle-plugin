@@ -48,8 +48,7 @@ import io.syslogic.agconnect.model.UploadResponseWrap;
 import io.syslogic.agconnect.model.UploadUrlResponse;
 
 /**
- * Abstract Publishing {@link BaseTask}
- *
+ * Abstract Upload Package {@link BaseTask}
  * @author Martin Zeitler
  */
 abstract public class UploadPackageTask extends BaseTask {
@@ -90,7 +89,6 @@ abstract public class UploadPackageTask extends BaseTask {
 
     /**
      * Obtaining the upload URL.
-     *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-url-0000001158365047">Obtaining the File Upload URL</a>.
      */
     private void getUploadUrl(String archiveSuffix) {
@@ -115,10 +113,10 @@ abstract public class UploadPackageTask extends BaseTask {
                 this.uploadUrl = result.getUploadUrl();
                 this.chunkUrl = result.getChunkUploadUrl();
                 if (getVerbose().get()) {
-                    this.stdOut("  Endpoint: " + this.uploadUrl);
+                    this.stdOut("> Endpoint: " + this.uploadUrl);
                 }
             } else {
-                this.stdOut("HTTP " + statusCode + " " +
+                this.stdOut("> HTTP " + statusCode + " " +
                         response.getStatusLine().getReasonPhrase());
             }
         } catch (URISyntaxException | IOException e) {
@@ -128,7 +126,6 @@ abstract public class UploadPackageTask extends BaseTask {
 
     /**
      * Uploading the File.
-     *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-upload-file-0000001158245059">Uploading a File</a>.
      */
     private void uploadFile(String archivePath) {
@@ -176,8 +173,8 @@ abstract public class UploadPackageTask extends BaseTask {
 
                             /* Log transfer stats before the task completes. */
                             long duration = System.currentTimeMillis() - timestamp;
-                            this.stdOut("\n" + getArtifactType().get().toUpperCase(Locale.ROOT) + " file " + getUploadFileName() + " has been uploaded.");
-                            this.stdOut(sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration) + ".");
+                            this.stdOut("> " + getArtifactType().get().toUpperCase(Locale.ROOT) + " file " + getUploadFileName() + " has been uploaded.");
+                            this.stdOut("> " + sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration) + ".");
                         }
                     } else {
                         ResponseStatus e = wrap.getResult().getStatus();
@@ -195,7 +192,6 @@ abstract public class UploadPackageTask extends BaseTask {
 
     /**
      * Updating App File Information.
-     *
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-file-info-0000001111685202">Updating App File Information</a>.
      */
     private void updateFileInfo(String fileName, String destFileUrl) {
@@ -218,7 +214,7 @@ abstract public class UploadPackageTask extends BaseTask {
             logResponse(fileName, response);
 
         } catch (IOException | URISyntaxException e) {
-            this.stdErr(e.getMessage());
+            this.stdErr("> " +  e.getMessage());
         }
     }
 
@@ -252,7 +248,7 @@ abstract public class UploadPackageTask extends BaseTask {
                     this.stdErr("\nCode " + code + ": " + message);
                 }
             } else {
-                this.stdErr(response.getStatusLine().toString());
+                this.stdErr("\n" + response.getStatusLine().toString());
             }
         } catch (IOException e) {
             this.stdErr(e.getMessage());
@@ -280,13 +276,13 @@ abstract public class UploadPackageTask extends BaseTask {
                 CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
                 for (CompilePackageState item : data.getPackageState()) {
                     if (item.getStatus() == 1) {
-                        this.stdOut("   Package: " + ConsoleUrl.PACKAGE_INFO
+                        this.stdOut("> Package: " + ConsoleUrl.PACKAGE_INFO
                                 .replace("{appId}", String.valueOf(this.appId))
                                 .replace("{packageId}", item.getPackageId()));
                     }
                 }
             } else {
-                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
+                this.stdErr("> HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
         } catch(Exception e) {
             this.stdErr(e.getMessage());
@@ -307,7 +303,6 @@ abstract public class UploadPackageTask extends BaseTask {
     /**
      * Obtain the artifact path from project property `archivesBaseName`.
      * Project property `archivesBaseName` defaults to `project.name`.
-     *
      * @return the absolute path to the artifact to upload.
      */
     @Nullable
@@ -351,7 +346,7 @@ abstract public class UploadPackageTask extends BaseTask {
         if (file.exists() && file.canRead()) {
             return true;
         } else {
-            this.stdErr("Not found: " + archivePath);
+            this.stdErr("\n> Not found: " + archivePath);
             return false;
         }
     }

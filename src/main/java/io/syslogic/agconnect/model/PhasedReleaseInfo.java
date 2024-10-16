@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: PhasedReleaseInfo
- *
+ * Data Model: PhasedReleaseInfo
  * @author Martin Zeitler
  */
 public class PhasedReleaseInfo {

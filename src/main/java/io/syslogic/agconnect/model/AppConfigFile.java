@@ -5,9 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 /**
- * Abstract Model: AppConfig
+ * Data Model: AppConfig
  * This is file agconnect-services.json, where only appInfo.appId is of interest.
- *
  * @author Martin Zeitler
  */
 public class AppConfigFile {
@@ -19,6 +18,7 @@ public class AppConfigFile {
     private ArrayList<AppConfigInfo> appInfos;
 
     /** @return the configVersion. */
+    @SuppressWarnings({"unused"})
     public String getConfigVersion() {
         return this.configVersion;
     }

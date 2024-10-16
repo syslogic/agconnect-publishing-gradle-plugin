@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * Abstract Model: AppIdListResponse
- *
+ * Data Model: AppIdListResponse
  * @author Martin Zeitler
  */
 public class AppIdListResponse {

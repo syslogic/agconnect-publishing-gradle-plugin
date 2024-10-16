@@ -3,9 +3,8 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AppConfigInfo
+ * Data Model: AppConfigInfo
  * This is file agconnect-services.json, where only appId is of interest.
- *
  * @author Martin Zeitler
  */
 public class AppConfigInfo {

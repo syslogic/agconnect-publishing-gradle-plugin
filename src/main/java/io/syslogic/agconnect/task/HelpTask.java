@@ -5,7 +5,6 @@ import org.gradle.api.tasks.TaskAction;
 
 /**
  * Help {@link DefaultTask}
- *
  * @author Martin Zeitler
  */
 public class HelpTask extends DefaultTask {

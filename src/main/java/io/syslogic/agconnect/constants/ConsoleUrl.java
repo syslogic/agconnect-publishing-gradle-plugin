@@ -2,7 +2,6 @@ package io.syslogic.agconnect.constants;
 
 /**
  * AppGallery Connect Console URL
- *
  * @author Martin Zeitler
  */
 public class ConsoleUrl {

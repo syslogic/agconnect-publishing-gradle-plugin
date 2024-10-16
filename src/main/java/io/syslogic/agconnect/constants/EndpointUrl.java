@@ -2,7 +2,6 @@ package io.syslogic.agconnect.constants;
 
 /**
  * AppGallery Connect API Endpoints
- *
  * @author Martin Zeitler
  */
 public class EndpointUrl {

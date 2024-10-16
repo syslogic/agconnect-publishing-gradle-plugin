@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class StringUtils {
 
     /**
-     * It capitlizes a given string.
+     * It capitalizes a given string.
      * @param string the input string.
      * @return the capitalized string.
      */

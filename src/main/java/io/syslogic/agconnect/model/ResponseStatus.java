@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: ResponseStatus
- *
+ * Data Model: ResponseStatus
  * @author Martin Zeitler
  */
 public class ResponseStatus {

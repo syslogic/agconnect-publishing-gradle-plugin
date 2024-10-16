@@ -46,6 +46,7 @@ public interface PublishingExtension {
      * <code>agcPublishing { releaseType = 1 }</code>
      * @param value 1=network, 3=phased.
      */
+    @SuppressWarnings({"unused"})
      void setReleaseType(Integer value);
 
     /**

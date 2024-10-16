@@ -2,7 +2,6 @@ package io.syslogic.agconnect.constants;
 
 /**
  * Artifact Types
- *
  * @author Martin Zeitler
  */
 public class ArtifactType {

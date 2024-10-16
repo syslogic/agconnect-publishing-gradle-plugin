@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Locale;
 
 /**
- * Abstract Model: UploadFileItem
- *
+ * Data Model: UploadFileItem
  * @author Martin Zeitler
  */
 public class UploadFileItem {

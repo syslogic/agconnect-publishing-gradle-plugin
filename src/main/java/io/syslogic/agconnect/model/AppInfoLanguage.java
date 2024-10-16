@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * Abstract Model: AppInfoLanguage
- *
+ * Data Model: AppInfoLanguage
  * @author Martin Zeitler
  */
 public class AppInfoLanguage {

@@ -7,8 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Abstract Model: AppInfo
- *
+ * Data Model: AppInfo
  * @author Martin Zeitler
  */
 public class AppInfo {

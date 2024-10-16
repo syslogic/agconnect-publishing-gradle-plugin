@@ -41,7 +41,6 @@ import io.syslogic.agconnect.model.TokenResponse;
 
 /**
  * Abstract {@link BaseTask}
- *
  * @author Martin Zeitler
  */
 abstract public class BaseTask extends DefaultTask {
@@ -154,7 +153,7 @@ abstract public class BaseTask extends DefaultTask {
                 this.accessToken = result.getAccessToken();
                 return true;
             } else {
-                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
+                this.stdErr("\n> HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
         } catch (IOException e) {
             this.stdErr(e.getMessage());

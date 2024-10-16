@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: FileUploadInfo
- *
+ * Data Model: FileUploadInfo
  * @author Martin Zeitler
  */
 @SuppressWarnings({"FieldMayBeFinal"})

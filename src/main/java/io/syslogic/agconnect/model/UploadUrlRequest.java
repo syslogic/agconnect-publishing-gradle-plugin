@@ -3,20 +3,22 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: UploadUrlRequest
- *
+ * Data Model: UploadUrlRequest
  * @author Martin Zeitler
  */
 @SuppressWarnings({"FieldMayBeFinal"})
 public class UploadUrlRequest {
 
     @SerializedName("appId")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String appId;
 
     @SerializedName("suffix")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String suffix; // apk/rpk/pdf/jpg/jpeg/png/bmp/mp4/mov/aab
 
     @SerializedName("releaseType")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private int releaseType; // 1, 8
 
     /**

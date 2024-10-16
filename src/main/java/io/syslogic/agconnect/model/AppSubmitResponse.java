@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AppSubmitResponse
- *
+ * Data Model: AppSubmitResponse
  * @author Martin Zeitler
  */
 public class AppSubmitResponse {

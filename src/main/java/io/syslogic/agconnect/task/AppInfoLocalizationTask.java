@@ -19,7 +19,6 @@ import io.syslogic.agconnect.model.AppInfoLocalization;
 
 /**
  * TODO: Abstract AppInfo Localization Update {@link BaseTask}
- *
  * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-language-info-update-0000001158245057">Updating App Localization Information</a>
  * @author Martin Zeitler
  */

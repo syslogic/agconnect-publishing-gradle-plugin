@@ -3,8 +3,7 @@ package io.syslogic.agconnect.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: AppInfoDeviceType
- *
+ * Data Model: AppInfoDeviceType
  * @author Martin Zeitler
  */
 public class AppInfoDeviceType {

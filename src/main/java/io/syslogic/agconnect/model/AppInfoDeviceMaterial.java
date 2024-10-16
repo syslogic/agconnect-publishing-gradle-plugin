@@ -1,8 +1,7 @@
 package io.syslogic.agconnect.model;
 
 /**
- * Abstract Model: AppInfoDeviceMaterial
- *
+ * Data Model: AppInfoDeviceMaterial
  * @author Martin Zeitler
  */
 public class AppInfoDeviceMaterial {

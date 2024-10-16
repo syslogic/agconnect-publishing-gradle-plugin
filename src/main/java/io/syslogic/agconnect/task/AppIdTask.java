@@ -17,7 +17,6 @@ import io.syslogic.agconnect.model.AppInfoAppId;
 
 /**
  * Abstract AppId {@link BaseTask}
- *
  * @author Martin Zeitler
  */
 abstract public class AppIdTask extends BaseTask {

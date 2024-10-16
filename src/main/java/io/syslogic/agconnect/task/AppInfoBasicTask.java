@@ -19,7 +19,6 @@ import io.syslogic.agconnect.model.AppInfo;
 
 /**
  * TODO: Abstract AppInfo Basic Update {@link BaseTask}
- *
  * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-info-update-0000001111685198">Updating App Basic Information</a>
  * @author Martin Zeitler
  */

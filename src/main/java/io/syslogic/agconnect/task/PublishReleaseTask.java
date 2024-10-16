@@ -17,8 +17,7 @@ import io.syslogic.agconnect.model.AppSubmitResponse;
 import io.syslogic.agconnect.model.ResponseStatus;
 
 /**
- * Abstract Submit Release {@link BaseTask}
- *
+ * Abstract Publish Release {@link BaseTask}
  * @author Martin Zeitler
  */
 abstract public class PublishReleaseTask extends BaseTask {
@@ -57,14 +56,14 @@ abstract public class PublishReleaseTask extends BaseTask {
                 AppSubmitResponse response1 = new Gson().fromJson(result, AppSubmitResponse.class);
                 ResponseStatus status = response1.getRet();
                 if (status.getCode() == ResultCode.SUCCESS) {
-                    this.stdOut("Submitted for release: " + this.packageName + " (" + this.appId + ").");
+                    this.stdOut("> Submitted for release: " + this.packageName + " (" + this.appId + ").");
                     this.stdOut(ConsoleUrl.INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
                 } else if (status.getCode() == ResultCode.INVALID_INPUT_PARAMETER) {
-                    this.stdErr("Submitted for release: " + this.packageName + " (" + this.appId + ").");
-                    this.stdErr("Error " + status.getCode() + ": " + status.getMessage());
+                    this.stdErr("> Submitted for release: " + this.packageName + " (" + this.appId + ").");
+                    this.stdErr("> Error " + status.getCode() + ": " + status.getMessage());
                 }
             } else {
-                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
+                this.stdErr("> HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
             }
         } catch(Exception e) {
             this.stdErr(e.getMessage());

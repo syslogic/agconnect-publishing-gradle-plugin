@@ -4,22 +4,23 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Abstract Model: FileInfoUpdateRequest
- *
+ * Data Model: FileInfoUpdateRequest
  * @author Martin Zeitler
  */
 @SuppressWarnings({"FieldMayBeFinal"})
 public class FileInfoUpdateRequest {
 
     @SerializedName("lang")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private String lang = "en-US";
 
     @SerializedName("fileType")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private int fileType = 5;
 
     // only one item!
-    @SuppressWarnings("FieldCanBeLocal")
     @SerializedName("files")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private FileUploadInfo fileInfo;
 
     /**
