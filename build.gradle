@@ -1,12 +1,12 @@
 // :buildSrc
 buildscript {
     ext {
-        github_handle = 'syslogic'
-        plugin_display_name = 'AppGallery Connect Publishing Plugin'
-        plugin_description = 'It uploads Android APK/ABB artifacts with AppGallery Connect Publishing API.'
-        plugin_identifier = 'agconnect-publishing-gradle-plugin'
-        plugin_class = 'io.syslogic.agconnect.PublishingPlugin'
-        plugin_id = 'io.syslogic.agconnect.publishing'
+        github_handle = "syslogic"
+        plugin_display_name = "AppGallery Connect Publishing Plugin"
+        plugin_description = "It uploads Android APK/ABB artifacts with AppGallery Connect Publishing API."
+        plugin_identifier = "agconnect-publishing-gradle-plugin"
+        plugin_class = "io.syslogic.agconnect.PublishingPlugin"
+        plugin_id = "io.syslogic.agconnect.publishing"
         plugin_version = libs.versions.plugin.version.get()
     }
 }
@@ -53,11 +53,11 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-tasks.register('javadocs', Javadoc) {
+tasks.register("javadocs", Javadoc) {
     title = "${plugin_display_name} ${plugin_version} API"
     source = java.sourceSets.main.java.srcDirs
-    destinationDir = project.file('/build/outputs/javadoc')
-    classpath = files(new File(System.getProperty('java.home') + File.separator + 'lib' + File.separator + 'rt.jar'))
+    destinationDir = project.file("/build/outputs/javadoc")
+    classpath = files(new File(System.getProperty("java.home") + File.separator + "lib" + File.separator + "rt.jar"))
     classpath += configurations.implementation
     options.links "https://docs.oracle.com/en/java/javase/17/docs/api/"
     options.linkSource true
@@ -65,19 +65,19 @@ tasks.register('javadocs', Javadoc) {
     failOnError false
 }
 
-tasks.register('javadocJar', Jar) {
+tasks.register("javadocJar", Jar) {
     dependsOn javadoc
     dependsOn javadoc
-    archiveClassifier.set('javadoc')
+    archiveClassifier.set("javadoc")
     from javadoc.destinationDir
 }
 
-tasks.register('sourcesJar', Jar) {
+tasks.register("sourcesJar", Jar) {
     from java.sourceSets.main.java.srcDirs
-    archiveClassifier.set('sources')
+    archiveClassifier.set("sources")
 }
 
-group = 'io.syslogic'
+group = "io.syslogic"
 version = "${plugin_version}"
 artifacts {
     archives javadocJar
