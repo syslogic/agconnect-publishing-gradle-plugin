@@ -67,7 +67,6 @@ tasks.register("javadocs", Javadoc) {
 
 tasks.register("javadocJar", Jar) {
     dependsOn javadoc
-    dependsOn javadoc
     archiveClassifier.set("javadoc")
     from javadoc.destinationDir
 }
