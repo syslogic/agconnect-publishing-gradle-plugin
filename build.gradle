@@ -108,11 +108,13 @@ afterEvaluate {
              * JetBrains Spaces Repository (private)
              * https://lp.jetbrains.com/space-source-code-management/
              */
-            maven {
-                url = System.getenv("JB_SPACE_MAVEN_REPO")
-                credentials {
-                    username = System.getenv("JB_SPACE_CLIENT_ID")
-                    password = System.getenv("JB_SPACE_CLIENT_SECRET")
+            if (System.getenv("JB_SPACE_MAVEN_REPO") != null) {
+                maven {
+                    url = System.getenv("JB_SPACE_MAVEN_REPO")
+                    credentials {
+                        username = System.getenv("JB_SPACE_CLIENT_ID")
+                        password = System.getenv("JB_SPACE_CLIENT_SECRET")
+                    }
                 }
             }
         }
