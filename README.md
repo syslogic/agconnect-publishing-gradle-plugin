@@ -35,9 +35,9 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.6.0'
-        classpath 'com.huawei.agconnect:agcp:1.9.1.303'
-        classpath 'io.syslogic:agconnect-publishing-gradle-plugin:1.3.6'
+        classpath "com.android.tools.build:gradle:8.7.3"
+        classpath "com.huawei.agconnect:agcp:1.9.1.304"
+        classpath "io.syslogic:agconnect-publishing-gradle-plugin:1.3.7"
     }
 }
 ````
@@ -45,7 +45,7 @@ buildscript {
 Or in the version-catalog `gradle/libs.versions.toml`:
 ````toml
 [versions]
-agconnect_publishing_plugin = '1.3.6'
+agconnect_publishing_plugin = "1.3.7"
 
 [plugins]
 agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = "agconnect_publishing_plugin" }
@@ -54,9 +54,9 @@ agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = 
 Then they can be applied in the module's `build.gradle`:
 ````groovy
 plugins {
-    id 'com.android.application'
-    id 'com.huawei.agconnect'
-    // id 'io.syslogic.agconnect.publishing'
+    id "com.android.application"
+    id "com.huawei.agconnect"
+    // id "io.syslogic.agconnect.publishing"
     alias(libs.plugins.agconnect.publishing)
 }
 ````
@@ -83,9 +83,9 @@ if (rootProject.file(json_agc).exists()) {
 }
 ````
 
-These properties are all optional, while:
+This configuration is entirely optional, while providing the config file at the default location:
 
- - providing the config file at the default location: `distribution/agconnect_apiclient.json`.
+`distribution/agconnect_apiclient.json`.
 
 ### Plugin Tasks
 
