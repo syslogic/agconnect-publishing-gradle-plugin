@@ -18,6 +18,7 @@ plugins {
 }
 
 dependencies {
+
     compileOnly gradleApi()
     //noinspection DependencyNotationArgument
     implementation libs.android.gradle
@@ -85,6 +86,7 @@ artifacts {
 
 afterEvaluate {
     publishing {
+
         publications {
             release(MavenPublication) {
                 groupId = group
@@ -103,17 +105,15 @@ afterEvaluate {
                 }
             }
         }
+
         repositories {
-            /*
-             * JetBrains Spaces Repository (private)
-             * https://lp.jetbrains.com/space-source-code-management/
-             */
-            if (System.getenv("JB_SPACE_MAVEN_REPO") != null) {
+            // https://support.atlassian.com/bitbucket-cloud/docs/variables-and-secrets/
+            if (System.getenv("BITBUCKET_BUILD_NUMBER") != null) {
                 maven {
-                    url = System.getenv("JB_SPACE_MAVEN_REPO")
+                    url = System.getenv("BITBUCKET_MAVEN_REPO")
                     credentials {
-                        username = System.getenv("JB_SPACE_CLIENT_ID")
-                        password = System.getenv("JB_SPACE_CLIENT_SECRET")
+                        username = System.getenv("BITBUCKET_CLIENT_ID")
+                        password = System.getenv("BITBUCKET_CLIENT_SECRET")
                     }
                 }
             }
