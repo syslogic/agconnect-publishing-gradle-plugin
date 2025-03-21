@@ -37,7 +37,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:8.9.0"
         classpath "com.huawei.agconnect:agcp:1.9.1.304"
-        classpath "io.syslogic:agconnect-publishing-gradle-plugin:1.3.8"
+        classpath "io.syslogic:agconnect-publishing-gradle-plugin:1.3.9"
     }
 }
 ````
@@ -45,7 +45,7 @@ buildscript {
 Or in the version-catalog `gradle/libs.versions.toml`:
 ````toml
 [versions]
-agconnect_publishing_plugin = "1.3.8"
+agconnect_publishing_plugin = "1.3.9"
 
 [plugins]
 agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = "agconnect_publishing_plugin" }
