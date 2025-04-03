@@ -2,12 +2,11 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.net.URIBuilder;
 
 import org.gradle.api.tasks.TaskAction;
 
@@ -44,8 +43,7 @@ abstract public class AppInfoTask extends BaseTask {
     @SuppressWarnings("UnusedReturnValue")
     public void getAppInfo() {
 
-        HttpGet request = new HttpGet();
-        request.setHeaders(getDefaultHeaders());
+
 
         try {
             URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_INFO);
@@ -54,27 +52,32 @@ abstract public class AppInfoTask extends BaseTask {
             /* If this parameter is not passed, app information in all languages is queried. */
             if (this.lang != null) {builder.setParameter("lang", this.lang);}
 
-            request.setURI(builder.build());
-            HttpResponse response = this.client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            HttpEntity httpEntity = response.getEntity();
-            String result = EntityUtils.toString(httpEntity);
+            HttpGet request = new HttpGet(builder.build());
+            request.setHeaders(getDefaultHeaders());
 
-            if (statusCode == HttpStatus.SC_OK) {
+            client.execute(request, response -> {
+                int statusCode = response.getCode();
+                HttpEntity httpEntity = response.getEntity();
+                String result = EntityUtils.toString(httpEntity);
+                if (statusCode == HttpStatus.SC_OK) {
 
-                AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
-                appInfo.getAppInfo().setPackageName(this.packageName); // adding an additional field.
+                    AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
+                    appInfo.getAppInfo().setPackageName(this.packageName); // adding an additional field.
 
-                /* Always logging the response. */
-                this.stdOut(appInfo.getAppInfo().toString());
+                    /* Always logging the response. */
+                    this.stdOut(appInfo.getAppInfo().toString());
 
-                /* Logging the URL to the "App information" page. */
-                if (getVerbose().get()) {
-                    this.stdOut(ConsoleUrl.APP_INFO.replace("{appId}", String.valueOf(this.appId)));
+                    /* Logging the URL to the "App information" page. */
+                    if (getVerbose().get()) {
+                        this.stdOut(ConsoleUrl.APP_INFO.replace("{appId}", String.valueOf(this.appId)));
+                    }
+                } else {
+                    this.stdErr("HTTP " + statusCode + " " + response.getReasonPhrase());
                 }
-            } else {
-                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
-            }
+
+                return null;
+            });
+
         } catch(Exception e) {
             this.stdErr(e.getMessage());
         }

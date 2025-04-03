@@ -2,12 +2,12 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.net.URIBuilder;
+
 import org.gradle.api.tasks.TaskAction;
 
 import io.syslogic.agconnect.constants.ConsoleUrl;
@@ -36,9 +36,6 @@ abstract public class PublishReleaseTask extends BaseTask {
     /** Submit an app for release. */
     public void submitForRelease() {
 
-        HttpPost request = new HttpPost();
-        request.setHeaders(getDefaultHeaders());
-
         try {
             URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_SUBMIT);
             builder.setParameter("appId", String.valueOf(this.appId));
@@ -46,25 +43,29 @@ abstract public class PublishReleaseTask extends BaseTask {
             // builder.setParameter("releaseTime", String.valueOf(this.releaseTime));
             // builder.setParameter("remark", "");
 
-            request.setURI(builder.build());
-            HttpResponse response = this.client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            HttpEntity httpEntity = response.getEntity();
-            String result = EntityUtils.toString(httpEntity);
+            HttpPost request = new HttpPost(builder.build());
+            request.setHeaders(getDefaultHeaders());
 
-            if (statusCode == HttpStatus.SC_OK) {
-                AppSubmitResponse response1 = new Gson().fromJson(result, AppSubmitResponse.class);
-                ResponseStatus status = response1.getRet();
-                if (status.getCode() == ResultCode.SUCCESS) {
-                    this.stdOut("> Submitted for release: " + this.packageName + " (" + this.appId + ").");
-                    this.stdOut(ConsoleUrl.INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
-                } else if (status.getCode() == ResultCode.INVALID_INPUT_PARAMETER) {
-                    this.stdErr("> Submitted for release: " + this.packageName + " (" + this.appId + ").");
-                    this.stdErr("> Error " + status.getCode() + ": " + status.getMessage());
+            client.execute(request, response -> {
+                HttpEntity httpEntity = response.getEntity();
+                String result = EntityUtils.toString(httpEntity);
+                int statusCode = response.getCode();
+                if (statusCode == HttpStatus.SC_OK) {
+                    AppSubmitResponse response1 = new Gson().fromJson(result, AppSubmitResponse.class);
+                    ResponseStatus status = response1.getRet();
+                    if (status.getCode() == ResultCode.SUCCESS) {
+                        this.stdOut("> Submitted for release: " + this.packageName + " (" + this.appId + ").");
+                        this.stdOut(ConsoleUrl.INTEGRATION.replace("{appId}", String.valueOf(this.appId)));
+                    } else if (status.getCode() == ResultCode.INVALID_INPUT_PARAMETER) {
+                        this.stdErr("> Submitted for release: " + this.packageName + " (" + this.appId + ").");
+                        this.stdErr("> Error " + status.getCode() + ": " + status.getMessage());
+                    }
+                } else {
+                    this.stdErr("> HTTP " + statusCode + " " + response.getReasonPhrase());
                 }
-            } else {
-                this.stdErr("> HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
-            }
+                return null;
+            });
+
         } catch(Exception e) {
             this.stdErr(e.getMessage());
         }
