@@ -2,19 +2,18 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.HttpResponseInterceptor;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicHeader;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
@@ -36,6 +35,8 @@ import io.syslogic.agconnect.constants.EndpointUrl;
 import io.syslogic.agconnect.model.ApiConfigFile;
 import io.syslogic.agconnect.model.AppConfigFile;
 import io.syslogic.agconnect.model.AppConfigInfo;
+import io.syslogic.agconnect.model.AppIdListResponse;
+import io.syslogic.agconnect.model.AppInfoAppId;
 import io.syslogic.agconnect.model.TokenRequest;
 import io.syslogic.agconnect.model.TokenResponse;
 
@@ -142,19 +143,21 @@ abstract public class BaseTask extends DefaultTask {
 
         String payload = new Gson().toJson(new TokenRequest(this.clientId, this.clientSecret));
         StringEntity entity = new StringEntity(payload, ContentType.APPLICATION_JSON);
+        request.setEntity(entity);
 
         try {
-            request.setEntity(entity);
-            HttpResponse response = client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == HttpStatus.SC_OK) {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                TokenResponse result = new Gson().fromJson(rd.readLine(), TokenResponse.class);
-                this.accessToken = result.getAccessToken();
-                return true;
-            } else {
-                this.stdErr("\n> HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
-            }
+            client.execute(request, response -> {
+                int statusCode = response.getCode();
+                if (statusCode == HttpStatus.SC_OK) {
+                    BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                    TokenResponse result = new Gson().fromJson(rd.readLine(), TokenResponse.class);
+                    this.accessToken = result.getAccessToken();
+                    return true;
+                } else {
+                    this.stdErr("\n> HTTP " + statusCode + " " + response.getReasonPhrase());
+                }
+                return null;
+            });
         } catch (IOException e) {
             this.stdErr(e.getMessage());
         }
@@ -177,10 +180,10 @@ abstract public class BaseTask extends DefaultTask {
 
         if (logHttp) {
             cb
-                    .addInterceptorFirst((HttpRequestInterceptor) (request, context) ->
-                            stdOut("> " + request.getRequestLine().toString()))
-                    .addInterceptorLast((HttpResponseInterceptor) (request, context) ->
-                            stdOut("> " + request.getStatusLine().toString()));
+                .addRequestInterceptorFirst((HttpRequestInterceptor) (request, details, context) ->
+                        stdOut("> " + request.getRequestUri()))
+                .addResponseInterceptorLast((HttpResponseInterceptor) (response, details, context) ->
+                        stdOut("> " + response.toString()));
         }
         return cb.build();
     }
@@ -195,7 +198,6 @@ abstract public class BaseTask extends DefaultTask {
     }
 
     @Input
-    @NotNull
     Header[] getDefaultHeaders() {
         Header[] headers;
         if (this.accessToken == null) {

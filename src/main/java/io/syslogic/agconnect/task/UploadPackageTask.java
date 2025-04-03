@@ -2,24 +2,27 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.net.URIBuilder;
+
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+
+import org.gradle.internal.impldep.org.apache.http.Consts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,32 +96,32 @@ abstract public class UploadPackageTask extends BaseTask {
      */
     private void getUploadUrl(String archiveSuffix) {
         try {
-            HttpGet request = new HttpGet();
-            request.setHeaders(getDefaultHeaders());
-            request.setURI(new URIBuilder(EndpointUrl.PUBLISH_UPLOAD_URL)
+            HttpGet request = new HttpGet(new URIBuilder(EndpointUrl.PUBLISH_UPLOAD_URL)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
                     .setParameter("suffix", archiveSuffix)
-                    .build()
-            );
+                    .build());
+            request.setHeaders(getDefaultHeaders());
 
-            HttpResponse response = this.client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == HttpStatus.SC_OK) {
-                InputStream stream = response.getEntity().getContent();
-                InputStreamReader isr = new InputStreamReader(stream, Consts.UTF_8);
-                BufferedReader rd = new BufferedReader(isr);
-                UploadUrlResponse result = new Gson().fromJson(rd.readLine(), UploadUrlResponse.class);
-                this.authCode = result.getAuthCode();
-                this.uploadUrl = result.getUploadUrl();
-                this.chunkUrl = result.getChunkUploadUrl();
-                if (getVerbose().get()) {
-                    this.stdOut("> Endpoint: " + this.uploadUrl);
+            client.execute(request, response -> {
+                int statusCode = response.getCode();
+                if (statusCode == HttpStatus.SC_OK) {
+                    InputStream stream = response.getEntity().getContent();
+                    InputStreamReader isr = new InputStreamReader(stream, Consts.UTF_8);
+                    BufferedReader rd = new BufferedReader(isr);
+                    UploadUrlResponse result = new Gson().fromJson(rd.readLine(), UploadUrlResponse.class);
+                    this.authCode = result.getAuthCode();
+                    this.uploadUrl = result.getUploadUrl();
+                    this.chunkUrl = result.getChunkUploadUrl();
+                    if (getVerbose().get()) {
+                        this.stdOut("> Endpoint: " + this.uploadUrl);
+                    }
+                } else {
+                    this.stdOut("> HTTP " + statusCode + " " + response.getReasonPhrase());
                 }
-            } else {
-                this.stdOut("> HTTP " + statusCode + " " +
-                        response.getStatusLine().getReasonPhrase());
-            }
+                return null;
+            });
+
         } catch (URISyntaxException | IOException e) {
             this.stdErr(e.getMessage());
         }
@@ -147,43 +150,47 @@ abstract public class UploadPackageTask extends BaseTask {
 
             try {
                 long timestamp = System.currentTimeMillis();
-                HttpResponse response = this.client.execute(request);
-                int statusCode = response.getStatusLine().getStatusCode();
-                HttpEntity httpEntity = response.getEntity();
-                String result = EntityUtils.toString(httpEntity);
-                if (statusCode == HttpStatus.SC_OK) {
-                    UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
-                    if (wrap.getResult().getResultCode() == ResultCode.SUCCESS) {
-                        List<UploadFileItem> items = wrap.getResult().getResult().getFileList();
-                        String sizeFormatted;
-                        for (UploadFileItem item : items) {
+                client.execute(request, response -> {
+                    int statusCode = response.getCode();
 
-                            /* Verbose logging */
-                            sizeFormatted = item.getSizeFormatted();
-                            if (getVerbose().get()) {
-                                // this.stdOut("Purified: " + item.getPurifiedForFile()); ?
-                                this.stdOut("  Download: " + item.getDestinationUrl());
-                                this.stdOut("Disposable: " + item.getDisposableUrl());
-                                this.stdOut("      Size: " + sizeFormatted);
+                    HttpEntity httpEntity = response.getEntity();
+                    String result = EntityUtils.toString(httpEntity);
+                    if (statusCode == HttpStatus.SC_OK) {
+                        UploadResponseWrap wrap = new Gson().fromJson(result, UploadResponseWrap.class);
+                        if (wrap.getResult().getResultCode() == ResultCode.SUCCESS) {
+                            List<UploadFileItem> items = wrap.getResult().getResult().getFileList();
+                            String sizeFormatted;
+                            for (UploadFileItem item : items) {
+
+                                /* Verbose logging */
+                                sizeFormatted = item.getSizeFormatted();
+                                if (getVerbose().get()) {
+                                    // this.stdOut("Purified: " + item.getPurifiedForFile()); ?
+                                    this.stdOut("  Download: " + item.getDestinationUrl());
+                                    this.stdOut("Disposable: " + item.getDisposableUrl());
+                                    this.stdOut("      Size: " + sizeFormatted);
+                                }
+
+                                /* Update the information for the uploaded file. */
+                                String filename = getUploadFileName();
+                                this.updateFileInfo(filename, item.getDestinationUrl());
+
+                                /* Log transfer stats before the task completes. */
+                                long duration = System.currentTimeMillis() - timestamp;
+                                this.stdOut("> " + getArtifactType().get().toUpperCase(Locale.ROOT) + " file " + getUploadFileName() + " has been uploaded.");
+                                this.stdOut("> " + sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration) + ".");
                             }
-
-                            /* Update the information for the uploaded file. */
-                            String filename = getUploadFileName();
-                            this.updateFileInfo(filename, item.getDestinationUrl());
-
-                            /* Log transfer stats before the task completes. */
-                            long duration = System.currentTimeMillis() - timestamp;
-                            this.stdOut("> " + getArtifactType().get().toUpperCase(Locale.ROOT) + " file " + getUploadFileName() + " has been uploaded.");
-                            this.stdOut("> " + sizeFormatted +" in " + Math.round(duration/1000F) + "s equals a transfer-rate of " + getTransferRate(item.getSize(), duration) + ".");
+                        } else {
+                            ResponseStatus e = wrap.getResult().getStatus();
+                            String msg = "Upload Error: " + e.getCode() + ": " + e.getMessage();
+                            this.stdErr(msg);
                         }
                     } else {
-                        ResponseStatus e = wrap.getResult().getStatus();
-                        String msg = "Upload Error: " + e.getCode() + ": " + e.getMessage();
-                        this.stdErr(msg);
+                        this.stdErr("Upload HTTP Error: " + statusCode + ": " + result);
                     }
-                } else {
-                    this.stdErr("Upload HTTP Error: " + statusCode + ": " + result);
-                }
+                    return null;
+                });
+
             } catch (IOException e) {
                 this.stdErr(e.getMessage());
             }
@@ -195,35 +202,33 @@ abstract public class UploadPackageTask extends BaseTask {
      * @see <a href="https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-file-info-0000001111685202">Updating App File Information</a>.
      */
     private void updateFileInfo(String fileName, String destFileUrl) {
-
-        HttpPut request = new HttpPut();
-        request.setHeaders(getDefaultHeaders());
-
         try {
-            request.setURI(new URIBuilder(EndpointUrl.PUBLISH_APP_FILE_INFO)
+            HttpPut request = new HttpPut(new URIBuilder(EndpointUrl.PUBLISH_APP_FILE_INFO)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("releaseType", String.valueOf(this.releaseType))
-                    .build()
-            );
+                    .build());
+            request.setHeaders(getDefaultHeaders());
 
             String payload = new FileInfoUpdateRequest(fileName, destFileUrl).toJson();
             StringEntity entity = new StringEntity(payload);
             request.setEntity(entity);
 
-            HttpResponse response = this.client.execute(request);
-            logResponse(fileName, response);
+            client.execute(request, response -> {
+                logResponse(fileName, response);
+                return null;
+            });
 
         } catch (IOException | URISyntaxException e) {
             this.stdErr("> " +  e.getMessage());
         }
     }
 
-    private void logResponse(@NotNull String fileName, @NotNull HttpResponse response) {
+    private void logResponse(@NotNull String fileName, @NotNull ClassicHttpResponse response) {
         try {
             HttpEntity httpEntity = response.getEntity();
             String result = EntityUtils.toString(httpEntity);
+            int statusCode = response.getCode();
 
-            int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_OK) {
                 FileInfoUpdateResponse data = new Gson().fromJson(result, FileInfoUpdateResponse.class);
                 String message = data.getStatus().getMessage();
@@ -248,9 +253,9 @@ abstract public class UploadPackageTask extends BaseTask {
                     this.stdErr("\nCode " + code + ": " + message);
                 }
             } else {
-                this.stdErr("\n" + response.getStatusLine().toString());
+                this.stdErr("\n" + response.toString());
             }
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             this.stdErr(e.getMessage());
         }
     }
@@ -260,30 +265,32 @@ abstract public class UploadPackageTask extends BaseTask {
      * @param packageIds package IDs, separated by commas.
      */
     public void getCompileStatus(@NotNull String packageIds) {
-        HttpGet request = new HttpGet();
-        request.setHeaders(getDefaultHeaders());
         try {
-            request.setURI(new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS)
+            HttpGet request = new HttpGet(new URIBuilder(EndpointUrl.PUBLISH_COMPILE_STATUS)
                     .setParameter("appId", String.valueOf(this.appId))
                     .setParameter("pkgIds", packageIds)
-                    .build()
-            );
-            HttpResponse response = this.client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            HttpEntity httpEntity = response.getEntity();
-            String result = EntityUtils.toString(httpEntity);
-            if (statusCode == HttpStatus.SC_OK) {
-                CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
-                for (CompilePackageState item : data.getPackageState()) {
-                    if (item.getStatus() == 1) {
-                        this.stdOut("> Package: " + ConsoleUrl.PACKAGE_INFO
-                                .replace("{appId}", String.valueOf(this.appId))
-                                .replace("{packageId}", item.getPackageId()));
+                    .build());
+
+            request.setHeaders(getDefaultHeaders());
+            client.execute(request, response -> {
+                int statusCode = response.getCode();
+                HttpEntity httpEntity = response.getEntity();
+                String result = EntityUtils.toString(httpEntity);
+                if (statusCode == HttpStatus.SC_OK) {
+                    CompileStateResponse data = new Gson().fromJson(result, CompileStateResponse.class);
+                    for (CompilePackageState item : data.getPackageState()) {
+                        if (item.getStatus() == 1) {
+                            this.stdOut("> Package: " + ConsoleUrl.PACKAGE_INFO
+                                    .replace("{appId}", String.valueOf(this.appId))
+                                    .replace("{packageId}", item.getPackageId()));
+                        }
                     }
+                } else {
+                    this.stdErr("> HTTP " + statusCode + " " + response.getReasonPhrase());
                 }
-            } else {
-                this.stdErr("> HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
-            }
+                return null;
+            });
+
         } catch(Exception e) {
             this.stdErr(e.getMessage());
         }

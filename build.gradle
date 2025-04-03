@@ -19,18 +19,18 @@ plugins {
 
 dependencies {
 
-    compileOnly gradleApi()
+    compileOnly(gradleApi())
     //noinspection DependencyNotationArgument
-    implementation libs.android.gradle
+    implementation(libs.android.gradle)
     //noinspection DependencyNotationArgument
-    implementation libs.annotations
+    implementation(libs.annotations)
     //noinspection DependencyNotationArgument
-    implementation libs.bundles.http.components
+    implementation(libs.bundles.http.components)
 
-    testImplementation libs.junit
-    //noinspection DependencyNotationArgument
-    testImplementation libs.annotations
+    testImplementation(libs.junit)
     testImplementation gradleTestKit()
+    //noinspection DependencyNotationArgument
+    testImplementation(libs.annotations)
     testImplementation(project)
 }
 
@@ -60,29 +60,30 @@ tasks.register("javadocs", Javadoc) {
     destinationDir = project.file("/build/outputs/javadoc")
     classpath = files(new File(System.getProperty("java.home") + File.separator + "lib" + File.separator + "rt.jar"))
     classpath += configurations.implementation
-    options.links "https://docs.oracle.com/en/java/javase/17/docs/api/"
-    options.linkSource true
-    options.author true
-    failOnError false
+    options.links = "https://docs.oracle.com/en/java/javase/17/docs/api/"
+    options.linkSource = true
+    options.author = true
+    failOnError = false
 }
 
 tasks.register("javadocJar", Jar) {
-    dependsOn javadoc
+    dependsOn(javadoc)
     archiveClassifier.set("javadoc")
-    from javadoc.destinationDir
+    from(javadoc.destinationDir)
 }
 
 tasks.register("sourcesJar", Jar) {
-    from java.sourceSets.main.java.srcDirs
+    from(java.sourceSets.main.java.srcDirs)
     archiveClassifier.set("sources")
+}
+
+artifacts {
+    archives(javadocJar)
+    archives(sourcesJar)
 }
 
 group = "io.syslogic"
 version = "${plugin_version}"
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
 
 afterEvaluate {
     publishing {

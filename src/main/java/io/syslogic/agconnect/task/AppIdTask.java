@@ -2,12 +2,11 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.net.URIBuilder;
 
 import org.gradle.api.tasks.TaskAction;
 
@@ -34,28 +33,29 @@ abstract public class AppIdTask extends BaseTask {
 
     /** */
     public void getAppIdList() {
-
-        HttpGet request = new HttpGet();
-        request.setHeaders(getDefaultHeaders());
-
         try {
             URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_ID_LIST);
             builder.setParameter("packageName", String.valueOf(this.packageName));
+            HttpGet request = new HttpGet(builder.build());
+            request.setHeaders(getDefaultHeaders());
 
-            request.setURI(builder.build());
-            HttpResponse response = this.client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            HttpEntity httpEntity = response.getEntity();
-            String result = EntityUtils.toString(httpEntity);
+            client.execute(request, response -> {
+                int statusCode = response.getCode();
 
-            if (statusCode == HttpStatus.SC_OK) {
-                AppIdListResponse appIds = new Gson().fromJson(result, AppIdListResponse.class);
-                for (AppInfoAppId item : appIds.getAppIds()) {
-                    this.stdOut(item.toString());
+                HttpEntity httpEntity = response.getEntity();
+                String result = EntityUtils.toString(httpEntity);
+
+                AppIdListResponse appIds = null;
+                if (statusCode == HttpStatus.SC_OK) {
+                    appIds = new Gson().fromJson(result, AppIdListResponse.class);
+                    for (AppInfoAppId item : appIds.getAppIds()) {
+                        this.stdOut(item.toString());
+                    }
+                } else {
+                    this.stdErr("HTTP " + statusCode + " " + response.getReasonPhrase());
                 }
-            } else {
-                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
-            }
+                return appIds;
+            });
 
         } catch(Exception e) {
             this.stdErr(e.getMessage());

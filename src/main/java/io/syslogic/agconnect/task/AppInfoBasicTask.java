@@ -2,13 +2,13 @@ package io.syslogic.agconnect.task;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.net.URIBuilder;
+
 import org.gradle.api.tasks.TaskAction;
 
 import java.nio.charset.StandardCharsets;
@@ -38,36 +38,39 @@ abstract public class AppInfoBasicTask extends BaseTask {
 
     /** It updates basic app information. */
     public void updateAppInfoBasic() {
-
-        HttpPut request = new HttpPut();
-        request.setHeaders(getDefaultHeaders());
-
         try {
             URIBuilder builder = new URIBuilder(EndpointUrl.PUBLISH_APP_INFO);
             builder.setParameter("appId", String.valueOf(this.appId));
             builder.setParameter("releaseType", String.valueOf(this.releaseType));
-            request.setURI(builder.build());
+
+            HttpPut request = new HttpPut(builder.build());
+            request.setHeaders(getDefaultHeaders());
 
             /* TODO... */
             AppInfo item = new AppInfo();
             request.setEntity(new StringEntity(new Gson().toJson(item), StandardCharsets.UTF_8));
 
-            HttpResponse response = this.client.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            HttpEntity httpEntity = response.getEntity();
-            String result = EntityUtils.toString(httpEntity);
+            client.execute(request, response -> {
+                int statusCode = response.getCode();
 
-            if (statusCode == HttpStatus.SC_OK) {
-                // AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
-                if (getVerbose().get()) { /* Logging the URL to the "App information" page. */
-                    this.stdOut(ConsoleUrl.APP_INFO.replace("{appId}", String.valueOf(this.appId)));
+                HttpEntity httpEntity = response.getEntity();
+                String result = EntityUtils.toString(httpEntity);
+
+                if (statusCode == HttpStatus.SC_OK) {
+                    // AppInfoResponse appInfo = new Gson().fromJson(result, AppInfoResponse.class);
+                    if (getVerbose().get()) { /* Logging the URL to the "App information" page. */
+                        this.stdOut(ConsoleUrl.APP_INFO.replace("{appId}", String.valueOf(this.appId)));
+                    } else {
+                        this.stdOut("> AppInfo updated");
+                        this.stdOut("> " + result);
+                    }
                 } else {
-                    this.stdOut("> AppInfo updated");
-                    this.stdOut("> " + result);
+                    this.stdErr("HTTP " + statusCode + " " + response.getReasonPhrase());
                 }
-            } else {
-                this.stdErr("HTTP " + statusCode + " " + response.getStatusLine().getReasonPhrase());
-            }
+
+                return null;
+            });
+
         } catch(Exception e) {
             this.stdErr(e.getMessage());
         }
