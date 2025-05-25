@@ -1,4 +1,4 @@
-// settings.gradle
+// settings.gradle.kts
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -7,9 +7,9 @@ pluginManagement {
     }
 }
 
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
-    //noinspection UnnecessaryQualifiedReference
-    repositoriesMode.set(org.gradle.api.initialization.resolve.RepositoriesMode.PREFER_SETTINGS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
