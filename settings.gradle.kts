@@ -1,4 +1,4 @@
-// settings.gradle
+// settings.gradle.kts
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -7,6 +7,7 @@ pluginManagement {
     }
 }
 
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     //noinspection UnnecessaryQualifiedReference
     repositoriesMode.set(org.gradle.api.initialization.resolve.RepositoriesMode.PREFER_SETTINGS)
@@ -14,5 +15,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         mavenLocal()
+    }
+
+    versionCatalogs {
+        create("plugin") {
+            from(files("gradle/libs.versions.toml"))
+        }
     }
 }
