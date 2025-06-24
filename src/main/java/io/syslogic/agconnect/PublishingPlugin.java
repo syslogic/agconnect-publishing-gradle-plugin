@@ -74,7 +74,7 @@ class PublishingPlugin implements Plugin<Project> {
             /* 0 or N product flavors. */
             if (productFlavors.length == 0) {
 
-                /* Product flavors not configured. */
+                /* Product flavors were not configured. */
                 if (verbose) {
                     System.out.println("\nProduct flavors not configured.");
                 }
@@ -142,7 +142,7 @@ class PublishingPlugin implements Plugin<Project> {
 
             } else {
 
-                /* Multiple product flavors configured */
+                /* Multiple product-flavors were configured. */
                 if (verbose) {
                     System.out.println("\n> " + productFlavors.length + " product flavors configured: " + stringArrayToCsv(productFlavors) + ".");
                 }
