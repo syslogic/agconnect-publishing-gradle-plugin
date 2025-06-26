@@ -6,6 +6,7 @@ plugins {
 }
 
 project.ext.set("github_handle",       "syslogic")
+project.ext.set("group_id",            "io.syslogic")
 project.ext.set("plugin_display_name", "AppGallery Connect Publishing Plugin")
 project.ext.set("plugin_description",  "It uploads Android APK/ABB artifacts with AppGallery Connect Publishing API.")
 project.ext.set("plugin_identifier",   "agconnect-publishing-gradle-plugin")
@@ -41,21 +42,27 @@ gradlePlugin {
     }
 }
 
-tasks.withType<Jar>().configureEach {
-    archiveBaseName.set("${project.ext.get("plugin_identifier")}")
-    archiveVersion.set("${project.ext.get("plugin_version")}")
-}
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-tasks.register<Javadoc>("javadocs") {
-    setDestinationDir(project.file("/build/outputs/javadoc"))
+tasks.withType<Jar>().configureEach {
+    archiveBaseName.set("${project.ext.get("plugin_identifier")}")
+    archiveVersion.set("${project.ext.get("plugin_version")}")
+}
+
+// Gradle 9.0 deprecation fix
+val implCls: Configuration by configurations.creating {
+    extendsFrom(configurations.getByName("implementation"))
+    isCanBeResolved = true
+}
+
+val javadocs by tasks.registering(Javadoc::class) {
     title = "${project.ext.get("plugin_display_name")} ${project.ext.get("plugin_version")} API"
-    source = sourceSets.getByName("main").java
-    classpath = files(File(System.getProperty("java.home") + File.separator + "lib" + File.separator + "rt.jar"))
-    classpath += configurations.getByName("implementation")
+    classpath += implCls.asFileTree.filter {it.extension == "jar"}
+    setDestinationDir(project.file("/build/outputs/javadoc"))
+    source = sourceSets.main.get().allJava
     // options.links = "https://docs.oracle.com/en/java/javase/17/docs/api/"
     // options.linkSource = true
     // options.author = true
@@ -65,15 +72,15 @@ tasks.register<Javadoc>("javadocs") {
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
     from(project.file("/build/outputs/javadoc"))
-    dependsOn("javadocs")
+    dependsOn(javadocs)
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
-    from(sourceSets.getByName("main").java.srcDirs)
+    from(sourceSets.main.get().java.srcDirs)
 }
 
-group = "io.syslogic"
+group = "${project.ext.get("group_id")}"
 version = "${project.ext.get("plugin_version")}"
 artifacts {
     archives(javadocJar)
@@ -85,7 +92,7 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components.getByName("java"))
-                groupId = "io.syslogic"
+                groupId = "${project.ext.get("group_id")}"
                 artifactId = "${project.ext.get("plugin_identifier")}"
                 version = "${project.ext.get("plugin_version")}"
                 pom {

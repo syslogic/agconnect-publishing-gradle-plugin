@@ -35,9 +35,9 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.10.1"
+        classpath "com.android.tools.build:gradle:8.11.0"
         classpath "com.huawei.agconnect:agcp:1.9.3.300"
-        classpath "io.syslogic:agconnect-publishing-gradle-plugin:1.3.9"
+        classpath "io.syslogic:agconnect-publishing-gradle-plugin:1.4.1"
     }
 }
 ````
@@ -45,7 +45,7 @@ buildscript {
 Or in the version-catalog `gradle/libs.versions.toml`:
 ````toml
 [versions]
-agconnect_publishing_plugin = "1.3.9"
+agconnect_publishing_plugin = "1.4.1"
 
 [plugins]
 agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = "agconnect_publishing_plugin" }
