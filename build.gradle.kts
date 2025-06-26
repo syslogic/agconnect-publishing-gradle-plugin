@@ -1,8 +1,8 @@
 // :buildSrc
 plugins {
-    alias(plugin.plugins.maven.publish)
-    alias(plugin.plugins.gradle.plugin)
-    alias(plugin.plugins.gradle.publish)
+    alias(buildSrc.plugins.maven.publish)
+    alias(buildSrc.plugins.gradle.plugin)
+    alias(buildSrc.plugins.gradle.publish)
 }
 
 project.ext.set("github_handle",       "syslogic")
@@ -11,22 +11,22 @@ project.ext.set("plugin_description",  "It uploads Android APK/ABB artifacts wit
 project.ext.set("plugin_identifier",   "agconnect-publishing-gradle-plugin")
 project.ext.set("plugin_class",        "io.syslogic.agconnect.PublishingPlugin")
 project.ext.set("plugin_id",           "io.syslogic.agconnect.publishing")
-project.ext.set("plugin_version",      plugin.versions.plugin.version.get())
+project.ext.set("plugin_version",      buildSrc.versions.plugin.version.get())
 
 dependencies {
 
     compileOnly(dependencyNotation = gradleApi())
     //noinspection DependencyNotationArgument
-    implementation(dependencyNotation = plugin.android.gradle)
+    implementation(dependencyNotation = buildSrc.android.gradle)
     //noinspection DependencyNotationArgument
-    implementation(dependencyNotation = plugin.annotations)
+    implementation(dependencyNotation = buildSrc.annotations)
     //noinspection DependencyNotationArgument
-    implementation(dependencyNotation = plugin.bundles.http.components)
+    implementation(dependencyNotation = buildSrc.bundles.http.components)
 
-    testImplementation(dependencyNotation = plugin.junit)
+    testImplementation(dependencyNotation = buildSrc.junit)
     testImplementation(dependencyNotation = gradleTestKit())
     //noinspection DependencyNotationArgument
-    testImplementation(dependencyNotation = plugin.annotations)
+    testImplementation(dependencyNotation = buildSrc.annotations)
     testImplementation(dependencyNotation = project)
 }
 
@@ -61,6 +61,7 @@ tasks.register<Javadoc>("javadocs") {
     // options.author = true
     isFailOnError = false
 }
+
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
     from(project.file("/build/outputs/javadoc"))
@@ -95,21 +96,6 @@ afterEvaluate {
                         connection = "scm:git:git://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
                         developerConnection = "scm:git:ssh://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
                         url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}/"
-                    }
-                }
-            }
-        }
-        repositories {
-            /*
-             * JetBrains Spaces Repository (private)
-             * https://lp.jetbrains.com/space-source-code-management/
-             */
-            if (System.getenv("JB_SPACE_MAVEN_REPO") != null) {
-                maven {
-                    url = uri(System.getenv("JB_SPACE_MAVEN_REPO"))
-                    credentials {
-                        username = System.getenv("JB_SPACE_CLIENT_ID")
-                        password = System.getenv("JB_SPACE_CLIENT_SECRET")
                     }
                 }
             }

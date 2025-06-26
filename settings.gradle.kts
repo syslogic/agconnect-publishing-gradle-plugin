@@ -9,17 +9,15 @@ pluginManagement {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
-    //noinspection UnnecessaryQualifiedReference
-    repositoriesMode.set(org.gradle.api.initialization.resolve.RepositoriesMode.PREFER_SETTINGS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    versionCatalogs {
+        create("buildSrc") {
+            from(files("gradle/libs.versions.toml"))
+        }
+    }
     repositories {
         google()
         mavenCentral()
         mavenLocal()
-    }
-
-    versionCatalogs {
-        create("plugin") {
-            from(files("gradle/libs.versions.toml"))
-        }
     }
 }
