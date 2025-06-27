@@ -61,7 +61,7 @@ val implCls: Configuration by configurations.creating {
 val javadocs by tasks.registering(Javadoc::class) {
     title = "${project.ext.get("plugin_display_name")} ${project.ext.get("plugin_version")} API"
     classpath += implCls.asFileTree.filter {it.extension == "jar"}
-    setDestinationDir(project.file("/build/outputs/javadoc"))
+    setDestinationDir(project.file("/build/javadoc"))
     source = sourceSets.main.get().allJava
     // options.links = "https://docs.oracle.com/en/java/javase/17/docs/api/"
     // options.linkSource = true
@@ -71,7 +71,7 @@ val javadocs by tasks.registering(Javadoc::class) {
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
-    from(project.file("/build/outputs/javadoc"))
+    from(project.file("/build/javadoc"))
     dependsOn(javadocs)
 }
 
