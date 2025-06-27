@@ -363,6 +363,7 @@ class PublishingPlugin implements Plugin<Project> {
 
     /** Obtain Android ApplicationBuildType, which have a ApkSigningConfig. */
     @NotNull
+    @SuppressWarnings("NewApi")
     String[] getBuildTypes(@NotNull Project project) {
         ArrayList<String> buildTypes = new ArrayList<>();
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");
