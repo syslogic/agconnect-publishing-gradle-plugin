@@ -83,6 +83,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 group = "${project.ext.get("group_id")}"
 version = "${project.ext.get("plugin_version")}"
+
 artifacts {
     archives(javadocJar)
     archives(sourcesJar)
