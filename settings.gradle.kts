@@ -1,9 +1,17 @@
 // settings.gradle.kts
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        google()
+        mavenCentral {
+            content {
+                includeGroupByRegex("org.apache.*")
+            }
+        }
+        gradlePluginPortal {
+            content {
+                excludeGroupByRegex("org.apache.*")
+                includeGroupByRegex("com.gradle.*")
+            }
+        }
     }
 }
 
