@@ -1,3 +1,5 @@
+import org.codehaus.groovy.runtime.DefaultGroovyMethods.head
+
 // :buildSrc
 plugins {
     alias(buildSrc.plugins.maven.publish)
@@ -43,7 +45,6 @@ gradlePlugin {
     }
 }
 
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
@@ -62,7 +63,7 @@ val implCls: Configuration by configurations.creating {
 val javadocs by tasks.registering(Javadoc::class) {
     title = "${project.ext.get("plugin_display_name")} ${project.ext.get("plugin_version")} API"
     classpath += implCls.asFileTree.filter {it.extension == "jar"}
-    setDestinationDir(project.file("/build/javadoc"))
+    destinationDir = rootProject.file("build/javadoc")
     source = sourceSets.main.get().allJava
     // options.links = "https://docs.oracle.com/en/java/javase/17/docs/api/"
     // options.linkSource = true
@@ -72,7 +73,7 @@ val javadocs by tasks.registering(Javadoc::class) {
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
-    from(project.file("/build/javadoc"))
+    from(rootProject.file("build/javadoc"))
     dependsOn(javadocs)
 }
 
@@ -89,25 +90,54 @@ artifacts {
     archives(sourcesJar)
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components.getByName("java"))
-                groupId = "${project.ext.get("group_id")}"
-                artifactId = "${project.ext.get("plugin_identifier")}"
-                version = "${project.ext.get("plugin_version")}"
-                pom {
-                    name = "${project.ext.get("plugin_display_name")}"
-                    description = "${project.ext.get("plugin_description")}"
-                    url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}"
-                    scm {
-                        connection = "scm:git:git://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
-                        developerConnection = "scm:git:ssh://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
-                        url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}/"
-                    }
+configure<PublishingExtension> {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+
+    publications {
+        register<MavenPublication>("GPR") {
+            from(components.getByName("java"))
+            groupId = "${project.ext.get("group_id")}"
+            artifactId = "${project.ext.get("plugin_identifier")}"
+            version = "${project.ext.get("plugin_version")}"
+            pom {
+                name = "${project.ext.get("plugin_display_name")}"
+                description = "${project.ext.get("plugin_description")}"
+                url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}"
+                scm {
+                    connection = "scm:git:git://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
+                    developerConnection = "scm:git:ssh://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
+                    url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}/"
+                }
+            }
+        }
+
+        register<MavenPublication>("JitPack") {
+            from(components.getByName("java"))
+            groupId = "${project.ext.get("group_id")}"
+            artifactId = "${project.ext.get("plugin_identifier")}"
+            version = "${project.ext.get("plugin_version")}"
+            pom {
+                name = "${project.ext.get("plugin_display_name")}"
+                description = "${project.ext.get("plugin_description")}"
+                url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}"
+                scm {
+                    connection = "scm:git:git://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
+                    developerConnection = "scm:git:ssh://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
+                    url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}/"
                 }
             }
         }
     }
 }
+
+// tasks.withType<MavenPublication>().forEach { pub: MavenPublication ->
+// }

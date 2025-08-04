@@ -1,15 +1,16 @@
 // settings.gradle.kts
+
 pluginManagement {
     repositories {
-        mavenCentral {
-            content {
-                includeGroupByRegex("org.apache.*")
-            }
-        }
         gradlePluginPortal {
             content {
                 excludeGroupByRegex("org.apache.*")
                 includeGroupByRegex("com.gradle.*")
+            }
+        }
+        mavenCentral {
+            content {
+                includeGroupByRegex("org.apache.*")
             }
         }
     }

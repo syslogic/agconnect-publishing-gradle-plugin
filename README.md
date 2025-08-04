@@ -35,8 +35,8 @@ buildscript {
         maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.11.0"
-        classpath "com.huawei.agconnect:agcp:1.9.3.300"
+        classpath "com.android.tools.build:gradle:8.11.1"
+        classpath "com.huawei.agconnect:agcp:1.9.3.302"
         classpath "io.syslogic:agconnect-publishing-gradle-plugin:1.4.1"
     }
 }
@@ -73,13 +73,20 @@ plugins {
 ````groovy
 /** Huawei AppGallery Connect: agc-apiclient.json */
 def json_agc = "distribution${File.separator}agconnect_apiclient.json"
-if (rootProject.file(json_agc).exists()) {
-    agcPublishing {
-        configFile = rootProject.file(json_agc).absolutePath
-        releaseType = 1
-        verbose = false
-        logHttp = true
-    }
+
+agcPublishing {
+    configFile = rootProject.file(json_agc).absolutePath
+    releaseType = 1
+    verbose = false
+    logHttp = true
+}
+````
+
+````kotlin
+configure<PublishingExtensionImpl> {
+    configFile = rootProject.file(json_agc).absolutePath
+    verbose = false
+    logHttp = true
 }
 ````
 
