@@ -92,7 +92,7 @@ configure<PublishingExtensionImpl> {
 
 This configuration is entirely optional, while providing the config file at the default location:
 
-`distribution/agconnect_apiclient.json`.
+ - `distribution/agconnect_apiclient.json`.
 
 ### Plugin Tasks
 
