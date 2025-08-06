@@ -56,7 +56,7 @@ jobs:
              echo "PUBLISHED=false" >> "$GITHUB_ENV"
           fi
 
-      - name: 🐘 Gradle Build
+      - name: 🐘 Gradle Build Only
         if: ${{ env.PUBLISHED == 'true' }}
         run: |
           gradle --no-daemon :build
@@ -71,7 +71,7 @@ jobs:
           gradle --no-daemon :build :publishGPRPublicationToGitHubPackagesRepository
           ls -la ./build/libs | grep jar
 
-      - name: 📦 Retain Artifact (JAR)
+      - name: 📦 Retain Artifacts (JAR)
         id: retain-plugin-jar
         uses: actions/upload-artifact@v4
         with:
