@@ -47,7 +47,7 @@ jobs:
           mkdir build
           chmod +x ./gradlew
           PLUGIN_VERSION=$(cat ./gradle/libs.versions.toml | grep plugin_version | grep -Po '[\d.]+' | head -n1)
-          PACKAGE=https://maven.pkg.github.com/${{ env.GITHUB_ACTOR }}/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_NS }}/${{ env.PLUGIN_NAME }}/$PLUGIN_VERSION/${{ env.PLUGIN_NAME }}-$PLUGIN_VERSION.jar
+          PACKAGE=https://maven.pkg.github.com/${{ env.GITHUB_ACTOR }}/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_NS }}/${{ env.PLUGIN_NAME }}/${PLUGIN_VERSION}/${{ env.PLUGIN_NAME }}-${PLUGIN_VERSION}.jar
           if wget --user ${{ env.GITHUB_ACTOR }} --password ${{ env.GITHUB_TOKEN }} -q --method=HEAD $PACKAGE; then
               echo "::notice::Version $PLUGIN_VERSION already published."
               echo "PUBLISHED=true" >> "$GITHUB_ENV"

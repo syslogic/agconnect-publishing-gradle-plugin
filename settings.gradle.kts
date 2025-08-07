@@ -11,6 +11,7 @@ pluginManagement {
         mavenCentral {
             content {
                 includeGroupByRegex("org.apache.*")
+                excludeGroupByRegex("com.gradle.*")
             }
         }
     }

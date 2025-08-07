@@ -1,5 +1,3 @@
-import org.codehaus.groovy.runtime.DefaultGroovyMethods.head
-
 // :buildSrc
 plugins {
     alias(buildSrc.plugins.maven.publish)
@@ -7,42 +5,41 @@ plugins {
     alias(buildSrc.plugins.gradle.publish)
 }
 
-project.ext.set("github_handle",       "syslogic")
-project.ext.set("group_id",            "io.syslogic")
-project.ext.set("plugin_display_name", "AppGallery Connect Publishing Plugin")
-project.ext.set("plugin_description",  "It uploads Android APK/ABB artifacts with AppGallery Connect Publishing API.")
-project.ext.set("plugin_identifier",   "agconnect-publishing-gradle-plugin")
-project.ext.set("plugin_class",        "io.syslogic.agconnect.PublishingPlugin")
-project.ext.set("plugin_id",           "io.syslogic.agconnect.publishing")
-project.ext.set("plugin_version",      buildSrc.versions.plugin.version.get())
+val pluginId: String by extra(buildSrc.versions.plugin.id.get())
+val pluginCls: String by extra(buildSrc.versions.plugin.cls.get())
+val pluginGroup: String by extra(buildSrc.versions.plugin.group.get())
+val pluginVersion: String by extra(buildSrc.versions.plugin.version.get())
+val pluginName: String by extra(buildSrc.versions.plugin.name.get())
+val pluginDesc: String by extra(buildSrc.versions.plugin.desc.get())
+val pluginIdentifier: String by extra(buildSrc.versions.plugin.identifier.get())
+val githubEmail: String by extra(buildSrc.versions.github.email.get())
+val githubDev: String by extra(buildSrc.versions.github.dev.get())
+val githubHandle: String by extra(buildSrc.versions.github.handle.get())
 
-dependencies {
-
-    api(dependencyNotation = gradleApi())
-    //noinspection DependencyNotationArgument
-    api(dependencyNotation = buildSrc.android.gradle)
-
-    //noinspection DependencyNotationArgument
-    implementation(dependencyNotation = buildSrc.annotations)
-    //noinspection DependencyNotationArgument
-    implementation(dependencyNotation = buildSrc.bundles.http.components)
-
-    testImplementation(dependencyNotation = buildSrc.junit)
-    testImplementation(dependencyNotation = gradleTestKit())
-    //noinspection DependencyNotationArgument
-    testImplementation(dependencyNotation = buildSrc.annotations)
-    testImplementation(dependencyNotation = project)
-}
 
 gradlePlugin {
     plugins {
         create("PublishingPlugin") {
-            id = "${project.ext.get("plugin_id")}"
-            implementationClass = "${project.ext.get("plugin_class")}"
-            displayName = "${project.ext.get("plugin_display_name")}"
-            description = "${project.ext.get("plugin_description")}"
+            id = pluginId
+            implementationClass = pluginCls
+            displayName = pluginName
+            description = pluginDesc
         }
     }
+}
+
+dependencies {
+
+    api(dependencyNotation = gradleApi())
+    api(dependencyNotation = buildSrc.android.gradle)
+
+    implementation(dependencyNotation = buildSrc.annotations)
+    implementation(dependencyNotation = buildSrc.bundles.http.components)
+
+    testImplementation(dependencyNotation = buildSrc.junit)
+    testImplementation(dependencyNotation = gradleTestKit())
+    testImplementation(dependencyNotation = buildSrc.annotations)
+    testImplementation(dependencyNotation = project)
 }
 
 tasks.withType<Test>().configureEach {
@@ -50,8 +47,8 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.withType<Jar>().configureEach {
-    archiveBaseName.set("${project.ext.get("plugin_identifier")}")
-    archiveVersion.set("${project.ext.get("plugin_version")}")
+    archiveBaseName.set(pluginIdentifier)
+    archiveVersion.set(pluginVersion)
 }
 
 // Gradle 9.0 deprecation fix
@@ -61,7 +58,7 @@ val implCls: Configuration by configurations.creating {
 }
 
 val javadocs by tasks.registering(Javadoc::class) {
-    title = "${project.ext.get("plugin_display_name")} ${project.ext.get("plugin_version")} API"
+    title = "$pluginName $pluginVersion API"
     classpath += implCls.asFileTree.filter {it.extension == "jar"}
     destinationDir = rootProject.file("build/javadoc")
     source = sourceSets.main.get().allJava
@@ -82,19 +79,20 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().java.srcDirs)
 }
 
-group = "${project.ext.get("group_id")}"
-version = "${project.ext.get("plugin_version")}"
-
 artifacts {
     archives(javadocJar)
     archives(sourcesJar)
 }
 
+group = pluginGroup
+version = pluginVersion
+
 configure<PublishingExtension> {
+
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}")
+            url = uri("https://maven.pkg.github.com/${githubHandle}/${pluginIdentifier}")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -103,41 +101,34 @@ configure<PublishingExtension> {
     }
 
     publications {
-        register<MavenPublication>("GPR") {
+        register<MavenPublication>("Plugin") {
             from(components.getByName("java"))
-            groupId = "${project.ext.get("group_id")}"
-            artifactId = "${project.ext.get("plugin_identifier")}"
-            version = "${project.ext.get("plugin_version")}"
+            groupId = pluginGroup
+            artifactId = pluginIdentifier
+            version = pluginVersion
             pom {
-                name = "${project.ext.get("plugin_display_name")}"
-                description = "${project.ext.get("plugin_description")}"
-                url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}"
+                name = pluginName
+                description = pluginDesc
+                url = "https://github.com/${githubHandle}/${pluginIdentifier}"
                 scm {
-                    connection = "scm:git:git://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
-                    developerConnection = "scm:git:ssh://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
-                    url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}/"
+                    connection = "scm:git:git://github.com/${githubHandle}/${pluginIdentifier}.git"
+                    developerConnection = "scm:git:ssh://github.com/${githubHandle}/${pluginIdentifier}.git"
+                    url = "https://github.com/${githubHandle}/${pluginIdentifier}/"
                 }
-            }
-        }
-
-        register<MavenPublication>("JitPack") {
-            from(components.getByName("java"))
-            groupId = "${project.ext.get("group_id")}"
-            artifactId = "${project.ext.get("plugin_identifier")}"
-            version = "${project.ext.get("plugin_version")}"
-            pom {
-                name = "${project.ext.get("plugin_display_name")}"
-                description = "${project.ext.get("plugin_description")}"
-                url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}"
-                scm {
-                    connection = "scm:git:git://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
-                    developerConnection = "scm:git:ssh://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}.git"
-                    url = "https://github.com/${project.ext.get("github_handle")}/${project.ext.get("plugin_identifier")}/"
+                developers {
+                    developer {
+                        name = githubDev
+                        email = githubEmail
+                        id = githubHandle
+                    }
+                }
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "http://www.opensource.org/licenses/mit-license.php"
+                    }
                 }
             }
         }
     }
 }
-
-// tasks.withType<MavenPublication>().forEach { pub: MavenPublication ->
-// }
