@@ -12,10 +12,9 @@ val pluginVersion: String by extra(buildSrc.versions.plugin.version.get())
 val pluginName: String by extra(buildSrc.versions.plugin.name.get())
 val pluginDesc: String by extra(buildSrc.versions.plugin.desc.get())
 val pluginIdentifier: String by extra(buildSrc.versions.plugin.identifier.get())
+val githubHandle: String by extra(buildSrc.versions.github.handle.get())
 val githubEmail: String by extra(buildSrc.versions.github.email.get())
 val githubDev: String by extra(buildSrc.versions.github.dev.get())
-val githubHandle: String by extra(buildSrc.versions.github.handle.get())
-
 
 gradlePlugin {
     plugins {
@@ -87,45 +86,46 @@ artifacts {
 group = pluginGroup
 version = pluginVersion
 
-configure<PublishingExtension> {
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${githubHandle}/${pluginIdentifier}")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+afterEvaluate {
+    configure<PublishingExtension> {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/${githubHandle}/${pluginIdentifier}")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
             }
         }
-    }
 
-    publications {
-        register<MavenPublication>("Plugin") {
-            from(components.getByName("java"))
-            groupId = pluginGroup
-            artifactId = pluginIdentifier
-            version = pluginVersion
-            pom {
-                name = pluginName
-                description = pluginDesc
-                url = "https://github.com/${githubHandle}/${pluginIdentifier}"
-                scm {
-                    connection = "scm:git:git://github.com/${githubHandle}/${pluginIdentifier}.git"
-                    developerConnection = "scm:git:ssh://github.com/${githubHandle}/${pluginIdentifier}.git"
-                    url = "https://github.com/${githubHandle}/${pluginIdentifier}/"
-                }
-                developers {
-                    developer {
-                        name = githubDev
-                        email = githubEmail
-                        id = githubHandle
+        publications {
+            register<MavenPublication>("Plugin") {
+                from(components.getByName("java"))
+                groupId = pluginGroup
+                artifactId = pluginIdentifier
+                version = pluginVersion
+                pom {
+                    name = pluginName
+                    description = pluginDesc
+                    url = "https://github.com/${githubHandle}/${pluginIdentifier}"
+                    scm {
+                        connection = "scm:git:git://github.com/${githubHandle}/${pluginIdentifier}.git"
+                        developerConnection = "scm:git:ssh://github.com/${githubHandle}/${pluginIdentifier}.git"
+                        url = "https://github.com/${githubHandle}/${pluginIdentifier}/"
                     }
-                }
-                licenses {
-                    license {
-                        name = "MIT License"
-                        url = "http://www.opensource.org/licenses/mit-license.php"
+                    developers {
+                        developer {
+                            name = githubDev
+                            email = githubEmail
+                            id = githubHandle
+                        }
+                    }
+                    licenses {
+                        license {
+                            name = "MIT License"
+                            url = "http://www.opensource.org/licenses/mit-license.php"
+                        }
                     }
                 }
             }
