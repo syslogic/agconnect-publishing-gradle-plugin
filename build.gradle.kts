@@ -34,6 +34,7 @@ dependencies {
 
     implementation(dependencyNotation = buildSrc.annotations)
     implementation(dependencyNotation = buildSrc.bundles.http.components)
+    implementation(dependencyNotation = buildSrc.gson)
 
     testImplementation(dependencyNotation = buildSrc.junit)
     testImplementation(dependencyNotation = gradleTestKit())
