@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
  * Data Model: UploadUrlRequest
  * @author Martin Zeitler
  */
-@SuppressWarnings({"FieldMayBeFinal"})
 public class UploadUrlRequest {
 
     @SerializedName("appId")

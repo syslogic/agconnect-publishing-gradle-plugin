@@ -17,7 +17,6 @@ public class AppInfoLanguage {
     private String appName;
 
     @SerializedName("deviceMaterials")
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private List<AppInfoDeviceMaterial> deviceMaterials;
 
     @Override

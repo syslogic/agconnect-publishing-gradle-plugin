@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
  * Data Model: TokenRequest
  * @author Martin Zeitler
  */
-@SuppressWarnings({"FieldMayBeFinal"})
 public class TokenRequest {
 
     @SerializedName("grant_type")

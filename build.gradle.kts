@@ -79,9 +79,18 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().java.srcDirs)
 }
 
-artifacts {
-    archives(javadocJar)
-    archives(sourcesJar)
+// Gradle 9.1 deprecation fix
+configurations {
+    @Suppress("UnstableApiUsage")
+    consumable("jars") {
+        outgoing.artifact(javadocJar)
+        outgoing.artifact(sourcesJar)
+    }
+}
+
+tasks.named("assemble") {
+    dependsOn(javadocJar)
+    dependsOn(sourcesJar)
 }
 
 group = pluginGroup
