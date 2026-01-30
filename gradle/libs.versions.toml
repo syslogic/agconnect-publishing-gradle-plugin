@@ -9,7 +9,7 @@ github_email      = "syslogic@users.noreply.github.com"
 github_dev        = "Martin Zeitler"
 github_handle     = "syslogic"
 
-plugin_version    = "1.4.2"
+plugin_version    = "1.4.3"
 android_gradle    = "9.0.0"
 gradle_publish    = "2.0.0"
 annotations       = "26.0.2-1"
@@ -28,8 +28,8 @@ maven_publish     = { id = "maven-publish" }
 # agconnect_publishing = { id = "io.syslogic.agconnect.publishing", version.ref = "plugin_version" }
 
 [libraries]
-android_gradle    = { module = "com.android.tools.build:gradle-api", version.ref = "android_gradle" }
 annotations       = { module = "org.jetbrains:annotations", version.ref = "annotations" }
+android_gradle    = { module = "com.android.tools.build:gradle-api", version.ref = "android_gradle" }
 httpcore          = { module = "org.apache.httpcomponents:httpcore", version.ref = "httpcore" }
 httpclient        = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
 httpmime          = { module = "org.apache.httpcomponents:httpmime", version.ref = "httpmime" }
