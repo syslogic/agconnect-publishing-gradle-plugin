@@ -21,7 +21,6 @@ import io.syslogic.agconnect.task.AppIdTask;
 import io.syslogic.agconnect.task.AppInfoLocalizationTask;
 import io.syslogic.agconnect.task.AppInfoBasicTask;
 import io.syslogic.agconnect.task.AppInfoTask;
-import io.syslogic.agconnect.task.HelpTask;
 import io.syslogic.agconnect.task.UploadPackageTask;
 import io.syslogic.agconnect.task.PublishReleaseTask;
 import io.syslogic.agconnect.util.StringUtils;
@@ -50,9 +49,6 @@ class PublishingPlugin implements Plugin<Project> {
         /* Apply the default path for the API client configuration file. */
         this.configFile = project.getRootProject().getProjectDir().getAbsolutePath() +
                 File.separator + "distribution" + File.separator + "agconnect_apiclient.json";
-
-        /* Project before evaluate: register task `:welp` */
-        registerHelpTask(project,"welp");
 
         /* Project after evaluate. */
         project.afterEvaluate(it -> {
@@ -226,14 +222,6 @@ class PublishingPlugin implements Plugin<Project> {
         });
     }
 
-    /** Register {@link HelpTask}. */
-    @SuppressWarnings("SameParameterValue")
-    void registerHelpTask(@NotNull Project project, @NotNull String taskName) {
-        if (project.getTasks().findByName(taskName) == null) {
-            project.getTasks().register(taskName, HelpTask.class, task -> task.setGroup(taskGroup));
-        }
-    }
-
     /** Register {@link AppIdTask}. */
     void registerAppIdTask(
             @NotNull Project project, @NotNull String taskName,
@@ -363,7 +351,6 @@ class PublishingPlugin implements Plugin<Project> {
 
     /** Obtain Android ApplicationBuildType, which have a ApkSigningConfig. */
     @NotNull
-    @SuppressWarnings("NewApi")
     String[] getBuildTypes(@NotNull Project project) {
         ArrayList<String> buildTypes = new ArrayList<>();
         ApplicationExtension android = (ApplicationExtension) project.getExtensions().getByName("android");

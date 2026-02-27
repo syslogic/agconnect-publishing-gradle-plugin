@@ -7,10 +7,10 @@ plugins {
 
 val pluginId: String by extra(buildSrc.versions.plugin.id.get())
 val pluginCls: String by extra(buildSrc.versions.plugin.cls.get())
-val pluginGroup: String by extra(buildSrc.versions.plugin.group.get())
-val pluginVersion: String by extra(buildSrc.versions.plugin.version.get())
 val pluginName: String by extra(buildSrc.versions.plugin.name.get())
 val pluginDesc: String by extra(buildSrc.versions.plugin.desc.get())
+val pluginGroup: String by extra(buildSrc.versions.plugin.group.get())
+val pluginVersion: String by extra(buildSrc.versions.plugin.version.get())
 val pluginIdentifier: String by extra(buildSrc.versions.plugin.identifier.get())
 val githubHandle: String by extra(buildSrc.versions.github.handle.get())
 val githubEmail: String by extra(buildSrc.versions.github.email.get())
