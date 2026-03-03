@@ -14,12 +14,21 @@ public class TokenResponse {
     @SerializedName("expires_in")
     private int expiresIn;
 
-    /** @return the access-token. */
+    /** Constructor */
+    public TokenResponse() {}
+
+    /**
+     * Access Token
+     * @return the access-token.
+     */
     public String getAccessToken() {
         return this.accessToken;
     }
 
-    /** @return token expiry in seconds. */
+    /**
+     * Token expiry
+     * @return token expiry in seconds.
+     */
     public int getExpiresIn() {
         return this.expiresIn;
     }

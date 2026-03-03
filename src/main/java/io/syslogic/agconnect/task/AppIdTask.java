@@ -32,7 +32,7 @@ abstract public class AppIdTask extends BaseTask {
         }
     }
 
-    /** */
+    /** getAppIdList() */
     public void getAppIdList() {
 
         HttpGet request = new HttpGet();

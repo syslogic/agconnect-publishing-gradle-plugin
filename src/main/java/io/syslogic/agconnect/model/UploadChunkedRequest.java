@@ -6,4 +6,6 @@ package io.syslogic.agconnect.model;
  */
 public class UploadChunkedRequest {
 
+    /** Constructor */
+    public UploadChunkedRequest() {}
 }

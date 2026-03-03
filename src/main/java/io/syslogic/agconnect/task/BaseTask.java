@@ -45,27 +45,45 @@ import io.syslogic.agconnect.model.TokenResponse;
  */
 abstract public class BaseTask extends DefaultTask {
 
-    /** @return ApiConfigFile */
+    /**
+     * Task input: ApiConfigFile
+     * @return ApiConfigFile
+     */
     @Input
     abstract public Property<String> getApiConfigFile();
 
-    /** @return AppConfigFile */
+    /**
+     * Task input: AppConfigFile
+     * @return AppConfigFile
+     */
     @Input
     abstract public Property<String> getAppConfigFile();
 
-    /** @return BuildType */
+    /**
+     * Task input: BuildType
+     * @return BuildType
+     */
     @Input
     abstract public Property<String> getBuildType();
 
-    /** @return ReleaseType */
+    /**
+     * Task input: ReleaseType
+     * @return ReleaseType
+     */
     @Input
     abstract public Property<Integer> getReleaseType();
 
-    /** @return LogHttp */
+    /**
+     * Task input: LogHttp
+     * @return LogHttp
+     */
     @Input
     public abstract Property<Boolean> getLogHttp();
 
-    /** @return Verbose */
+    /**
+     * Task input: Verbose
+     * @return Verbose
+     */
     @Input
     public abstract Property<Boolean> getVerbose();
 

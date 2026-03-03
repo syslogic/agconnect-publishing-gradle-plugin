@@ -6,6 +6,9 @@ package io.syslogic.agconnect.model;
  */
 public class AppInfoDeviceMaterial {
 
+    /** Constructor */
+    public AppInfoDeviceMaterial() {}
+
     @Override
     public String toString() {
         return "AppInfoDeviceMaterial {"+

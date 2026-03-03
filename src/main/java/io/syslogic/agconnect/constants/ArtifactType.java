@@ -5,6 +5,10 @@ package io.syslogic.agconnect.constants;
  * @author Martin Zeitler
  */
 public class ArtifactType {
+
+    /** Constructor */
+    public ArtifactType() {}
+
     /** AAB - Android App Bundle (default). */
     public static final String AAB = "aab";
     /** APK - Android Package Kit (legacy). */

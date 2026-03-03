@@ -15,12 +15,21 @@ public class AppConfigInfo {
     @SerializedName("app_info")
     private AppInfoSimple appInfo;
 
-    /** @return the appId. */
+    /** Constructor */
+    public AppConfigInfo() {}
+
+    /**
+     * The appId.
+     * @return the appId.
+     */
     public Long getAppId() {
         return this.appInfo.getAppId();
     }
 
-    /** @return the packageName. */
+    /**
+     * The packageName.
+     * @return the packageName.
+     */
     public String getPackageName() {
         return this.packageName;
     }

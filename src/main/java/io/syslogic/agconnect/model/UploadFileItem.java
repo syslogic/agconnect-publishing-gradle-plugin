@@ -22,27 +22,45 @@ public class UploadFileItem {
     @SerializedName("size")
     private int size;
 
-    /** @return destination URL. */
+    /** Constructor */
+    public UploadFileItem() {}
+
+    /**
+     * Destination URL
+     * @return destination URL.
+     */
     public String getDestinationUrl() {
         return this.destinationUrl;
     }
 
-    /** @return disposable URL. */
+    /**
+     * Disposable URL
+     * @return disposable URL.
+     */
     public String getDisposableUrl() {
         return this.disposableUrl;
     }
 
-    /** @return purified for file. */
+    /**
+     * PurifiedForFile
+     * @return purified for file.
+     */
     public boolean getPurifiedForFile() {
         return this.purifiedForFile;
     }
 
-    /** @return size numeric. */
+    /**
+     * Item size numeric
+     * @return size numeric.
+     */
     public int getSize() {
         return this.size;
     }
 
-    /** @return size formatted. */
+    /**
+     * Item size formatted
+     * @return size formatted.
+     */
     public String getSizeFormatted() {
         int u = 0;
         for (; this.size > 1024*1024; this.size >>= 10) {u++;}

@@ -16,8 +16,12 @@ public class AppInfoLanguage {
     @SerializedName("appName")
     private String appName;
 
+    @SuppressWarnings("unused")
     @SerializedName("deviceMaterials")
     private List<AppInfoDeviceMaterial> deviceMaterials;
+
+    /** Constructor */
+    public AppInfoLanguage() {}
 
     @Override
     public String toString() {

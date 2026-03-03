@@ -14,6 +14,9 @@ public class PublishingExtensionImpl implements PublishingExtension {
 
     private Boolean verbose = false;
 
+    /** Constructor */
+    public PublishingExtensionImpl() {}
+
     /**
      * Define the path to the API client configuration file.
      * <code>agcPublishing {configFile = ""}</code>

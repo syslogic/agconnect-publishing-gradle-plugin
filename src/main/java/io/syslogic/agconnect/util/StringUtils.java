@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class StringUtils {
 
+    /** Constructor */
+    public StringUtils() {}
+
     /**
      * It capitalizes a given string.
      * @param string the input string.

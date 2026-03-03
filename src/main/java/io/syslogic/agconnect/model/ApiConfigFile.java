@@ -34,31 +34,61 @@ public class ApiConfigFile {
     @SerializedName("region")
     private String region;
 
-    /** @return the configVersion. */
+    /** Constructor */
+    public ApiConfigFile() {}
+
+    /**
+     * The configVersion.
+     * @return the configVersion.
+     */
     public String getConfigVersion() {
         return this.configVersion;
     }
-    /** @return the role. */
+
+    /**
+     * The role.
+     * @return the role.
+     */
     public String getRole() {
         return this.role;
     }
-    /** @return the developerId. */
+
+    /**
+     * The developerId.
+     * @return the developerId.
+     */
     public String getDeveloperId() {
         return this.developerId;
     }
-    /** @return the projectId. */
+
+    /**
+     * The projectId.
+     * @return the projectId.
+     */
     public String getProjectId() {
         return this.projectId;
     }
-    /** @return the clientId. */
+
+    /**
+     * The clientId.
+     * @return the clientId.
+     */
     public String getClientId() {
         return this.clientId;
     }
-    /** @return the clientSecret. */
+
+    /**
+     * The clientSecret.
+     * @return the clientSecret.
+     */
     public String getClientSecret() {
         return this.clientSecret;
     }
-    /** @return the region. */
+
+    /**
+     * The region.
+     * @return the region.
+     */
     public String getRegion() {
         return this.region;
     }

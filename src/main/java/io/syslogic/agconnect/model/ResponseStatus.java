@@ -14,12 +14,21 @@ public class ResponseStatus {
     @SerializedName(value="errorDesc", alternate={"msg"})
     private String message;
 
-    /** @return status code. */
+    /** Constructor */
+    public ResponseStatus() {}
+
+    /**
+     * Status Code
+     * @return status code.
+     */
     public int getCode() {
         return this.code;
     }
 
-    /** @return status message. */
+    /**
+     * Status Message
+     * @return status message.
+     */
     public String getMessage() {
         return this.message;
     }

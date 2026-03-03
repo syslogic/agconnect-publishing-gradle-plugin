@@ -18,14 +18,14 @@ public class AuditInfo {
      * This parameter is returned only for apps released in the Chinese mainland.
      */
     @SerializedName("copyRightAuditResult")
-    private Integer copyRightAuditResult;
+    private Integer copyrightAuditResult;
 
     /**
      * Copyright review comments.
      * This parameter is returned only for apps released in the Chinese mainland.
      */
     @SerializedName("copyRightAuditOpinion")
-    private String copyRightAuditOpinion;
+    private String copyrightAuditOpinion;
 
     /**
      * Publication approval number review result.
@@ -33,14 +33,14 @@ public class AuditInfo {
      * This parameter is returned only for apps released in the Chinese mainland.
      */
     @SerializedName("copyRightCodeAuditResult")
-    private Integer copyRightCodeAuditResult;
+    private Integer copyrightCodeAuditResult;
 
     /**
      * Publication approval number review comments.
      * This parameter is returned only for apps released in the Chinese mainland.
      */
     @SerializedName("copyRightCodeAuditOpinion")
-    private String copyRightCodeAuditOpinion;
+    private String copyrightCodeAuditOpinion;
 
     /**
      * ICP information review result.
@@ -57,43 +57,67 @@ public class AuditInfo {
     @SerializedName("recordAuditOpinion")
     private String recordAuditOpinion;
 
-    /** @return audit opinion. */
+    /** Constructor */
+    public AuditInfo() {}
+
+    /**
+     * AuditOpinion
+     * @return audit opinion.
+     */
     @SuppressWarnings({"unused"})
     public String getAuditOpinion() {
         return this.auditOpinion;
     }
 
-    /** @return copyright audit result. */
+    /**
+     * CopyrightAuditResult
+     * @return copyright audit result.
+     */
     @SuppressWarnings({"unused"})
-    public Integer getCopyRightAuditResult() {
-        return this.copyRightAuditResult;
+    public Integer getCopyrightAuditResult() {
+        return this.copyrightAuditResult;
     }
 
-    /** @return copyright audit opinion. */
+    /**
+     * CopyrightAuditOpinion
+     * @return copyright audit opinion.
+     */
     @SuppressWarnings({"unused"})
-    public String getCopyRightAuditOpinion() {
-        return this.copyRightAuditOpinion;
+    public String getCopyrightAuditOpinion() {
+        return this.copyrightAuditOpinion;
     }
 
-    /** @return copyright code-audit result. */
+    /**
+     * CopyrightCodeAuditResult
+     * @return copyright code-audit result.
+     */
     @SuppressWarnings({"unused"})
-    public Integer getCopyRightCodeAuditResult() {
-        return this.copyRightCodeAuditResult;
+    public Integer getCopyrightCodeAuditResult() {
+        return this.copyrightCodeAuditResult;
     }
 
-    /** @return copyright code-audit opinion. */
+    /**
+     * CopyrightCodeAuditOpinion
+     * @return copyright code-audit opinion.
+     */
     @SuppressWarnings({"unused"})
-    public String getCopyRightCodeAuditOpinion() {
-        return this.copyRightCodeAuditOpinion;
+    public String getCopyrightCodeAuditOpinion() {
+        return this.copyrightCodeAuditOpinion;
     }
 
-    /** @return record audit result. */
+    /**
+     * RecordAuditResult
+     * @return record audit result.
+     */
     @SuppressWarnings({"unused"})
     public Integer getRecordAuditResult() {
         return this.recordAuditResult;
     }
 
-    /** @return record audit opinion. */
+    /**
+     * RecordAuditOpinion
+     * @return record audit opinion.
+     */
     @SuppressWarnings({"unused"})
     public String getRecordAuditOpinion() {
         return this.recordAuditOpinion;
@@ -103,10 +127,10 @@ public class AuditInfo {
     public String toString() {
         return "AuditInfo {"+
             "auditOpinion: \"" + this.auditOpinion + "\", " +
-            "copyRightAuditResult: \"" + this.copyRightAuditResult + "\", " +
-            "copyRightAuditOpinion: \"" + this.copyRightAuditOpinion + "\", " +
-            "copyRightCodeAuditResult: \"" + this.copyRightCodeAuditResult + "\", " +
-            "copyRightCodeAuditOpinion: \"" + this.copyRightCodeAuditOpinion + "\", " +
+            "copyrightAuditResult: \"" + this.copyrightAuditResult + "\", " +
+            "copyrightAuditOpinion: \"" + this.copyrightAuditOpinion + "\", " +
+            "copyrightCodeAuditResult: \"" + this.copyrightCodeAuditResult + "\", " +
+            "copyrightCodeAuditOpinion: \"" + this.copyrightCodeAuditOpinion + "\", " +
             "recordAuditResult: \"" + this.recordAuditResult + "\", " +
             "recordAuditOpinion: \"" + this.recordAuditOpinion + "\" " +
         "}";

@@ -14,10 +14,19 @@ public class UploadResponseWrap {
     @SerializedName("result")
     private UploadResponse result;
 
-    /** @return the result code. */
+    /** Constructor */
+    public UploadResponseWrap() {}
+
+    /**
+     * Upload Result Code
+     * @return the result code.
+     */
     public int getResultCode() {return this.resultCode;}
 
-    /** @return the upload response result. */
+    /**
+     * Upload Response Result
+     * @return the upload response result.
+     */
     public UploadResponse getResult() {
         return this.result;
     }

@@ -11,7 +11,13 @@ public class AppInfoDeviceType {
     @SerializedName("deviceType")
     private int deviceType;
 
-    /** @return the deviceType. */
+    /** Constructor */
+    public AppInfoDeviceType() {}
+
+    /**
+     * DeviceType
+     * @return the deviceType.
+     */
     public int getDeviceType() {
         return this.deviceType;
     }

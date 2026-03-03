@@ -20,22 +20,37 @@ public class UploadUrlResponse {
     @SerializedName("authCode")
     private String authCode;
 
-    /** @return the response status. */
+    /** Constructor */
+    public UploadUrlResponse() {}
+
+    /**
+     * ResponseStatus
+     * @return the response status.
+     */
     public ResponseStatus getStatus() {
         return this.status;
     }
 
-    /** @return the upload URL. */
+    /**
+     * UploadUrl
+     * @return the upload URL.
+     */
     public String getUploadUrl() {
         return this.uploadUrl;
     }
 
-    /** @return the chunked upload URL. */
+    /**
+     * ChunkUploadUrl
+     * @return the chunked upload URL.
+     */
     public String getChunkUploadUrl() {
         return this.chunkUploadUrl;
     }
 
-    /** @return the upload auth-code. */
+    /**
+     * AuthCode
+     * @return the upload auth-code.
+     */
     public String getAuthCode() {
         return this.authCode;
     }

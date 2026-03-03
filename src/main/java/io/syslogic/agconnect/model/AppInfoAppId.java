@@ -14,6 +14,9 @@ public class AppInfoAppId {
     @SerializedName("value")
     private int value;
 
+    /** Constructor */
+    public AppInfoAppId() {}
+
     @Override
     public String toString() {
         return "AppInfoAppId {"+

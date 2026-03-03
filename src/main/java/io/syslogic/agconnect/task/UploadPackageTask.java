@@ -53,19 +53,31 @@ import io.syslogic.agconnect.model.UploadUrlResponse;
  */
 abstract public class UploadPackageTask extends BaseTask {
 
-    /** @return ReleaseType */
+    /**
+     * Task input: ReleaseType
+     * @return ReleaseType
+     */
     @Input
     abstract public Property<Integer> getReleaseType();
 
-    /** @return ArtifactType */
+    /**
+     * Task input: ArtifactType
+     * @return ArtifactType
+     */
     @Input
     abstract public Property<String> getArtifactType();
 
-    /** @return ProductFlavor */
+    /**
+     * Task input: ProductFlavor
+     * @return ProductFlavor
+     */
     @Input
     abstract public Property<String> getProductFlavor();
 
-    /** @return BuildVariant */
+    /**
+     * Task input: BuildVariant
+     * @return BuildVariant
+     */
     @Input
     abstract public Property<String> getBuildVariant();
 

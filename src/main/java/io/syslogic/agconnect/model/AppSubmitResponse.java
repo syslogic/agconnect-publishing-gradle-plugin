@@ -11,7 +11,13 @@ public class AppSubmitResponse {
     @SerializedName("ret")
     private ResponseStatus ret;
 
-    /** @return response status. */
+    /** Constructor */
+    public AppSubmitResponse() {}
+
+    /**
+     * ResponseStatus
+     * @return response status.
+     */
     public ResponseStatus getRet() {
         return this.ret;
     }

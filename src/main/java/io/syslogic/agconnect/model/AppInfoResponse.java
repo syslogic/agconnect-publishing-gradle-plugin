@@ -14,13 +14,22 @@ public class AppInfoResponse {
     @SerializedName("appInfo")
     private AppInfo appInfo;
 
-    /** @return response status. */
+    /** Constructor */
+    public AppInfoResponse() {}
+
+    /**
+     * ResponseStatus
+     * @return response status.
+     */
     @SuppressWarnings({"unused"})
     public ResponseStatus getRet() {
         return this.ret;
     }
 
-    /** @return app information. */
+    /**
+     * AppInfo
+     * @return app information.
+     */
     public AppInfo getAppInfo() {
         return this.appInfo;
     }

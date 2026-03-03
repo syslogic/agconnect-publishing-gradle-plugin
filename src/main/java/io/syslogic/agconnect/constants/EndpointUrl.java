@@ -6,6 +6,9 @@ package io.syslogic.agconnect.constants;
  */
 public class EndpointUrl {
 
+    /** Constructor */
+    public EndpointUrl() {}
+
     /** Endpoint URL */
     public static final String OAUTH2_TOKEN            = "https://connect-api.cloud.huawei.com/api/oauth2/v1/token";
     /** Endpoint URL */

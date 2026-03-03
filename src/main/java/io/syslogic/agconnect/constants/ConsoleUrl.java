@@ -6,6 +6,9 @@ package io.syslogic.agconnect.constants;
  */
 public class ConsoleUrl {
 
+    /** Constructor */
+    public ConsoleUrl() {}
+
     /** Link to AppGallery Connect Console */
     public static final String PACKAGE_INFO           = "https://developer.huawei.com/consumer/en/service/josp/agc/index.html#/myApp/{appId}/v{packageId}";
 

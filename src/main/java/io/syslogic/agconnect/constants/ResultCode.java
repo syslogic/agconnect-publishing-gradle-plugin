@@ -8,6 +8,9 @@ package io.syslogic.agconnect.constants;
 @SuppressWarnings("unused")
 public class ResultCode {
 
+    /** Constructor */
+    public ResultCode() {}
+
     /** API result code. */
     public static final int SUCCESS                  = 0;
 

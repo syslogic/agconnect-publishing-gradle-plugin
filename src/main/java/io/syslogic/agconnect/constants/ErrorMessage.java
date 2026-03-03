@@ -6,6 +6,9 @@ package io.syslogic.agconnect.constants;
  */
 public class ErrorMessage {
 
+    /** Constructor */
+    public ErrorMessage() {}
+
     /** Error Message Payload. */
     public static final String APP_SIGNING_NOT_ENABLED = "[cds]add apk failed, additional msg is [app bundle must do app signature.]";
 

@@ -23,6 +23,9 @@ public class AppInfoLocalization {
     @SerializedName("newFeatures")
     private String newFeatures;
 
+    /** Constructor */
+    public AppInfoLocalization() {}
+
     @Override
     public String toString() {
         return "AppInfoLocalization {"+

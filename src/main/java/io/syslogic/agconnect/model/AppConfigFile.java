@@ -17,13 +17,22 @@ public class AppConfigFile {
     @SerializedName("appInfos")
     private ArrayList<AppConfigInfo> appInfos;
 
-    /** @return the configVersion. */
+    /** Constructor */
+    public AppConfigFile() {}
+
+    /**
+     * The configVersion.
+     * @return the configVersion.
+     */
     @SuppressWarnings({"unused"})
     public String getConfigVersion() {
         return this.configVersion;
     }
 
-    /** @return the AppConfigInfo. */
+    /**
+     * The AppConfigInfo.
+     * @return the AppConfigInfo.
+     */
     public ArrayList<AppConfigInfo> getAppInfos() {
         return this.appInfos;
     }

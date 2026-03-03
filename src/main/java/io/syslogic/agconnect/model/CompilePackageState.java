@@ -10,11 +10,14 @@ import com.google.gson.annotations.SerializedName;
 @SuppressWarnings("unused")
 public class CompilePackageState {
 
-     @SerializedName("pkgId")
+    @SerializedName("pkgId")
     private String packageId;
 
     @SerializedName("successStatus")
     private int status;
+
+    /** Constructor */
+    public CompilePackageState() {}
 
     /**
      * App package ID.

@@ -30,9 +30,11 @@ public class AppInfo {
     @SerializedName("updateTime")
     private String updateTime;
 
+    @SuppressWarnings("unused")
     @SerializedName("deviceTypes")
     private List<AppInfoDeviceType> deviceTypes;
 
+    @SuppressWarnings("unused")
     @SerializedName("languages")
     private List<AppInfoLanguage> languages;
 
@@ -42,7 +44,13 @@ public class AppInfo {
     // for easier identification.
     private String packageName;
 
-    /** @param value the packageName. */
+    /** Constructor */
+    public AppInfo() {}
+
+    /**
+     * Setter for the package name.
+     * @param value the packageName.
+     */
     public void setPackageName(String value) {
         this.packageName = value;
     }

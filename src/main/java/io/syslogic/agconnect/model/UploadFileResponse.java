@@ -19,12 +19,21 @@ public class UploadFileResponse {
     @SerializedName("fileInfoList")
     private List<UploadFileItem> fileList;
 
-    /** @return the result-code. */
+    /** Constructor */
+    public UploadFileResponse() {}
+
+    /**
+     * Result Code
+     * @return the result-code.
+     */
     public int getResultCode() {
         return this.resultCode;
     }
 
-    /** @return a list of upload-file items. */
+    /**
+     * List of {@link UploadFileItem}
+     * @return a list of upload-file items.
+     */
     public List<UploadFileItem> getFileList() {
         return this.fileList;
     }

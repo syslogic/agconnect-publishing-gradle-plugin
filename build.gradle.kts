@@ -1,4 +1,4 @@
-// :buildSrc
+// :build-logic
 plugins {
     alias(buildSrc.plugins.maven.publish)
     alias(buildSrc.plugins.gradle.plugin)
@@ -58,15 +58,29 @@ val implCls: Configuration by configurations.creating {
 }
 
 val javadocs by tasks.registering(Javadoc::class) {
+    group = "documentation"
+    destinationDir = project.file("build/outputs/javadoc")
     title = "$pluginName $pluginVersion API"
-    classpath += implCls.asFileTree.filter {it.extension == "jar"}
-    destinationDir = rootProject.file("build/javadoc")
+    classpath += implCls.asFileTree.filter {it.extension == "jar" }
     source = sourceSets.main.get().allJava
-    // options.links = "https://docs.oracle.com/en/java/javase/17/docs/api/"
-    // options.linkSource = true
-    // options.author = true
     isFailOnError = false
+    options {
+        this as StandardJavadocDocletOptions
+        links = mutableListOf("https://docs.oracle.com/en/java/javase/17/docs/api/")
+        isLinkSource = true
+        isAuthor = true
+    }
 }
+
+/*
+tasks.withType<Javadoc> {
+    options {
+        this as StandardJavadocDocletOptions
+        addBooleanOption("Xdoclint:all").value = true
+        addBooleanOption("Xdoclint:-missing").value = true
+    }
+}
+*/
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")

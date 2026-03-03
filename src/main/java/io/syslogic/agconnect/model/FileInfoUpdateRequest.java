@@ -32,7 +32,10 @@ public class FileInfoUpdateRequest {
         this.fileInfo = new FileUploadInfo(fileName, destFileUrl);
     }
 
-    /** @return JSON string. */
+    /**
+     * Return as JSON.
+     * @return JSON string.
+     */
     public String toJson() {
         return new Gson().toJson(this);
     }
