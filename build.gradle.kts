@@ -72,16 +72,6 @@ val javadocs by tasks.registering(Javadoc::class) {
     }
 }
 
-/*
-tasks.withType<Javadoc> {
-    options {
-        this as StandardJavadocDocletOptions
-        addBooleanOption("Xdoclint:all").value = true
-        addBooleanOption("Xdoclint:-missing").value = true
-    }
-}
-*/
-
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
     from(rootProject.file("build/javadoc"))

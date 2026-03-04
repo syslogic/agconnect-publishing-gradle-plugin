@@ -11,7 +11,7 @@ github_handle     = "syslogic"
 
 plugin_version    = "1.4.4"
 android_gradle    = "9.1.0"
-gradle_publish    = "2.0.0"
+gradle_publish    = "2.1.0"
 annotations       = "26.1.0"
 httpcore          = "4.4.16"
 httpclient        = "4.5.14"
